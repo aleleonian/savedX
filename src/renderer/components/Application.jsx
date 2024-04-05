@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { Notification } from './Notification';
 
 export const Application = () => {
-    const [notification, setNotification] = useState(null);
+    const [notificationMessage, setNotificationMessage] = useState(null);
+    const [notificationClass, setNotificationClass] = useState(null);
 
     useEffect(() => {
         // Listen for messages from the preload script
         const eventListener = event => {
             if (event.detail) {
-                setNotification(event.detail);
-            }
+                const data = event.detail.split("--");
+                setNotificationClass(data[0]);
+                setNotificationMessage(data[1]);
+                setTimeout(() => {
+                    setNotificationMessage(null);
+                }, 2000);            }
         };
 
         window.addEventListener('NOTIFICATION', eventListener);
@@ -28,7 +34,11 @@ export const Application = () => {
         <section>
             <h1>Hi, bros!</h1>
             <button onClick={logIntoX}>Log into X</button>
-            {notification && <p>{notification}</p>}
+            {notificationMessage &&
+                <Notification
+                    notificationClass={notificationClass}
+                    notificationMessage={notificationMessage}
+                />}
         </section>
     );
 };
