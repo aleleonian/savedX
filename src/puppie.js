@@ -21,7 +21,10 @@ if (process.env.EXECUTABLE_PATH) {
     pupConfig.executablePath = process.env.EXECUTABLE_PATH;
 }
 
-export const goFetch = async () => {
+export const goFetch = async (username, password) => {
+
+    console.log("username, password:", username, password);
+    
     let browser = await puppeteer.launch(pupConfig);
     let responseObject = {};
     if (!browser) {

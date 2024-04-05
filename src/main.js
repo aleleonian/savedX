@@ -1,12 +1,9 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('node:path');
-const fs = require('fs');
 import { goFetch } from "./puppie";
+import * as dbTools from "./util/db";
 
 let mainWindow;
-let db;
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -36,10 +33,11 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
-  db = init();
-  if (!db) {
+  const success = await init();
+  console.log("init success->", success)
+  if (!success) {
     mainWindow.webContents.send('NOTIFICATION', 'error--db file does not exist');
   }
   else {
@@ -66,20 +64,13 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.on('log-into-x', async (event, data) => {
-  console.log("ready to log into X!");
-  let result = await goFetch();
+  const credentials = await dbTools.getXCredentials();
+  console.log("credentials->", credentials)
+  let result = await goFetch(credentials.Username, credentials.Password);
 })
 
-const init = () => {
-  try {
-    // Check if the file exists
-    const dbPath = path.resolve(path.resolve(app.getAppPath(), 'src', 'data', 'savedx.db'));
-    fs.accessSync(dbPath, fs.constants.F_OK);
-    return new sqlite3.Database(dbPath);
-    // File exists, you can open it here
-  } catch (err) {
-    // File doesn't exist, handle the error
-    console.error('File does not exist:', err);
-  }
-  return db;
+const init = async () => {
+  // Check if the file exists
+  const dbPath = path.resolve(path.resolve(app.getAppPath(), 'src', 'data', 'savedx.db'));
+  return await dbTools.openDb(dbPath);
 }
