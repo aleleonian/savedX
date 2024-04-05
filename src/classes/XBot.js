@@ -465,17 +465,22 @@ export class XBot {
 
     storeBookmarks = async () => {
 
-        const bookmarkDivs = await page.$$('[data-testid="cellInnerDiv"]');
+        const bookmarkDivs = await this.page.$$('[data-testid="cellInnerDiv"]');
 
-        console.log("bookmarkDivs->", bookmarkDivs);
+        const htmlContentDivs = [];
 
-        let processedBookmarks = bookmarkDivs.map(div => {
+        for (const divHandle of bookmarkDivs) {
+            // Get the HTML content of the div
+            const htmlContent = await divHandle.evaluate(div => div.outerHTML);
+            htmlContentDivs.push(htmlContent)
+        }
+
+        let processedBookmarks = htmlContentDivs.map(div => {
             const divItem = {};
-            divItem.html = div.outerHTML;
-            divItem.hash = this.createHash(div.outerHTML);
+            divItem.html = div;
+            divItem.hash = this.createHash(div);
             return divItem;
         })
-        console.log("processedBookmarks->", processedBookmarks);
 
         for (const newBookmark of processedBookmarks) {
             const hashExists = this.bookmarks.some(bookmark => bookmark.hash === newBookmark.hash);
@@ -491,15 +496,39 @@ export class XBot {
 
         console.log("bookmarks->", bookmarks);
 
-        while (!(await this.isScrolledToBottom())) {
+        let previousHeight = 0;
+
+        while (true) {
+            console.log("Gonna scroll...");
             await this.page.evaluate(() => {
-                window.scrollBy(0, 100);
+                window.scrollBy(0, 300);
             });
+
             // Wait for a while after each scroll to give time for content loading
-            await this.page.waitForTimeout(1000); // Adjust the wait time as needed
+            await this.wait(3000); // Adjust the wait time as needed
 
             await this.storeBookmarks();
+
+            const currentHeight = await this.page.evaluate(() => document.body.scrollHeight);
+
+            console.log("currentHeight:", currentHeight);
+            console.log("previousHeight:", previousHeight);
+
+            if (currentHeight === previousHeight) {
+                console.log("currentHeight === previousHeight. Not Gonna scrol anymore...");
+                // No new content loaded, stop scrolling
+                break;
+            }
+            previousHeight = currentHeight;
+
+            if (await this.isScrolledToBottom()) {
+                // Reached the bottom
+                console.log('Scrolled to the bottom.');
+                break;
+            }
         }
+
+        console.log("returning!");
 
         return this.bookmarks;
     }
@@ -511,7 +540,6 @@ export class XBot {
             const clientHeight = document.documentElement.clientHeight;
             return Math.ceil(scrollTop + clientHeight) >= scrollHeight;
         });
-        console.log("isScrolledToBottom: result->", result)
         return result;
     };
     // monitorMutations = async () => {

@@ -74,7 +74,7 @@ ipcMain.on('log-into-x', async (event, data) => {
     await xBot.wait(8000);
     await xBot.goto('https://twitter.com/i/bookmarks');
     await xBot.wait(8000);
-    const bookmarks = await xBot.storeBookmarks();
+    const bookmarks = await xBot.scrapeBookmarks();
     console.log("bookmarks->", bookmarks);
   }
 })
