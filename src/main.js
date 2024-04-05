@@ -1,6 +1,11 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('node:path');
+const fs = require('fs');
 import { goFetch } from "./puppie";
+
+let mainWindow;
+let db;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -9,7 +14,7 @@ if (require('electron-squirrel-startup')) {
 
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -33,7 +38,13 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow();
-
+  db = init();
+  if (!db) {
+    mainWindow.webContents.send('NOTIFICATION', 'error--db file does not exist');
+  }
+  else {
+    mainWindow.webContents.send('NOTIFICATION', 'success--db file DOES exist!');
+  }
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
@@ -58,3 +69,17 @@ ipcMain.on('log-into-x', async (event, data) => {
   console.log("ready to log into X!");
   let result = await goFetch();
 })
+
+const init = () => {
+  try {
+    // Check if the file exists
+    const dbPath = path.resolve(path.resolve(app.getAppPath(), 'src', 'data', 'savedx.db'));
+    fs.accessSync(dbPath, fs.constants.F_OK);
+    return new sqlite3.Database(dbPath);
+    // File exists, you can open it here
+  } catch (err) {
+    // File doesn't exist, handle the error
+    console.error('File does not exist:', err);
+  }
+  return db;
+}
