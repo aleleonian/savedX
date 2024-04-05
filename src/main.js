@@ -1,7 +1,8 @@
+require('dotenv').config();
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
-import { goFetch } from "./puppie";
 import * as dbTools from "./util/db";
+import { XBot } from "./classes/XBot";
 
 let mainWindow;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -64,9 +65,14 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.on('log-into-x', async (event, data) => {
+  console.log("TWITTER_PROFILE_URL:", process.env.TWITTER_PROFILE_URL);
   const credentials = await dbTools.getXCredentials();
-  console.log("credentials->", credentials)
-  let result = await goFetch(credentials.Username, credentials.Password);
+  const xBot = new XBot();
+  let result = await xBot.init();
+  if (result.success) {
+    result = await xBot.loginToX();
+    console.log("log into x result = ", JSON.stringify(result));
+  }
 })
 
 const init = async () => {
