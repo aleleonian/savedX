@@ -37,7 +37,6 @@ const createWindow = () => {
 app.whenReady().then(async () => {
   createWindow();
   const success = await init();
-  console.log("init success->", success)
   if (!success) {
     mainWindow.webContents.send('NOTIFICATION', 'error--db file does not exist');
   }
@@ -72,6 +71,11 @@ ipcMain.on('log-into-x', async (event, data) => {
   if (result.success) {
     result = await xBot.loginToX();
     console.log("log into x result = ", JSON.stringify(result));
+    await xBot.wait(8000);
+    await xBot.goto('https://twitter.com/i/bookmarks');
+    await xBot.wait(8000);
+    const bookmarks = await xBot.storeBookmarks();
+    console.log("bookmarks->", bookmarks);
   }
 })
 

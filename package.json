@@ -31,6 +31,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "electron-squirrel-startup": "^1.0.0",
     "puppeteer": "^22.6.2",

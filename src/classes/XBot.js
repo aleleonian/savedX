@@ -1,10 +1,8 @@
 const puppeteer = require('puppeteer-extra');
 const pluginStealth = require('puppeteer-extra-plugin-stealth');
-// const dataDirPlugin = require("puppeteer-extra-plugin-user-data-dir");
 puppeteer.use(pluginStealth());
 const path = require("path");
-// const {executablePath} = require('puppeteer')
-// puppeteer.use(dataDirPlugin('/Users/aleleonian/Library/Application Support/Google/Chrome/Default'));
+const crypto = require('crypto');
 
 // const puppeteerClassic = require("puppeteer");
 // const iPhone = KnownDevices["iPhone X"];
@@ -41,8 +39,15 @@ export class XBot {
         this.isBusy = false;
         this.queue = [];
         this.queueTimer = false;
+        this.monitorFlag = true;
+        this.bookmarks = [];
     }
 
+    createHash(inputString) {
+        const hash = crypto.createHash('md5');
+        hash.update(inputString);
+        return hash.digest('hex');
+    }
     setBusy(state) {
         this.isBusy = state;
         return true;
@@ -191,7 +196,7 @@ export class XBot {
             console.log("tweet() found and clicked TWITTER_POST_BUTTON");
 
             //TODO: scan the page for "Whoops! you posted that already"
-            
+
             this.isBusy = false;
             this.tweets[userId] = text;
             return this.respond(true, "xBot tweeted!");
@@ -426,5 +431,130 @@ export class XBot {
     wait(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
+
+    monitorForElements = async () => {
+        let previousElementCount = 0;
+
+        while (this.monitorFlag) {
+            try {
+                // Count the number of elements matching the selector
+                const currentElementCount = await this.page.$$eval('div[data-testid="cellInnerDiv"]', elements => elements.length);
+
+                // Check if new elements have appeared
+                if (currentElementCount > previousElementCount) {
+                    // Perform actions on the new elements
+                    console.log(`${currentElementCount - previousElementCount} new div(s) with data-testid="cellInnerDiv" appeared in the DOM. Gonna store them.`);
+
+                    this.storeBookmarks();
+
+                    // Optionally, you can get references to the new elements and perform actions on them
+                    // const newElements = await this.page.$$(`div[data-testid="cellInnerDiv"]:nth-child(n + ${previousElementCount + 1})`);
+                    // console.log(newElements);
+
+                    // Update the previousElementCount
+                    previousElementCount = currentElementCount;
+                }
+
+                // Optionally, wait for a brief interval before checking again
+                await this.wait(1000);
+            } catch (error) {
+                console.log('Error occurred:', error);
+            }
+        }
+    };
+
+    storeBookmarks = async () => {
+
+        const bookmarkDivs = await page.$$('[data-testid="cellInnerDiv"]');
+
+        console.log("bookmarkDivs->", bookmarkDivs);
+
+        let processedBookmarks = bookmarkDivs.map(div => {
+            const divItem = {};
+            divItem.html = div.outerHTML;
+            divItem.hash = this.createHash(div.outerHTML);
+            return divItem;
+        })
+        console.log("processedBookmarks->", processedBookmarks);
+
+        for (const newBookmark of processedBookmarks) {
+            const hashExists = this.bookmarks.some(bookmark => bookmark.hash === newBookmark.hash);
+            if (!hashExists) {
+                this.bookmarks.push(newBookmark);
+            }
+        }
+        return this.bookmarks;
+    }
+    scrapeBookmarks = async () => {
+
+        const bookmarks = await this.storeBookmarks();
+
+        console.log("bookmarks->", bookmarks);
+
+        while (!(await this.isScrolledToBottom())) {
+            await this.page.evaluate(() => {
+                window.scrollBy(0, 100);
+            });
+            // Wait for a while after each scroll to give time for content loading
+            await this.page.waitForTimeout(1000); // Adjust the wait time as needed
+
+            await this.storeBookmarks();
+        }
+
+        return this.bookmarks;
+    }
+
+    isScrolledToBottom = async () => {
+        const result = await this.page.evaluate(() => {
+            const scrollTop = document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+            return Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+        });
+        console.log("isScrolledToBottom: result->", result)
+        return result;
+    };
+    // monitorMutations = async () => {
+    //     await this.page.exposeFunction('puppeteerLogMutation', () => {
+    //         console.log('Mutation Detected: A child node has been added or removed.');
+    //     });
+
+    //     await this.page.evaluate(() => {
+    //         const target = document.querySelector('body');
+    //         const observer = new MutationObserver(mutations => {
+    //             for (const mutation of mutations) {
+    //                 console.log("mutation->", mutation)
+    //                 if (mutation.type === 'childList') {
+    //                     puppeteerLogMutation();
+    //                 }
+    //             }
+    //         });
+    //         observer.observe(target, { childList: true });
+    //     });
+    // }
+
+    // monitorMutations2 = async () => {
+    //     this.page.on('response', async response => {
+    //         // Log the response URL and status
+    //         if (response.url().endsWith("client_event.json")) {
+    //             console.log(`Response received from ${response.url()} - Status: ${response.status()}`);
+
+    //             // Optionally, log the response headers
+    //             // console.log('Response Headers:', response.headers());
+
+    //             // Get the response body as text
+    //             const responseBody = await response.text();
+
+    //             // Log the response body
+    //             console.log('Response Body:', responseBody);
+
+    //             // If you want to continue with the default behavior,
+    //             // you can do so by calling response.continue()
+    //             // response.continue();
+    //             response.continue();
+    //         }
+    //     });
+    // }
+
 }
 module.exports = XBot;
