@@ -60,7 +60,7 @@ export class XBot {
         if (match && match.length > 1) {
             translateYValue = match[1];
         }
-        return translateYValue ? translateYValue : this.createHash(divHtmlContent); 
+        return translateYValue ? translateYValue : this.createHash(divHtmlContent);
     }
 
     createHash(inputString) {
@@ -282,6 +282,13 @@ export class XBot {
     }
 
     async logOut() {
+        await this.goto('https://www.x.com/logout');
+        let foundAndClicked = await this.findAndClick(process.env.TWITTER_LOGOUT_BUTTON);
+        if (!foundAndClicked) {
+            console.log("Cant't find TWITTER_LOGOUT_BUTTON");
+            return false;
+        }
+        console.log("Found TWITTER_LOGOUT_BUTTON");
         this.isLoggedIn = false;
         return true;
     }
@@ -470,8 +477,8 @@ export class XBot {
 
         let processedBookmarks = htmlContentDivs.map(div => {
             const divItem = {};
-            divItem.html = div;
-            divItem.id = this.getId(div);
+            divItem.htmlContent = div;
+            divItem.indexId = this.getId(div);
             return divItem;
         })
 

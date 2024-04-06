@@ -63,11 +63,16 @@ app.on('window-all-closed', () => {
   }
 });
 
+app.on('before-quit', () => {
+  // Your code to run before the app process exits
+  dbTools.closeDb();
+  // Save data, perform cleanup, etc.
+});
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.on('log-into-x', async (event, data) => {
   console.log("TWITTER_PROFILE_URL:", process.env.TWITTER_PROFILE_URL);
-  const credentials = await dbTools.getXCredentials();
+  // const credentials = await dbTools.getXCredentials();
   const xBot = new XBot();
   let result = await xBot.init();
   if (result.success) {
@@ -89,6 +94,8 @@ ipcMain.on('log-into-x', async (event, data) => {
         console.log('Array contents have been successfully dumped into the file:', filePath);
       }
     });
+    await dbTools.storeTweets(bookmarks);
+    await xBot.logOut();
     await xBot.closeBrowser();
   }
 })

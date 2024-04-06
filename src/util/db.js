@@ -1,8 +1,7 @@
 const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const { promisify } = require('util');
-
-var db;
+let db;
 
 export const openDb = (filePath) => {
     return new Promise((resolve, reject) => {
@@ -15,6 +14,7 @@ export const openDb = (filePath) => {
                 } else {
                     console.log('Database opened successfully');
                     db.allAsync = promisify(db.all).bind(db);
+                    db.dbRun = promisify(db.run).bind(db);
                     resolve(true); // Database opened successfully, resolve with true
                 }
             });
@@ -26,6 +26,26 @@ export const openDb = (filePath) => {
     });
 }
 
+export const storeTweets = async (tweetArray) => {
+    await db.dbRun(`CREATE TABLE IF NOT EXISTS tweets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        indexId TEXT,
+        htmlContent TEXT
+      )`);
+
+    await Promise.all(tweetArray.map(async (tweet) => {
+        await db.run(`INSERT INTO tweets (indexId, htmlContent) VALUES (?, ?)`, [tweet.indexId, tweet.htmlContent]);
+    }));
+
+    // tweetArray.forEach(tweet => {
+    //     db.run(`INSERT INTO tweets (indexId, htmlContent) VALUES (?, ?)`, [tweet.indexId, tweet.htmlContent], function (err) {
+    //         if (err) {
+    //             return console.error(err.message);
+    //         }
+    //         console.log(`A row has been inserted with id ${this.lastID}`);
+    //     });
+    // });
+}
 export const setDb = (dbConnection) => {
     db = dbConnection;
 }
