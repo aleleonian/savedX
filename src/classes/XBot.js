@@ -3,6 +3,7 @@ const pluginStealth = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(pluginStealth());
 const path = require("path");
 const crypto = require('crypto');
+const cheerio = require('cheerio');
 
 // const puppeteerClassic = require("puppeteer");
 // const iPhone = KnownDevices["iPhone X"];
@@ -41,6 +42,25 @@ export class XBot {
         this.queueTimer = false;
         this.monitorFlag = true;
         this.bookmarks = [];
+    }
+
+    getId(divHtmlContent) {
+        const $ = cheerio.load(divHtmlContent);
+
+        // Get the style attribute value of #mainDiv
+        const mainDivStyle = $('[data-testid="cellInnerDiv"]').attr('style');
+
+        const translateYRegex = /translateY\(([-\d.]+)px\)/;
+
+        // Match the translateY value using the regex
+        const match = mainDivStyle.match(translateYRegex);
+
+        // Extract the translateY value if a match is found
+        let translateYValue = null;
+        if (match && match.length > 1) {
+            translateYValue = match[1];
+        }
+        return translateYValue ? translateYValue : this.createHash(divHtmlContent); 
     }
 
     createHash(inputString) {
@@ -257,6 +277,10 @@ export class XBot {
     // try catch each and every interaction attempt
     // detect wheter i'm being requested my email
 
+    async closeBrowser() {
+        return await this.browser.close();
+    }
+
     async logOut() {
         this.isLoggedIn = false;
         return true;
@@ -432,36 +456,36 @@ export class XBot {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    monitorForElements = async () => {
-        let previousElementCount = 0;
+    // monitorForElements = async () => {
+    //     let previousElementCount = 0;
 
-        while (this.monitorFlag) {
-            try {
-                // Count the number of elements matching the selector
-                const currentElementCount = await this.page.$$eval('div[data-testid="cellInnerDiv"]', elements => elements.length);
+    //     while (this.monitorFlag) {
+    //         try {
+    //             // Count the number of elements matching the selector
+    //             const currentElementCount = await this.page.$$eval('div[data-testid="cellInnerDiv"]', elements => elements.length);
 
-                // Check if new elements have appeared
-                if (currentElementCount > previousElementCount) {
-                    // Perform actions on the new elements
-                    console.log(`${currentElementCount - previousElementCount} new div(s) with data-testid="cellInnerDiv" appeared in the DOM. Gonna store them.`);
+    //             // Check if new elements have appeared
+    //             if (currentElementCount > previousElementCount) {
+    //                 // Perform actions on the new elements
+    //                 console.log(`${currentElementCount - previousElementCount} new div(s) with data-testid="cellInnerDiv" appeared in the DOM. Gonna store them.`);
 
-                    this.storeBookmarks();
+    //                 this.storeBookmarks();
 
-                    // Optionally, you can get references to the new elements and perform actions on them
-                    // const newElements = await this.page.$$(`div[data-testid="cellInnerDiv"]:nth-child(n + ${previousElementCount + 1})`);
-                    // console.log(newElements);
+    //                 // Optionally, you can get references to the new elements and perform actions on them
+    //                 // const newElements = await this.page.$$(`div[data-testid="cellInnerDiv"]:nth-child(n + ${previousElementCount + 1})`);
+    //                 // console.log(newElements);
 
-                    // Update the previousElementCount
-                    previousElementCount = currentElementCount;
-                }
+    //                 // Update the previousElementCount
+    //                 previousElementCount = currentElementCount;
+    //             }
 
-                // Optionally, wait for a brief interval before checking again
-                await this.wait(1000);
-            } catch (error) {
-                console.log('Error occurred:', error);
-            }
-        }
-    };
+    //             // Optionally, wait for a brief interval before checking again
+    //             await this.wait(1000);
+    //         } catch (error) {
+    //             console.log('Error occurred:', error);
+    //         }
+    //     }
+    // };
 
     storeBookmarks = async () => {
 
@@ -478,13 +502,13 @@ export class XBot {
         let processedBookmarks = htmlContentDivs.map(div => {
             const divItem = {};
             divItem.html = div;
-            divItem.hash = this.createHash(div);
+            divItem.id = this.getId(div);
             return divItem;
         })
 
         for (const newBookmark of processedBookmarks) {
-            const hashExists = this.bookmarks.some(bookmark => bookmark.hash === newBookmark.hash);
-            if (!hashExists) {
+            const idExists = this.bookmarks.some(bookmark => bookmark.id === newBookmark.id);
+            if (!idExists) {
                 this.bookmarks.push(newBookmark);
             }
         }
@@ -492,45 +516,52 @@ export class XBot {
     }
     scrapeBookmarks = async () => {
 
-        const bookmarks = await this.storeBookmarks();
+        await this.storeBookmarks();
 
-        console.log("bookmarks->", bookmarks);
-
-        let previousHeight = 0;
+        let scrollPosition = 0;
 
         while (true) {
             console.log("Gonna scroll...");
             await this.page.evaluate(() => {
-                window.scrollBy(0, 300);
+                window.scrollBy(0, window.innerHeight);
             });
 
             // Wait for a while after each scroll to give time for content loading
-            await this.wait(3000); // Adjust the wait time as needed
+            await this.wait(3000);
 
             await this.storeBookmarks();
 
-            const currentHeight = await this.page.evaluate(() => document.body.scrollHeight);
+            console.log("bookmarks stored.");
 
-            console.log("currentHeight:", currentHeight);
-            console.log("previousHeight:", previousHeight);
+            // if (this.delimiterBookmarkFound('css-175oi2r r-4d76ec')) {
+            //     console.log("Delimiter bookmark found. Aborting.");
+            //     break;
+            // }
 
-            if (currentHeight === previousHeight) {
-                console.log("currentHeight === previousHeight. Not Gonna scrol anymore...");
-                // No new content loaded, stop scrolling
+            // Get the scroll position
+            const newScrollPosition = await this.page.evaluate(() => {
+                return window.scrollY;
+            });
+
+            if (newScrollPosition > scrollPosition) {
+                console.log("looping again.");
+                scrollPosition = newScrollPosition
+            }
+            else if (newScrollPosition <= scrollPosition) {
+                console.log("End of page reached. Aborting.");
                 break;
             }
-            previousHeight = currentHeight;
 
-            if (await this.isScrolledToBottom()) {
-                // Reached the bottom
-                console.log('Scrolled to the bottom.');
-                break;
-            }
         }
 
         console.log("returning!");
 
         return this.bookmarks;
+    }
+
+    delimiterBookmarkFound = (searchString) => {
+        const matchingObjects = this.bookmarks.filter(obj => obj.html.includes(searchString));
+        return matchingObjects.length > 0;
     }
 
     isScrolledToBottom = async () => {

@@ -1,8 +1,10 @@
 require('dotenv').config();
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
+import fs from 'fs';
 import * as dbTools from "./util/db";
 import { XBot } from "./classes/XBot";
+
 
 let mainWindow;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -75,7 +77,19 @@ ipcMain.on('log-into-x', async (event, data) => {
     await xBot.goto('https://twitter.com/i/bookmarks');
     await xBot.wait(8000);
     const bookmarks = await xBot.scrapeBookmarks();
-    console.log("bookmarks->", bookmarks);
+    const filePath = 'bookmarks.json';
+    // Convert the array to a string
+    const arrayJson = JSON.stringify(bookmarks, null, 2);
+
+    // Write the array contents to a file
+    fs.writeFile(filePath, arrayJson, (err) => {
+      if (err) {
+        console.error('Error writing file:', err);
+      } else {
+        console.log('Array contents have been successfully dumped into the file:', filePath);
+      }
+    });
+    await xBot.closeBrowser();
   }
 })
 
