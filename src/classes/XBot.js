@@ -456,37 +456,6 @@ export class XBot {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    // monitorForElements = async () => {
-    //     let previousElementCount = 0;
-
-    //     while (this.monitorFlag) {
-    //         try {
-    //             // Count the number of elements matching the selector
-    //             const currentElementCount = await this.page.$$eval('div[data-testid="cellInnerDiv"]', elements => elements.length);
-
-    //             // Check if new elements have appeared
-    //             if (currentElementCount > previousElementCount) {
-    //                 // Perform actions on the new elements
-    //                 console.log(`${currentElementCount - previousElementCount} new div(s) with data-testid="cellInnerDiv" appeared in the DOM. Gonna store them.`);
-
-    //                 this.storeBookmarks();
-
-    //                 // Optionally, you can get references to the new elements and perform actions on them
-    //                 // const newElements = await this.page.$$(`div[data-testid="cellInnerDiv"]:nth-child(n + ${previousElementCount + 1})`);
-    //                 // console.log(newElements);
-
-    //                 // Update the previousElementCount
-    //                 previousElementCount = currentElementCount;
-    //             }
-
-    //             // Optionally, wait for a brief interval before checking again
-    //             await this.wait(1000);
-    //         } catch (error) {
-    //             console.log('Error occurred:', error);
-    //         }
-    //     }
-    // };
-
     storeBookmarks = async () => {
 
         const bookmarkDivs = await this.page.$$('[data-testid="cellInnerDiv"]');
@@ -533,11 +502,6 @@ export class XBot {
 
             console.log("bookmarks stored.");
 
-            // if (this.delimiterBookmarkFound('css-175oi2r r-4d76ec')) {
-            //     console.log("Delimiter bookmark found. Aborting.");
-            //     break;
-            // }
-
             // Get the scroll position
             const newScrollPosition = await this.page.evaluate(() => {
                 return window.scrollY;
@@ -554,11 +518,10 @@ export class XBot {
 
         }
 
-        console.log("returning!");
-
         return this.bookmarks;
     }
 
+    //TODO deprecated
     delimiterBookmarkFound = (searchString) => {
         const matchingObjects = this.bookmarks.filter(obj => obj.html.includes(searchString));
         return matchingObjects.length > 0;
@@ -573,47 +536,6 @@ export class XBot {
         });
         return result;
     };
-    // monitorMutations = async () => {
-    //     await this.page.exposeFunction('puppeteerLogMutation', () => {
-    //         console.log('Mutation Detected: A child node has been added or removed.');
-    //     });
-
-    //     await this.page.evaluate(() => {
-    //         const target = document.querySelector('body');
-    //         const observer = new MutationObserver(mutations => {
-    //             for (const mutation of mutations) {
-    //                 console.log("mutation->", mutation)
-    //                 if (mutation.type === 'childList') {
-    //                     puppeteerLogMutation();
-    //                 }
-    //             }
-    //         });
-    //         observer.observe(target, { childList: true });
-    //     });
-    // }
-
-    // monitorMutations2 = async () => {
-    //     this.page.on('response', async response => {
-    //         // Log the response URL and status
-    //         if (response.url().endsWith("client_event.json")) {
-    //             console.log(`Response received from ${response.url()} - Status: ${response.status()}`);
-
-    //             // Optionally, log the response headers
-    //             // console.log('Response Headers:', response.headers());
-
-    //             // Get the response body as text
-    //             const responseBody = await response.text();
-
-    //             // Log the response body
-    //             console.log('Response Body:', responseBody);
-
-    //             // If you want to continue with the default behavior,
-    //             // you can do so by calling response.continue()
-    //             // response.continue();
-    //             response.continue();
-    //         }
-    //     });
-    // }
 
 }
 module.exports = XBot;
