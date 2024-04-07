@@ -110,8 +110,12 @@ ipcMain.on("log-into-x", async (event, data) => {
 
 const init = async () => {
   // Check if the file exists
-  const dbPath = path.resolve(
-    path.resolve(app.getAppPath(), "src", "data", "savedx.db")
-  );
+  console.log("process.env.NODE_ENV:", process.env.NODE_ENV);
+
+  let dbPath;
+  dbPath =
+    process.env.NODE_ENV === "development"
+      ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
+      : "./savedx.db";
   return await dbTools.openDb(dbPath);
 };
