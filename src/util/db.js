@@ -1,4 +1,3 @@
-const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const { promisify } = require('util');
 let db;
@@ -6,7 +5,6 @@ let db;
 export const openDb = (filePath) => {
     return new Promise((resolve, reject) => {
         try {
-            fs.accessSync(filePath, fs.constants.F_OK);
             db = new sqlite3.Database(filePath, (err) => {
                 if (err) {
                     console.error('Error opening database:', err);
