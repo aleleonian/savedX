@@ -117,5 +117,23 @@ const init = async () => {
     process.env.NODE_ENV === "development"
       ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
       : "./savedx.db";
-  return await dbTools.openDb(dbPath);
+      console.log("")
+  const openDbResult = await dbTools.openDb(dbPath);
+  if(openDbResult){
+
+  const tweets = await dbTools.readAllTweets();
+
+  console.log("tweets->", JSON.stringify(tweets));
+
+    if (!tweets.success) {
+      mainWindow.webContents.send(
+        "NOTIFICATION",
+        "error--could not read tweets from db"
+      );
+      return false;
+    } else {
+      mainWindow.webContents.send("CONTENT", tweets.rows);
+      return true;
+    }
+  }
 };
