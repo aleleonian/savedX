@@ -20,7 +20,6 @@ ipcRenderer.on("NOTIFICATION", (event, message) => {
   console.log("message from main:", message);
   if (domContentLoaded) dispatchNotification("NOTIFICATION", message);
   else {
-    console.log("Dom content not loaded yet!");
     setTimeout(() => {
       dispatchNotification("NOTIFICATION", message);
     }, 1500);
@@ -28,8 +27,6 @@ ipcRenderer.on("NOTIFICATION", (event, message) => {
 });
 
 ipcRenderer.on("CONTENT", async (event, message) => {
-  console.log("content message from main!");
-  console.log(message);
   if (domContentLoaded) dispatchNotification("CONTENT", message);
   while (!domContentLoaded) {
     await new Promise((resolve) => setTimeout(resolve, 1000));

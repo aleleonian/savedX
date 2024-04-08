@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Notification } from "./Notification";
-import DOMPurify from "dompurify";
+// import DOMPurify from "dompurify";
+import cheerio from "cheerio";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
@@ -40,13 +41,19 @@ export const Application = () => {
     return (
       <div>
         {tweetsArray.map((tweet, index) => {
+          const $ = cheerio.load(tweet.htmlContent);
+          // Select all <span> tags inside the <div> with data-testid="tweetText"
+          const spanText = $('div[data-testid="tweetText"] > span').text();
+          return <div key={index}>{spanText}</div>;
+        })}
+        {/* {tweetsArray.map((tweet, index) => {
           const sanitizedHtml = DOMPurify.sanitize(tweet.htmlContent);
           return <div key={index} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
-        })}
+        })} */}
       </div>
     );
   };
-  
+
   return (
     <section>
       <h1>Hi, bros!</h1>

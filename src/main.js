@@ -74,13 +74,11 @@ app.on("before-quit", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.on("log-into-x", async (event, data) => {
-  console.log("TWITTER_PROFILE_URL:", process.env.TWITTER_PROFILE_URL);
   // const credentials = await dbTools.getXCredentials();
   const xBot = new XBot();
   let result = await xBot.init();
   if (result.success) {
     result = await xBot.loginToX();
-    console.log("log into x result = ", JSON.stringify(result));
     if (result.success) {
       await xBot.wait(8000);
       await xBot.goto("https://twitter.com/i/bookmarks");
@@ -110,20 +108,14 @@ ipcMain.on("log-into-x", async (event, data) => {
 
 const init = async () => {
   // Check if the file exists
-  console.log("process.env.NODE_ENV:", process.env.NODE_ENV);
-
   let dbPath;
   dbPath =
     process.env.NODE_ENV === "development"
       ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
       : "./savedx.db";
-      console.log("")
   const openDbResult = await dbTools.openDb(dbPath);
-  if(openDbResult){
-
-  const tweets = await dbTools.readAllTweets();
-
-  console.log("tweets->", JSON.stringify(tweets));
+  if (openDbResult) {
+    const tweets = await dbTools.readAllTweets();
 
     if (!tweets.success) {
       mainWindow.webContents.send(
