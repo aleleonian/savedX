@@ -42,9 +42,15 @@ export const Application = () => {
       <div>
         {tweetsArray.map((tweet, index) => {
           const $ = cheerio.load(tweet.htmlContent);
-          // Select all <span> tags inside the <div> with data-testid="tweetText"
-          const spanText = $('div[data-testid="tweetText"] > span').text();
-          return <div key={index}>{spanText}</div>;
+          {/* const UserNameDiv = $('[data-testid="User-Name"]'); */}
+          const username = $('[data-testid="User-Name"] > div > div > a > div > div > span').text();
+          const tweetText = $('div[data-testid="tweetText"] > span').text();
+          return (
+            <div key={index}>
+              <div>{username}</div>
+              <div>{tweetText}</div>
+            </div>
+          );
         })}
         {/* {tweetsArray.map((tweet, index) => {
           const sanitizedHtml = DOMPurify.sanitize(tweet.htmlContent);
