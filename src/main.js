@@ -39,14 +39,13 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
-  const success = await init();
-  if (!success) {
+  const initStatus = await init();
+  console.log("initStatus->", initStatus);
+  if (!initStatus.success) {
     mainWindow.webContents.send(
       "NOTIFICATION",
-      "error--db file does not exist"
+      `error--${initStatus.errorMessage}`
     );
-  } else {
-    mainWindow.webContents.send("NOTIFICATION", "success--db file DOES exist!");
   }
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
@@ -84,25 +83,27 @@ ipcMain.on("log-into-x", async (event, data) => {
       await xBot.goto("https://twitter.com/i/bookmarks");
       await xBot.wait(8000);
       const bookmarks = await xBot.scrapeBookmarks();
-      const filePath = "bookmarks.json";
-      // Convert the array to a string
-      const arrayJson = JSON.stringify(bookmarks, null, 2);
+      // const filePath = "bookmarks.json";
+      // // Convert the array to a string
+      // const arrayJson = JSON.stringify(bookmarks, null, 2);
 
-      // Write the array contents to a file
-      fs.writeFile(filePath, arrayJson, (err) => {
-        if (err) {
-          console.error("Error writing file:", err);
-        } else {
-          console.log(
-            "Array contents have been successfully dumped into the file:",
-            filePath
-          );
-        }
-      });
+      // // Write the array contents to a file
+      // fs.writeFile(filePath, arrayJson, (err) => {
+      //   if (err) {
+      //     console.error("Error writing file:", err);
+      //   } else {
+      //     console.log(
+      //       "Array contents have been successfully dumped into the file:",
+      //       filePath
+      //     );
+      //   }
+      // });
       await dbTools.storeTweets(bookmarks);
       await xBot.logOut();
     }
     await xBot.closeBrowser();
+    const tweets = await dbTools.readAllTweets();
+    mainWindow.webContents.send("CONTENT", tweets.rows);
   }
 });
 
@@ -116,16 +117,17 @@ const init = async () => {
   const openDbResult = await dbTools.openDb(dbPath);
   if (openDbResult) {
     const tweets = await dbTools.readAllTweets();
-
+    console.log("tweets->", tweets)
     if (!tweets.success) {
-      mainWindow.webContents.send(
-        "NOTIFICATION",
-        "error--could not read tweets from db"
-      );
-      return false;
-    } else {
+      const resultOBj = {};
+      resultOBj.success = tweets.success;
+      if (tweets.errorMessage) resultOBj.errorMessage = tweets.errorMessage
+      return resultOBj;
+    }
+    else {
       mainWindow.webContents.send("CONTENT", tweets.rows);
-      return true;
+      return { success: true };
     }
   }
-};
+}
+

@@ -65,15 +65,15 @@ export const readAllTweets = async () => {
   const query = `SELECT * FROM TWEETS`;
   try {
     const rows = await db.allAsync(query);
-    if (rows.length < 1) return false;
     return {
-        success:true,
-        rows,
+      success: true,
+      rows,
     }
   } catch (error) {
     console.error("Error executing query:", error);
     return {
-        success:false
+      success: false,
+      errorMessage: `Could not read tweets: ${error}`
     };
   }
 };
