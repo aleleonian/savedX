@@ -483,7 +483,7 @@ export class XBot {
         })
 
         for (const newBookmark of processedBookmarks) {
-            const idExists = this.bookmarks.some(bookmark => bookmark.id === newBookmark.id);
+            const idExists = this.bookmarks.some(bookmark => bookmark.indexId === newBookmark.indexId);
             if (!idExists) {
                 this.bookmarks.push(newBookmark);
             }
