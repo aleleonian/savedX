@@ -76,7 +76,13 @@ export const Application = () => {
           notificationMessage={notificationMessage}
         />
       )}
-      {tweetsData && tweetsData.length > 0 && displayTweetsData(tweetsData)}
+      <div className="text-center">
+        {
+          tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
+            :
+            "There's nothing to show, bro 😣"
+        }
+      </div>
     </section>
   );
 };
