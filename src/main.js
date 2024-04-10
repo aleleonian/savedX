@@ -40,7 +40,6 @@ const createWindow = () => {
 app.whenReady().then(async () => {
   createWindow();
   const initStatus = await init();
-  console.log("initStatus->", initStatus);
   if (!initStatus.success) {
     mainWindow.webContents.send(
       "NOTIFICATION",
@@ -117,7 +116,6 @@ const init = async () => {
   const openDbResult = await dbTools.openDb(dbPath);
   if (openDbResult) {
     const tweets = await dbTools.readAllTweets();
-    console.log("tweets->", tweets)
     if (!tweets.success) {
       const resultOBj = {};
       resultOBj.success = tweets.success;

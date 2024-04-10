@@ -35,6 +35,8 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@table-library/react-table-library": "^4.1.7",
     "cheerio": "^1.0.0-rc.12",
     "crypto": "^1.0.1",
     "dompurify": "^3.1.0",

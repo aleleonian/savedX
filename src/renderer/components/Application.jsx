@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Notification } from "./Notification";
 // import DOMPurify from "dompurify";
 import cheerio from "cheerio";
+import { TweetTable } from "./TweetTable";
+
+
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
@@ -37,25 +40,25 @@ export const Application = () => {
     window.savedXApi.logIntoX();
   }
 
+  const parseTweetData = (tweetsArray) => {
+    return tweetsArray.map((tweet, index) => {
+      const $ = cheerio.load(tweet.htmlContent);
+      {/* const UserNameDiv = $('[data-testid="User-Name"]'); */ }
+      const username = $('[data-testid="User-Name"] > div > div > a > div > div > span').text();
+      const tweetText = $('div[data-testid="tweetText"] > span').text();
+      return {
+        id: tweet.id,
+        tweetText: $('div[data-testid="tweetText"] > span').text(),
+        username: $('[data-testid="User-Name"] > div > div > a > div > div > span').text(),
+      }
+    })
+  }
   const displayTweetsData = (tweetsArray) => {
+    const nodes = parseTweetData(tweetsArray);
     return (
+
       <div>
-        {tweetsArray.map((tweet, index) => {
-          const $ = cheerio.load(tweet.htmlContent);
-          {/* const UserNameDiv = $('[data-testid="User-Name"]'); */}
-          const username = $('[data-testid="User-Name"] > div > div > a > div > div > span').text();
-          const tweetText = $('div[data-testid="tweetText"] > span').text();
-          return (
-            <div key={index}>
-              <div>{username}</div>
-              <div>{tweetText}</div>
-            </div>
-          );
-        })}
-        {/* {tweetsArray.map((tweet, index) => {
-          const sanitizedHtml = DOMPurify.sanitize(tweet.htmlContent);
-          return <div key={index} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
-        })} */}
+        <TweetTable nodes={nodes} />
       </div>
     );
   };
