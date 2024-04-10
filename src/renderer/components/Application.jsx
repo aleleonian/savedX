@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Notification } from "./Notification";
-// import DOMPurify from "dompurify";
 import cheerio from "cheerio";
 import { TweetTable } from "./TweetTable";
 
@@ -64,9 +63,13 @@ export const Application = () => {
   };
 
   return (
-    <section>
-      <h1>Hi, bros!</h1>
-      <button onClick={logIntoX}>Log into X</button>
+    <section className="home">
+      <h1 className="text-center text-3xl mb-8">SavedX: your X bookmarks</h1>
+
+      <div className="text-center">
+        <button className="btn btn-blue" onClick={logIntoX}>Go fetch tweets</button>
+      </div>
+
       {notificationMessage && (
         <Notification
           notificationClass={notificationClass}
