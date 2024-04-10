@@ -53,7 +53,6 @@ export const TweetTable = ({ nodes }) => {
 
     return (
         <>
-
             <label htmlFor="search">
                 Search by Tweet Text:&nbsp;
                 <input id="search" type="text" value={search} onChange={handleSearch} />
