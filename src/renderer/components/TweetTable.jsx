@@ -5,39 +5,51 @@ import { getTheme } from "@table-library/react-table-library/baseline";
 
 const columns = [
     { label: 'Tweet', renderCell: (item) => item.tweetText },
-    // {
-    //   label: 'Deadline',
-    //   renderCell: (item) =>
-    //     item.deadline.toLocaleDateString('en-US', {
-    //       year: 'numeric',
-    //       month: '2-digit',
-    //       day: '2-digit',
-    //     }),
-    // },
-    // { label: 'Type', renderCell: (item) => item.type },
-    // {
-    //   label: 'Complete',
-    //   renderCell: (item) => item.isComplete.toString(),
-    // },
-    // { label: 'Tasks', renderCell: (item) => item.nodes },
 ];
-
-// const nodes = [
-//   {
-//     id: '0',
-//     name: 'Shopping List',
-//     deadline: new Date(2020, 1, 15),
-//     type: 'TASK',
-//     isComplete: true,
-//     nodes: 3,
-//   },
-// ];
 
 export const TweetTable = ({ nodes }) => {
 
     let data = { nodes };
 
-    const theme = useTheme(getTheme());
+    const stripedTheme = {
+        BaseRow: `
+            font-size: 14px;
+          `,
+        HeaderRow: `
+            background-color: #eaf5fd;
+          `,
+        Row: `
+            &:nth-of-type(odd) {
+              background-color: #d2e9fb;
+            }
+    
+            &:nth-of-type(even) {
+              background-color: #eaf5fd;
+            }
+          `,
+    };
+
+    const marginTheme = {
+        BaseCell: `
+            margin: 9px;
+            padding: 11px;
+          `,
+    };
+
+    const colorTheme = {
+        BaseRow: `
+            color: #141414;
+          `,
+        Row: `
+            &:hover {
+              color: orange;
+            }
+    
+            cursor: pointer;
+          `,
+    };
+
+    const theme = useTheme([colorTheme, stripedTheme, marginTheme]);
 
     const [search, setSearch] = React.useState("");
 
@@ -53,13 +65,16 @@ export const TweetTable = ({ nodes }) => {
 
     return (
         <>
-            <label htmlFor="search">
-                Search by Tweet Text:&nbsp;
-                <input id="search" type="text" value={search} onChange={handleSearch} />
-            </label>
-            <br />
+            <div className="search-box p-[11px] text-left flex justify-between">
+                <div>
+                    Search by Tweet Text:
+                </div>
+                <div className='bg-red'>
+                    <input id="search" type="text" value={search} onChange={handleSearch} className='border' />
+                </div>
+            </div>
 
-            <CompactTable columns={columns} data={data} theme={theme}/>
+            <CompactTable columns={columns} data={data} theme={theme} />
         </>
     )
 }

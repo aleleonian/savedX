@@ -64,9 +64,9 @@ export const Application = () => {
 
   return (
     <section className="home">
-      <h1 className="text-center text-3xl mb-8">SavedX: your X bookmarks</h1>
+      <h1 className="text-center text-3xl mb-4">SavedX: your X bookmarks</h1>
 
-      <div className="text-center">
+      <div className="text-center my-4">
         <button className="btn btn-blue" onClick={logIntoX}>Go fetch tweets</button>
       </div>
 
