@@ -105,6 +105,44 @@ ipcMain.on("log-into-x", async (event, data) => {
     mainWindow.webContents.send("CONTENT", tweets.rows);
   }
 });
+ipcMain.on("log-into-x", async (event, data) => {
+  // const credentials = await dbTools.getXCredentials();
+  const xBot = new XBot();
+  let result = await xBot.init();
+  if (result.success) {
+    result = await xBot.loginToX();
+    if (result.success) {
+      await xBot.wait(8000);
+      await xBot.goto("https://twitter.com/i/bookmarks");
+      await xBot.wait(8000);
+      const bookmarks = await xBot.scrapeBookmarks();
+      // const filePath = "bookmarks.json";
+      // // Convert the array to a string
+      // const arrayJson = JSON.stringify(bookmarks, null, 2);
+
+      // // Write the array contents to a file
+      // fs.writeFile(filePath, arrayJson, (err) => {
+      //   if (err) {
+      //     console.error("Error writing file:", err);
+      //   } else {
+      //     console.log(
+      //       "Array contents have been successfully dumped into the file:",
+      //       filePath
+      //     );
+      //   }
+      // });
+      await dbTools.storeTweets(bookmarks);
+      await xBot.logOut();
+    }
+    await xBot.closeBrowser();
+    const tweets = await dbTools.readAllTweets();
+    mainWindow.webContents.send("CONTENT", tweets.rows);
+  }
+});
+ipcMain.on("read-tweets-from-db", async (event, data) => {
+  const tweets = await dbTools.readAllTweets();
+  mainWindow.webContents.send("SAVED_TWEETS", tweets.rows);
+});
 
 const init = async () => {
   // Check if the file exists

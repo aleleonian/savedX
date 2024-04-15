@@ -14,6 +14,7 @@ function dispatchNotification(eventType, message) {
 
 contextBridge.exposeInMainWorld("savedXApi", {
   logIntoX: () => ipcRenderer.send("log-into-x"),
+  getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {
