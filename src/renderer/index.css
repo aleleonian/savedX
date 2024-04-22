@@ -42,3 +42,7 @@ body {
 .btn-blue:hover {
   @apply bg-blue-700;
 }
+
+th[role="columnheader"] {
+  display: none;
+}
