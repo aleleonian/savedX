@@ -40,6 +40,21 @@ export const storeTweets = async (tweetArray) => {
     })
   );
 };
+export const deleteTweets = async (tweetArray) => {
+  const query = `DELETE FROM TWEETS`;
+  try {
+    await db.allAsync(query);
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error("deleteTweets: Error executing query:", error);
+    return {
+      success: false,
+      errorMessage: `Could not delete tweets: ${error}`
+    };
+  }
+};
 export const setDb = (dbConnection) => {
   db = dbConnection;
 };

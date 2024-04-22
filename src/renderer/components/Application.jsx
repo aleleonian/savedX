@@ -35,8 +35,8 @@ export const Application = () => {
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
-  function logIntoX() {
-    window.savedXApi.logIntoX();
+  function goFetchTweets() {
+    window.savedXApi.goFetchTweets();
   }
 
   const parseTweetData = (tweetsArray) => {
@@ -79,7 +79,7 @@ export const Application = () => {
             "There's nothing to show, bro 😣"
         }
         <div className="text-center my-4">
-          <button className="btn btn-blue" onClick={logIntoX}>Go fetch tweets</button>
+          <button className="btn btn-blue" onClick={goFetchTweets}>Go fetch tweets</button>
         </div>
       </div>
     </section>
