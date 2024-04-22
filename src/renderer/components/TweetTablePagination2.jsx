@@ -12,8 +12,6 @@ const TweetTablePagination2 = ({ nodes }) => {
 
     let data = { nodes };
 
-    debugger;
-
     const handleSearch = (event) => {
         setSearch(event.target.value);
     };
@@ -24,13 +22,50 @@ const TweetTablePagination2 = ({ nodes }) => {
         ),
     };
 
+    const stripedTheme = {
+        BaseRow: `
+            font-size: 14px;
+          `,
+        HeaderRow: `
+            background-color: #eaf5fd;
+          `,
+        Row: `
+            &:nth-of-type(odd) {
+              background-color: #d2e9fb;
+            }
+    
+            &:nth-of-type(even) {
+              background-color: #eaf5fd;
+            }
+          `,
+    };
 
-    const theme = useTheme(getTheme());
+    const marginTheme = {
+        BaseCell: `
+            margin: 9px;
+            padding: 11px;
+          `,
+    };
+
+    const colorTheme = {
+        BaseRow: `
+            color: #141414;
+          `,
+        Row: `
+            &:hover {
+              color: orange;
+            }
+    
+            cursor: pointer;
+          `,
+    };
+
+    const theme = useTheme([colorTheme, stripedTheme, marginTheme]);
 
     const pagination = usePagination(data, {
         state: {
             page: 0,
-            size: 2,
+            size: 10,
         },
         onChange: onPaginationChange,
     });
@@ -44,6 +79,16 @@ const TweetTablePagination2 = ({ nodes }) => {
     ];
     return (
         <>
+
+            <div className="search-box p-[11px] text-left flex justify-between">
+                <div>
+                    Search by Tweet Text:
+                </div>
+                <div className='bg-red'>
+                    <input id="search" type="text" value={search} onChange={handleSearch} className='border' />
+                </div>
+            </div>
+
             <CompactTable
                 columns={columns}
                 data={data}
@@ -51,21 +96,9 @@ const TweetTablePagination2 = ({ nodes }) => {
                 pagination={pagination}
             />
 
-            <br />
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-
-                <div className="search-box p-[11px] text-left flex justify-between">
-                    <div>
-                        Search by Tweet Text:
-                    </div>
-                    <div className='bg-red'>
-                        <input id="search" type="text" value={search} onChange={handleSearch} className='border' />
-                    </div>
-                </div>
-
-                <span>Total Pages: {pagination.state.getTotalPages(data.nodes)}</span>
-
-                <span>
+            <div className="search-box p-[11px] text-left flex justify-between">
+                <div>Total Pages: {pagination.state.getTotalPages(data.nodes)}</div>
+                <div>
                     Page:{" "}
                     {pagination.state.getPages(data.nodes).map((_, index) => (
                         <button
@@ -79,10 +112,8 @@ const TweetTablePagination2 = ({ nodes }) => {
                             {index + 1}
                         </button>
                     ))}
-                </span>
+                </div>
             </div>
-
-            <br />
         </>
     );
 };
