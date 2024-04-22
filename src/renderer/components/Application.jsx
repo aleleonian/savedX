@@ -66,10 +66,6 @@ export const Application = () => {
     <section className="home">
       <h1 className="text-center text-3xl mb-4">SavedX: your X bookmarks</h1>
 
-      <div className="text-center my-4">
-        <button className="btn btn-blue" onClick={logIntoX}>Go fetch tweets</button>
-      </div>
-
       {notificationMessage && (
         <Notification
           notificationClass={notificationClass}
@@ -82,6 +78,9 @@ export const Application = () => {
             :
             "There's nothing to show, bro 😣"
         }
+        <div className="text-center my-4">
+          <button className="btn btn-blue" onClick={logIntoX}>Go fetch tweets</button>
+        </div>
       </div>
     </section>
   );
