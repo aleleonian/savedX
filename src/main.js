@@ -73,7 +73,9 @@ app.on("before-quit", () => {
 // code. You can also put them in separate files and import them here.
 ipcMain.on("go-fetch-tweets", async (event, data) => {
   // const credentials = await dbTools.getXCredentials();
+  // here we should trigger the progress dialog
   const xBot = new XBot();
+  showProgress();
   let result = await xBot.init();
   if (result.success) {
     result = await xBot.loginToX();
@@ -88,6 +90,7 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
     }
     await xBot.closeBrowser();
     const tweets = await dbTools.readAllTweets();
+    hideProgress();
     mainWindow.webContents.send("CONTENT", tweets.rows);
   }
 });
@@ -96,6 +99,17 @@ ipcMain.on("read-tweets-from-db", async (event, data) => {
   const tweets = await dbTools.readAllTweets();
   mainWindow.webContents.send("SAVED_TWEETS", tweets.rows);
 });
+
+const showProgress = () => {
+  mainWindow.webContents.send(
+    "SHOW_PROGRESS", true
+  );
+}
+const hideProgress = () => {
+  mainWindow.webContents.send(
+    "SHOW_PROGRESS",false
+  );
+}
 
 const init = async () => {
   // Check if the file exists

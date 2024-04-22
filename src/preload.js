@@ -34,3 +34,7 @@ ipcRenderer.on("CONTENT", async (event, message) => {
   }
   dispatchNotification("CONTENT", message);
 });
+
+ipcRenderer.on("SHOW_PROGRESS", async (event, boolean) => {
+  dispatchNotification("SHOW_PROGRESS", boolean);
+});

@@ -481,8 +481,11 @@ export class XBot {
             const $ = cheerio.load(div);
             const divWithTestId = $('div[data-testid="cellInnerDiv"]');
             const isLastBookmark = divWithTestId.children('.css-175oi2r.r-4d76ec').length > 0;
-            if (isLastBookmark) return null;
-            
+            if (isLastBookmark) {
+                // console.log("tweet index: ", index);
+                return null;
+            }
+
             const divItem = {};
             divItem.htmlContent = div;
             divItem.indexId = this.getId(div);

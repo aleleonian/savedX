@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Notification } from "./Notification";
 import cheerio from "cheerio";
 import TweetsTable from "./TweetsTable";
-
+import { Title } from './Title';
 
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
+  const [showProgress, setShowProgress] = useState(false);
   const [tweetsData, setTweetsData] = useState(null);
 
   useEffect(() => {
@@ -23,15 +24,22 @@ export const Application = () => {
       }
     };
 
+    const progressEventListener = (event) => {
+      setShowProgress(event.detail);
+    }
+
     const contentEventListener = (event) => {
       setTweetsData(event.detail);
     };
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("CONTENT", contentEventListener);
+    window.addEventListener("SHOW_PROGRESS", progressEventListener);
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
+      window.removeEventListener("CONTENT", contentEventListener);
+      window.removeEventListener("SHOW_PROGRESS", progressEventListener);
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
@@ -62,9 +70,17 @@ export const Application = () => {
     );
   };
 
+  if (showProgress) {
+    return (
+      <>
+        <Title />
+        Bro, we're working on it...⏱
+      </>
+    )
+  }
   return (
     <section className="home">
-      <h1 className="text-center text-3xl mb-4">SavedX: your X bookmarks</h1>
+      <Title />
 
       {notificationMessage && (
         <Notification
@@ -74,7 +90,8 @@ export const Application = () => {
       )}
       <div className="text-center">
         {
-          tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
+          !showProgress &&
+            tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
             :
             "There's nothing to show, bro 😣"
         }
