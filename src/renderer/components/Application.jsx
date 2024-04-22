@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Notification } from "./Notification";
 import cheerio from "cheerio";
-import { TweetTablePagination } from "./TweetTablePagination";
+import TweetTablePagination2 from "./TweetTablePagination2";
 
 
 
@@ -57,7 +57,7 @@ export const Application = () => {
     return (
 
       <div>
-        <TweetTablePagination/>
+        <TweetTablePagination2 nodes={nodes} />
       </div>
     );
   };
