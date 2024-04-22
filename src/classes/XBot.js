@@ -475,12 +475,19 @@ export class XBot {
             htmlContentDivs.push(htmlContent)
         }
 
-        let processedBookmarks = htmlContentDivs.map(div => {
+
+        let processedBookmarks = htmlContentDivs.map((div, index) => {
+            // if div is the last bookmark, do not include it
+            const $ = cheerio.load(div);
+            const divWithTestId = $('div[data-testid="cellInnerDiv"]');
+            const isLastBookmark = divWithTestId.children('.css-175oi2r.r-4d76ec').length > 0;
+            if (isLastBookmark) return null;
+            
             const divItem = {};
             divItem.htmlContent = div;
             divItem.indexId = this.getId(div);
             return divItem;
-        })
+        }).filter(item => item !== null);
 
         for (const newBookmark of processedBookmarks) {
             const idExists = this.bookmarks.some(bookmark => bookmark.indexId === newBookmark.indexId);

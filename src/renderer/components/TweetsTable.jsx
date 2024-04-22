@@ -1,12 +1,9 @@
 import * as React from "react";
-
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
 import { usePagination } from "@table-library/react-table-library/pagination";
 
-
-const TweetTablePagination2 = ({ nodes }) => {
+const TweetsTable = ({ nodes }) => {
 
     const [search, setSearch] = React.useState("");
 
@@ -118,4 +115,4 @@ const TweetTablePagination2 = ({ nodes }) => {
     );
 };
 
-export default TweetTablePagination2;
+export default TweetsTable;
