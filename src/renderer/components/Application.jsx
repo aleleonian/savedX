@@ -40,12 +40,19 @@ export const Application = () => {
       }
       if (progressStages === constants.progress.HIDE_PROGRESS) {
         newShowProgress.active = false;
+        newShowProgress.login = false;
+        newShowProgress.scrape = false;
+        newShowProgress.logout = false;
+
       }
       if (progressStages & constants.progress.LOGGED_IN) {
         newShowProgress.login = true;
       }
       if (progressStages & constants.progress.SCRAPING) {
         newShowProgress.scrape = true;
+      }
+      if (progressStages & constants.progress.LOGGED_OUT) {
+        newShowProgress.logout = true;
       }
       setProgressState(newShowProgress);
     }

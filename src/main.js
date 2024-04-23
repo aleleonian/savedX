@@ -82,6 +82,8 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
   await wait(3000);
   showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING);
   await wait(3000);
+  showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING, constants.progress.LOGGED_OUT);
+  await wait(3000);
   hideProgress();
   return;
 
