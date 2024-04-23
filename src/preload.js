@@ -35,6 +35,7 @@ ipcRenderer.on("CONTENT", async (event, message) => {
   dispatchNotification("CONTENT", message);
 });
 
-ipcRenderer.on("SHOW_PROGRESS", async (event, boolean) => {
-  dispatchNotification("SHOW_PROGRESS", boolean);
+ipcRenderer.on("SHOW_PROGRESS", async (event, message) => {
+  console.log("preload.js->SHOW_PROGRESS:", message);
+  dispatchNotification("SHOW_PROGRESS", message);
 });

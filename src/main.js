@@ -1,9 +1,10 @@
 require("dotenv").config();
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
-import fs from "fs";
 import * as dbTools from "./util/db";
+import * as constants from "./util/constants";
 import { XBot } from "./classes/XBot";
+import { wait } from "./util/common";
 
 let mainWindow;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -75,7 +76,15 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
   // const credentials = await dbTools.getXCredentials();
   // here we should trigger the progress dialog
   const xBot = new XBot();
-  showProgress();
+  showProgress(constants.progress.INIT_PROGRESS);
+  await wait(3000);
+  showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN);
+  await wait(3000);
+  showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING);
+  await wait(3000);
+  hideProgress();
+  return;
+
   let result = await xBot.init();
   if (result.success) {
     result = await xBot.loginToX();
@@ -87,6 +96,8 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
       await dbTools.deleteTweets();
       await dbTools.storeTweets(bookmarks);
       await xBot.logOut();
+      await xBot.wait(3000);
+
     }
     await xBot.closeBrowser();
     const tweets = await dbTools.readAllTweets();
@@ -100,14 +111,21 @@ ipcMain.on("read-tweets-from-db", async (event, data) => {
   mainWindow.webContents.send("SAVED_TWEETS", tweets.rows);
 });
 
-const showProgress = () => {
+const showProgress = (...stages) => {
+  console.log("stages:", stages);
+  let stagesMessage = 0;
+  stages.forEach(currentStage => {
+    stagesMessage |= currentStage;
+  })
+  console.log("stagesMessage->", stagesMessage);
   mainWindow.webContents.send(
-    "SHOW_PROGRESS", true
+    "SHOW_PROGRESS", stagesMessage
   );
 }
 const hideProgress = () => {
+  console.log("hideProgress->", constants.progress.HIDE_PROGRESS);
   mainWindow.webContents.send(
-    "SHOW_PROGRESS",false
+    "SHOW_PROGRESS", constants.progress.HIDE_PROGRESS
   );
 }
 

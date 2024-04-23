@@ -3,12 +3,19 @@ import { Notification } from "./Notification";
 import cheerio from "cheerio";
 import TweetsTable from "./TweetsTable";
 import { Title } from './Title';
-
+import * as constants from "../../util/constants";
+import { Progress } from "./Progress";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
-  const [showProgress, setShowProgress] = useState(false);
+  // this state is getting reset between re-renders
+  const [progressState, setProgressState] = useState({
+    active: false,
+    login: false,
+    scrape: false,
+    logout: false
+  });
   const [tweetsData, setTweetsData] = useState(null);
 
   useEffect(() => {
@@ -25,7 +32,22 @@ export const Application = () => {
     };
 
     const progressEventListener = (event) => {
-      setShowProgress(event.detail);
+      // debugger;
+      const progressStages = event.detail;
+      const newShowProgress = { ...progressState };
+      if (progressStages === constants.progress.INIT_PROGRESS) {
+        newShowProgress.active = true;
+      }
+      if (progressStages === constants.progress.HIDE_PROGRESS) {
+        newShowProgress.active = false;
+      }
+      if (progressStages & constants.progress.LOGGED_IN) {
+        newShowProgress.login = true;
+      }
+      if (progressStages & constants.progress.SCRAPING) {
+        newShowProgress.scrape = true;
+      }
+      setProgressState(newShowProgress);
     }
 
     const contentEventListener = (event) => {
@@ -37,11 +59,12 @@ export const Application = () => {
 
     // Clean up event listener on component unmount
     return () => {
+      // debugger;
       window.removeEventListener("NOTIFICATION", notificationEventListener);
       window.removeEventListener("CONTENT", contentEventListener);
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
     };
-  }, []); // Empty dependency array ensures this effect runs only once after mount
+  }, [progressState]); // Empty dependency array ensures this effect runs only once after mount
 
   function goFetchTweets() {
     window.savedXApi.goFetchTweets();
@@ -70,11 +93,11 @@ export const Application = () => {
     );
   };
 
-  if (showProgress) {
+  // debugger;
+  if (progressState.active) {
     return (
       <>
-        <Title />
-        Bro, we're working on it...⏱
+        <Progress state={progressState} />
       </>
     )
   }
@@ -90,7 +113,7 @@ export const Application = () => {
       )}
       <div className="text-center">
         {
-          !showProgress &&
+          !progressState &&
             tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
             :
             "There's nothing to show, bro 😣"
