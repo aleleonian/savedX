@@ -346,6 +346,8 @@ export class XBot {
 
             await this.page.keyboard.press('Enter');
 
+            //HERE I GOTTA MAKE SURE I PROPERLY LOGGED IN
+
             console.log("Twitter Bot has logged in, we now will try to detect suspicion.");
 
             let confirmedSuspicion = await this.twitterSuspects();

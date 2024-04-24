@@ -120,7 +120,7 @@ export const Application = () => {
       )}
       <div className="text-center">
         {
-          !progressState &&
+          !progressState.active &&
             tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
             :
             "There's nothing to show, bro 😣"
