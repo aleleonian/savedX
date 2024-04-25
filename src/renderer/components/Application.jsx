@@ -12,8 +12,10 @@ export const Application = () => {
   // this state is getting reset between re-renders
   const [progressState, setProgressState] = useState({
     active: false,
-    login: false,
-    scrape: false,
+    logingIn: false,
+    loggedIn: false,
+    scraping: false,
+    scraped: false,
     logout: false
   });
   const [tweetsData, setTweetsData] = useState(null);
@@ -32,24 +34,37 @@ export const Application = () => {
     };
 
     const progressEventListener = (event) => {
-      // debugger;
-      const progressStages = event.detail;
+      const progressStages = event.detail.progressStages;
+      const data = event.detail.data ? event.detail.data : null;
+
       const newShowProgress = { ...progressState };
+      if (data) newShowProgress.data = data;
+
       if (progressStages === constants.progress.INIT_PROGRESS) {
         newShowProgress.active = true;
       }
       if (progressStages === constants.progress.HIDE_PROGRESS) {
         newShowProgress.active = false;
-        newShowProgress.login = false;
-        newShowProgress.scrape = false;
+        newShowProgress.logingIn = false;
+        newShowProgress.loggedIn = false;
+        newShowProgress.scraping = false;
+        newShowProgress.scraped = false;
         newShowProgress.logout = false;
 
       }
+      if (progressStages & constants.progress.LOGGING) {
+        newShowProgress.logingIn = true;
+      }
       if (progressStages & constants.progress.LOGGED_IN) {
-        newShowProgress.login = true;
+        newShowProgress.logingIn = false;
+        newShowProgress.loggedIn = true;
       }
       if (progressStages & constants.progress.SCRAPING) {
-        newShowProgress.scrape = true;
+        newShowProgress.scraping = true;
+      }
+      if (progressStages & constants.progress.SCRAPED) {
+        newShowProgress.scraping = false;
+        newShowProgress.scraped = true;
       }
       if (progressStages & constants.progress.LOGGED_OUT) {
         newShowProgress.logout = true;
@@ -80,13 +95,12 @@ export const Application = () => {
   const parseTweetData = (tweetsArray) => {
     return tweetsArray.map((tweet, index) => {
       const $ = cheerio.load(tweet.htmlContent);
-      {/* const UserNameDiv = $('[data-testid="User-Name"]'); */ }
       const username = $('[data-testid="User-Name"] > div > div > a > div > div > span').text();
       const tweetText = $('div[data-testid="tweetText"] > span').text();
       return {
         id: tweet.id,
-        tweetText: $('div[data-testid="tweetText"] > span').text(),
-        username: $('[data-testid="User-Name"] > div > div > a > div > div > span').text(),
+        tweetText,
+        username,
       }
     })
   }

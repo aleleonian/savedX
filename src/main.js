@@ -2,8 +2,8 @@ require("dotenv").config();
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
-import * as constants from "./util/constants";
-import { XBot } from "./classes/XBot";
+import { goFetchTweets, goFetchTweetsFake } from "./goFetchTweets";
+import { sendMessageToMainWindow, setMainWindow }from "./util/messaging";
 
 let mainWindow;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -21,6 +21,8 @@ const createWindow = () => {
     },
   });
 
+  setMainWindow(mainWindow);
+  
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -70,38 +72,7 @@ app.on("before-quit", () => {
 // code. You can also put them in separate files and import them here.
 ipcMain.on("go-fetch-tweets", async (event, data) => {
   // const credentials = await dbTools.getXCredentials();
-  // here we should trigger the progress dialog
-  showProgress(constants.progress.INIT_PROGRESS);
-  const xBot = new XBot();
-  let result = await xBot.init();
-  if (result.success) {
-    result = await xBot.loginToX();
-    if (result.success) {
-      showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN);
-      await xBot.wait(8000);
-      await xBot.goto("https://twitter.com/i/bookmarks");
-      await xBot.wait(8000);
-      const bookmarks = await xBot.scrapeBookmarks();
-      showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING);
-      await dbTools.deleteTweets();
-      await dbTools.storeTweets(bookmarks);
-      await xBot.logOut();
-      showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING, constants.progress.LOGGED_OUT);
-      await xBot.wait(3000);
-    }
-    else {
-      hideProgress();
-      sendMessageToMainWindow("NOTIFICATION", `error--Could not log into X 😫`);
-    }
-    await xBot.closeBrowser();
-    const tweets = await dbTools.readAllTweets();
-    hideProgress();
-    sendMessageToMainWindow("CONTENT", tweets.rows);
-  }
-  else {
-    hideProgress();
-    sendMessageToMainWindow("NOTIFICATION", `error--Trouble with XBot.init()`);
-  }
+  await goFetchTweetsFake();
 });
 
 ipcMain.on("read-tweets-from-db", async (event, data) => {
@@ -109,19 +80,6 @@ ipcMain.on("read-tweets-from-db", async (event, data) => {
   sendMessageToMainWindow("SAVED_TWEETS", tweets.rows);
 });
 
-const showProgress = (...stages) => {
-  console.log("stages:", stages);
-  let stagesMessage = 0;
-  stages.forEach(currentStage => {
-    stagesMessage |= currentStage;
-  })
-  console.log("stagesMessage->", stagesMessage);
-  sendMessageToMainWindow("SHOW_PROGRESS", stagesMessage);
-}
-const hideProgress = () => {
-  console.log("hideProgress->", constants.progress.HIDE_PROGRESS);
-  sendMessageToMainWindow("SHOW_PROGRESS", constants.progress.HIDE_PROGRESS);
-}
 
 const init = async () => {
   // Check if the file exists
@@ -144,8 +102,4 @@ const init = async () => {
       return { success: true };
     }
   }
-}
-
-const sendMessageToMainWindow = (type, data) => {
-  mainWindow.webContents.send(type, data);
 }

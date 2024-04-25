@@ -150,6 +150,18 @@ export class XBot {
             return false;
         }
     }
+    async findElement(targetElement) {
+        try {
+            await this.page.waitForSelector(targetElement);
+
+            return true;
+
+        }
+        catch (error) {
+            console.log("findElement: Error! ", error);
+            return false;
+        }
+    }
     async findAndGetText(targetElement) {
         try {
             let inputElement = await this.page.waitForSelector(targetElement);
@@ -347,6 +359,16 @@ export class XBot {
             await this.page.keyboard.press('Enter');
 
             //HERE I GOTTA MAKE SURE I PROPERLY LOGGED IN
+
+            // check for Suspicious login prevented
+            const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT);
+            if (found) {
+                console.log("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
+                this.isBusy = false;
+                return this.respond(false, "Wrong login information.");
+            }
+
+            //HERE I GOTTA MAKE SURE Twitter is not suspicious and temporarily blocked me
 
             console.log("Twitter Bot has logged in, we now will try to detect suspicion.");
 
