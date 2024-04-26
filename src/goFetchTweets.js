@@ -10,7 +10,7 @@ export async function goFetchTweets() {
     const xBot = new XBot();
     let result = await xBot.init();
     if (result.success) {
-        showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGING);
+        showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN);
         result = await xBot.loginToX();
         if (result.success) {
             showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN);
@@ -44,8 +44,7 @@ export async function goFetchTweets() {
 }
 export async function goFetchTweetsFake() {
     showProgress(encode(constants.progress.INIT_PROGRESS));
-    await common.wait(3000);
-    showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING));
+    showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN));
     await common.wait(3000);
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN));
     await common.wait(3000);
@@ -53,6 +52,8 @@ export async function goFetchTweetsFake() {
     await common.wait(3000);
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED));
     await common.wait(3000);
+    showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED, constants.progress.LOGGING_OUT));
+    await common.wait(2000);
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED, constants.progress.LOGGED_OUT));
     await common.wait(2000);
     hideProgress();
