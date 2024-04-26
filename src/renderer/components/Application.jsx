@@ -120,7 +120,6 @@ export const Application = () => {
     );
   };
 
-  // debugger;
   if (progressState.active) {
     return (
       <>
