@@ -1,7 +1,6 @@
 require("dotenv").config();
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
-import fs from "fs";
 import * as dbTools from "./util/db";
 import { XBot } from "./classes/XBot";
 
@@ -31,7 +30,7 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
 };
 
 // This method will be called when Electron has finished
