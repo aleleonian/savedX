@@ -55,7 +55,7 @@ export async function goFetchTweetsFake() {
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED, constants.progress.LOGGING_OUT));
     await common.wait(2000);
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED, constants.progress.LOGGED_OUT));
-    await common.wait(200000);
+    await common.wait(2000);
     hideProgress();
 }
 
