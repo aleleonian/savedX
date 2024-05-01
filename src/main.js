@@ -76,7 +76,8 @@ app.on("before-quit", () => {
 // code. You can also put them in separate files and import them here.
 ipcMain.on("go-fetch-tweets", async (event, data) => {
   // const credentials = await dbTools.getXCredentials();
-  await goFetchTweetsFake();
+  // await goFetchTweetsFake();
+  await goFetchTweets();
 });
 
 ipcMain.on("read-tweets-from-db", async (event, data) => {

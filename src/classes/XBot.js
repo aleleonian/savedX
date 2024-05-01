@@ -1,3 +1,5 @@
+import { timeout } from 'puppeteer';
+
 const puppeteer = require('puppeteer-extra');
 const pluginStealth = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(pluginStealth());
@@ -150,9 +152,9 @@ export class XBot {
             return false;
         }
     }
-    async findElement(targetElement) {
+    async findElement(targetElement, timeoutMs = 30000) {
         try {
-            await this.page.waitForSelector(targetElement);
+            await this.page.waitForSelector(targetElement, { timeout: timeoutMs });
 
             return true;
 
@@ -361,7 +363,7 @@ export class XBot {
             //HERE I GOTTA MAKE SURE I PROPERLY LOGGED IN
 
             // check for Suspicious login prevented
-            const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT);
+            const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT, 5000);
             if (found) {
                 console.log("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
                 this.isBusy = false;

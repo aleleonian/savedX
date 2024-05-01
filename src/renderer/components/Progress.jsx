@@ -58,7 +58,6 @@ export const Progress = ({ state }) => {
         logoutText = "Logged out of X ✅";
     }
 
-
     return (
         <>
             <div className="container mx-auto text-center">

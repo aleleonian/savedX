@@ -5,26 +5,27 @@ import * as common from "./util/common";
 import { sendMessageToMainWindow, encode } from "./util/messaging";
 
 export async function goFetchTweets() {
-
     showProgress(encode(constants.progress.INIT_PROGRESS));
     const xBot = new XBot();
     let result = await xBot.init();
     if (result.success) {
-        showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN);
+        showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN));
         result = await xBot.loginToX();
         if (result.success) {
-            showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN);
+            showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN));
             await xBot.wait(8000);
             await xBot.goto("https://twitter.com/i/bookmarks");
-            showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING);
+            showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING));
             await xBot.wait(8000);
             const bookmarks = await xBot.scrapeBookmarks();
-            showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED);
+            showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED));
             await dbTools.deleteTweets();
             await dbTools.storeTweets(bookmarks);
             await xBot.logOut();
-            showProgress(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING, constants.progress.LOGGED_OUT);
+            showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED, constants.progress.LOGGED_OUT));
             await xBot.wait(3000);
+            hideProgress();
+
         }
         else {
             hideProgress();
