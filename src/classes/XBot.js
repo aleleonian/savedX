@@ -1,4 +1,5 @@
-import { timeout } from 'puppeteer';
+import * as constants from "../util/constants";
+import { sendMessageToMainWindow, encode } from "../util/messaging";
 
 const puppeteer = require('puppeteer-extra');
 const pluginStealth = require('puppeteer-extra-plugin-stealth');
@@ -526,19 +527,22 @@ export class XBot {
         }
         return this.bookmarks;
     }
-    scrapeBookmarks = async () => {
+    scrapeBookmarks = async (showProgressFunction) => {
 
         await this.storeBookmarks();
 
         let scrollPosition = 0;
+        let percentage = 0;
 
         while (true) {
             console.log("Gonna scroll...");
             await this.page.evaluate(() => {
                 window.scrollBy(0, window.innerHeight);
             });
-
+            showProgressFunction(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING), percentage + "%");
             // Wait for a while after each scroll to give time for content loading
+            percentage += 10;
+            
             await this.wait(3000);
 
             await this.storeBookmarks();

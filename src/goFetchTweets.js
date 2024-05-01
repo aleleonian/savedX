@@ -17,7 +17,7 @@ export async function goFetchTweets() {
             await xBot.goto("https://twitter.com/i/bookmarks");
             showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING));
             await xBot.wait(8000);
-            const bookmarks = await xBot.scrapeBookmarks();
+            const bookmarks = await xBot.scrapeBookmarks(showProgress);
             showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED));
             await dbTools.deleteTweets();
             await dbTools.storeTweets(bookmarks);
