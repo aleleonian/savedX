@@ -311,13 +311,13 @@ export class XBot {
         this.isBusy = true;
 
         if (!this.isLoggedIn) {
-            let hasVisited = await this.goto("https://www.x.com/login");
+            let hasVisited = await this.goto(process.env.TWITTER_LOGIN_PAGE);
             if (!hasVisited) {
-                console.log("Can't visit https://www.x.com");
+                console.log("Can't visit " + process.env.TWITTER_LOGIN_PAGE);
                 this.isBusy = false;
                 return this.respond(false, "Could not visit x.com");
             }
-            console.log("We're at https://www.x.com");
+            console.log("We're at " + process.env.TWITTER_LOGIN_PAGE);
 
             let foundAndClicked = await this.findAndClick(process.env.TWITTER_USERNAME_INPUT);
             if (!foundAndClicked) {
@@ -542,7 +542,7 @@ export class XBot {
             showProgressFunction(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING), percentage + "%");
             // Wait for a while after each scroll to give time for content loading
             percentage += 10;
-            
+
             await this.wait(3000);
 
             await this.storeBookmarks();
