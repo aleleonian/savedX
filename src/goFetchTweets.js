@@ -21,6 +21,7 @@ export async function goFetchTweets() {
             showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED));
             await dbTools.deleteTweets();
             await dbTools.storeTweets(bookmarks);
+            await xBot.wait(3000);
             await xBot.logOut();
             showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED, constants.progress.LOGGED_OUT));
             await xBot.wait(3000);
@@ -49,7 +50,7 @@ export async function goFetchTweetsFake() {
     await common.wait(3000);
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN));
     await common.wait(3000);
-    showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING), "45%");
+    showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING));
     await common.wait(3000);
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED));
     await common.wait(3000);
@@ -60,10 +61,9 @@ export async function goFetchTweetsFake() {
     hideProgress();
 }
 
-const showProgress = (encodedStages, data = null) => {
+const showProgress = (encodedStages) => {
     const messageOBject = {};
     messageOBject.progressStages = encodedStages;
-    if (data) messageOBject.data = data;
     sendMessageToMainWindow("SHOW_PROGRESS", messageOBject);
 }
 

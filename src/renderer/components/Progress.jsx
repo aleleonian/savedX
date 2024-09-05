@@ -38,7 +38,7 @@ export const Progress = ({ state }) => {
     if (state.scraping) {
         scrapingClass = removeClass(scrapingClass, 'text-gray-400');
         scrapingClass = addClass(scrapingClass, 'text-blue-500');
-        scrapingText = "Scraping bookmarks " + state.data;
+        scrapingText = "Scraping bookmarks ⏳";
     }
     else if (state.scraped) {
         scrapingClass = removeClass(scrapingClass, 'text-gray-400');

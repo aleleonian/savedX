@@ -264,6 +264,23 @@ export class XBot {
             return false;
         }
     }
+    async twitterRequiresCaptcha() {
+        try {
+            const TwitterSuspects = await this.page.waitForXPath(`//*[contains(text(), '${process.env.TWITTER_AUTHENTICATE_TEXT}')]`, { timeout: 10000 })
+            if (TwitterSuspects) {
+                console.log("Found SUSPICION_TEXT!")
+                return true;
+            }
+            else {
+                console.log("Did NOT find SUSPICION_TEXT!")
+                return false;
+            }
+        }
+        catch (error) {
+            console.log("twitterSuspects() exception! -> Did NOT find SUSPICION_TEXT!")
+            return false;
+        }
+    }
     async twitterWantsVerification() {
         try {
             const TwitterWantsToVerify = await this.page.waitForXPath(`//*[contains(text(), '${process.env.VERIFICATION_TEXT}')]`, { timeout: 10000 })
@@ -297,7 +314,8 @@ export class XBot {
     }
 
     async logOut() {
-        await this.goto('https://www.x.com/logout');
+        // VOY POR ACA, este goto no anda
+        await this.goto("https://www.x.com/logout");
         let foundAndClicked = await this.findAndClick(process.env.TWITTER_LOGOUT_BUTTON);
         if (!foundAndClicked) {
             console.log("Cant't find TWITTER_LOGOUT_BUTTON");
@@ -346,10 +364,16 @@ export class XBot {
             foundAndClicked = await this.findAndClick(process.env.TWITTER_PASSWORD_INPUT);
             if (!foundAndClicked) {
                 console.log("Can't find and click TWITTER_PASSWORD_INPUT");
-                this.isBusy = false;
-                return this.respond(false, "Can't find and click TWITTER_PASSWORD_INPUT");
+                // let's look for this text We need to make sure that you’re a real person.
+                if (this.twitterRequiresCaptcha()) {
+                    console.log("Bro, you need to solve the puzzle!")
+                }
+                else {
+                    this.isBusy = false;
+                    return this.respond(false, "Can't find and click TWITTER_PASSWORD_INPUT");
+                }
             }
-            console.log("Found and clicked TWITTER_USERNAME_INPUT");
+            else console.log("Found and clicked TWITTER_USERNAME_INPUT");
 
             foundAndTyped = await this.findAndType(process.env.TWITTER_PASSWORD_INPUT, process.env.TWITTER_BOT_PASSWORD);
             if (!foundAndTyped) {
@@ -532,17 +556,15 @@ export class XBot {
         await this.storeBookmarks();
 
         let scrollPosition = 0;
-        let percentage = 0;
 
         while (true) {
             console.log("Gonna scroll...");
             await this.page.evaluate(() => {
                 window.scrollBy(0, window.innerHeight);
             });
-            showProgressFunction(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING), percentage + "%");
+            showProgressFunction(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING));
+
             // Wait for a while after each scroll to give time for content loading
-            percentage += 10;
-            
             await this.wait(3000);
 
             await this.storeBookmarks();
