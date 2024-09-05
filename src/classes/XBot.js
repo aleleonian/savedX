@@ -1,3 +1,6 @@
+import * as constants from "../util/constants";
+import { sendMessageToMainWindow, encode } from "../util/messaging";
+
 const puppeteer = require('puppeteer-extra');
 const pluginStealth = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(pluginStealth());
@@ -150,6 +153,18 @@ export class XBot {
             return false;
         }
     }
+    async findElement(targetElement, timeoutMs = 30000) {
+        try {
+            await this.page.waitForSelector(targetElement, { timeout: timeoutMs });
+
+            return true;
+
+        }
+        catch (error) {
+            console.log("findElement: Error! ", error);
+            return false;
+        }
+    }
     async findAndGetText(targetElement) {
         try {
             let inputElement = await this.page.waitForSelector(targetElement);
@@ -249,6 +264,23 @@ export class XBot {
             return false;
         }
     }
+    async twitterRequiresCaptcha() {
+        try {
+            const TwitterSuspects = await this.page.waitForXPath(`//*[contains(text(), '${process.env.TWITTER_AUTHENTICATE_TEXT}')]`, { timeout: 10000 })
+            if (TwitterSuspects) {
+                console.log("Found SUSPICION_TEXT!")
+                return true;
+            }
+            else {
+                console.log("Did NOT find SUSPICION_TEXT!")
+                return false;
+            }
+        }
+        catch (error) {
+            console.log("twitterSuspects() exception! -> Did NOT find SUSPICION_TEXT!")
+            return false;
+        }
+    }
     async twitterWantsVerification() {
         try {
             const TwitterWantsToVerify = await this.page.waitForXPath(`//*[contains(text(), '${process.env.VERIFICATION_TEXT}')]`, { timeout: 10000 })
@@ -282,7 +314,8 @@ export class XBot {
     }
 
     async logOut() {
-        await this.goto('https://www.x.com/logout');
+        // VOY POR ACA, este goto no anda
+        await this.goto("https://www.x.com/logout");
         let foundAndClicked = await this.findAndClick(process.env.TWITTER_LOGOUT_BUTTON);
         if (!foundAndClicked) {
             console.log("Cant't find TWITTER_LOGOUT_BUTTON");
@@ -331,10 +364,16 @@ export class XBot {
             foundAndClicked = await this.findAndClick(process.env.TWITTER_PASSWORD_INPUT);
             if (!foundAndClicked) {
                 console.log("Can't find and click TWITTER_PASSWORD_INPUT");
-                this.isBusy = false;
-                return this.respond(false, "Can't find and click TWITTER_PASSWORD_INPUT");
+                // let's look for this text We need to make sure that you’re a real person.
+                if (this.twitterRequiresCaptcha()) {
+                    console.log("Bro, you need to solve the puzzle!")
+                }
+                else {
+                    this.isBusy = false;
+                    return this.respond(false, "Can't find and click TWITTER_PASSWORD_INPUT");
+                }
             }
-            console.log("Found and clicked TWITTER_USERNAME_INPUT");
+            else console.log("Found and clicked TWITTER_USERNAME_INPUT");
 
             foundAndTyped = await this.findAndType(process.env.TWITTER_PASSWORD_INPUT, process.env.TWITTER_BOT_PASSWORD);
             if (!foundAndTyped) {
@@ -345,6 +384,18 @@ export class XBot {
             console.log("Found and typed TWITTER_PASSWORD_INPUT");
 
             await this.page.keyboard.press('Enter');
+
+            //HERE I GOTTA MAKE SURE I PROPERLY LOGGED IN
+
+            // check for Suspicious login prevented
+            const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT, 5000);
+            if (found) {
+                console.log("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
+                this.isBusy = false;
+                return this.respond(false, "Wrong login information.");
+            }
+
+            //HERE I GOTTA MAKE SURE Twitter is not suspicious and temporarily blocked me
 
             console.log("Twitter Bot has logged in, we now will try to detect suspicion.");
 
@@ -481,8 +532,11 @@ export class XBot {
             const $ = cheerio.load(div);
             const divWithTestId = $('div[data-testid="cellInnerDiv"]');
             const isLastBookmark = divWithTestId.children('.css-175oi2r.r-4d76ec').length > 0;
-            if (isLastBookmark) return null;
-            
+            if (isLastBookmark) {
+                // console.log("tweet index: ", index);
+                return null;
+            }
+
             const divItem = {};
             divItem.htmlContent = div;
             divItem.indexId = this.getId(div);
@@ -497,7 +551,7 @@ export class XBot {
         }
         return this.bookmarks;
     }
-    scrapeBookmarks = async () => {
+    scrapeBookmarks = async (showProgressFunction) => {
 
         await this.storeBookmarks();
 
@@ -508,6 +562,7 @@ export class XBot {
             await this.page.evaluate(() => {
                 window.scrollBy(0, window.innerHeight);
             });
+            showProgressFunction(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPING));
 
             // Wait for a while after each scroll to give time for content loading
             await this.wait(3000);

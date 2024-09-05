@@ -2,12 +2,23 @@ import React, { useState, useEffect } from "react";
 import { Notification } from "./Notification";
 import cheerio from "cheerio";
 import TweetsTable from "./TweetsTable";
-
-
+import { Title } from './Title';
+import * as constants from "../../util/constants";
+import { Progress } from "./Progress";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
+  // this state is getting reset between re-renders
+  const [progressState, setProgressState] = useState({
+    active: false,
+    logingIn: false,
+    loggedIn: false,
+    scraping: false,
+    scraped: false,
+    loggingOut: false,
+    loggedOut: false,
+  });
   const [tweetsData, setTweetsData] = useState(null);
 
   useEffect(() => {
@@ -23,17 +34,65 @@ export const Application = () => {
       }
     };
 
+    const progressEventListener = (event) => {
+      const progressStages = event.detail.progressStages;
+      const data = event.detail.data ? event.detail.data : null;
+
+      const newShowProgress = { ...progressState };
+      if (data) newShowProgress.data = data;
+
+      if (progressStages === constants.progress.INIT_PROGRESS) {
+        newShowProgress.active = true;
+      }
+      if (progressStages === constants.progress.HIDE_PROGRESS) {
+        newShowProgress.active = false;
+        newShowProgress.logingIn = false;
+        newShowProgress.loggedIn = false;
+        newShowProgress.scraping = false;
+        newShowProgress.scraped = false;
+        newShowProgress.loggingOut = false;
+        newShowProgress.loggedOut = false;
+      }
+      if (progressStages & constants.progress.LOGGING_IN) {
+        newShowProgress.logingIn = true;
+      }
+      if (progressStages & constants.progress.LOGGED_IN) {
+        newShowProgress.logingIn = false;
+        newShowProgress.loggedIn = true;
+      }
+      if (progressStages & constants.progress.SCRAPING) {
+        newShowProgress.scraping = true;
+      }
+      if (progressStages & constants.progress.SCRAPED) {
+        newShowProgress.scraping = false;
+        newShowProgress.scraped = true;
+      }
+      if (progressStages & constants.progress.LOGGING_OUT) {
+        newShowProgress.loggingOut = true;
+      }
+      if (progressStages & constants.progress.LOGGED_OUT) {
+        newShowProgress.loggingOut = false;
+        newShowProgress.loggedOut = true;
+      }
+      
+      setProgressState(newShowProgress);
+    }
+
     const contentEventListener = (event) => {
       setTweetsData(event.detail);
     };
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("CONTENT", contentEventListener);
+    window.addEventListener("SHOW_PROGRESS", progressEventListener);
 
     // Clean up event listener on component unmount
     return () => {
+      // debugger;
       window.removeEventListener("NOTIFICATION", notificationEventListener);
+      window.removeEventListener("CONTENT", contentEventListener);
+      window.removeEventListener("SHOW_PROGRESS", progressEventListener);
     };
-  }, []); // Empty dependency array ensures this effect runs only once after mount
+  }, [progressState]); // Empty dependency array ensures this effect runs only once after mount
 
   function goFetchTweets() {
     window.savedXApi.goFetchTweets();
@@ -42,13 +101,12 @@ export const Application = () => {
   const parseTweetData = (tweetsArray) => {
     return tweetsArray.map((tweet, index) => {
       const $ = cheerio.load(tweet.htmlContent);
-      {/* const UserNameDiv = $('[data-testid="User-Name"]'); */ }
       const username = $('[data-testid="User-Name"] > div > div > a > div > div > span').text();
       const tweetText = $('div[data-testid="tweetText"] > span').text();
       return {
         id: tweet.id,
-        tweetText: $('div[data-testid="tweetText"] > span').text(),
-        username: $('[data-testid="User-Name"] > div > div > a > div > div > span').text(),
+        tweetText,
+        username,
       }
     })
   }
@@ -62,9 +120,16 @@ export const Application = () => {
     );
   };
 
+  if (progressState.active) {
+    return (
+      <>
+        <Progress state={progressState} />
+      </>
+    )
+  }
   return (
     <section className="home">
-      <h1 className="text-center text-3xl mb-4">SavedX: your X bookmarks</h1>
+      <Title />
 
       {notificationMessage && (
         <Notification
@@ -74,7 +139,8 @@ export const Application = () => {
       )}
       <div className="text-center">
         {
-          tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
+          !progressState.active &&
+            tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
             :
             "There's nothing to show, bro 😣"
         }

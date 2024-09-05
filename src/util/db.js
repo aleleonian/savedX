@@ -77,7 +77,7 @@ export const getXCredentials = async () => {
 };
 
 export const readAllTweets = async () => {
-  const query = `SELECT * FROM TWEETS`;
+  const query = `SELECT * FROM TWEETS ORDER BY indexId`;
   try {
     const rows = await db.allAsync(query);
     return {
