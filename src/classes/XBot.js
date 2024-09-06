@@ -96,7 +96,7 @@ export class XBot {
                 success: true,
             }
             this.page = await browser.newPage();
-            this.page.setDefaultTimeout(5000);
+            this.page.setDefaultTimeout(8000);
             return responseObject;
         }
     }
@@ -358,16 +358,12 @@ export class XBot {
             return false;
         }
     }
-    // TODO: set less time for the timeout for finding elements
-    // try catch each and every interaction attempt
-    // detect wheter i'm being requested my email
 
     async closeBrowser() {
         return await this.browser.close();
     }
 
     async logOut() {
-        // VOY POR ACA, este goto no anda
         await this.goto("https://x.com/logout");
         let foundAndClicked = await this.findAndClick(process.env.TWITTER_LOGOUT_BUTTON);
         if (!foundAndClicked) {
@@ -423,7 +419,8 @@ export class XBot {
                     console.log("Bro, you need to solve the puzzle!")
                 }
                 else if (await this.unusualLoginDetected()) {
-                    console.log("Bro, X detected an unusual login attempt! Will try to calm the bitch down.")
+                    console.log("Bro, X detected an unusual login attempt! Will try to calm the bitch down.");
+                    await this.wait(15000);
                     try {
                         await this.findAndType(process.env.TWITTER_UNUSUAL_LOGIN_EMAIL_INPUT, process.env.TWITTER_BOT_EMAIL);
                         await this.findAndClick(process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON);
@@ -437,6 +434,16 @@ export class XBot {
                     // click TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON
                 }
                 else if (await this.arkoseChallengeDetected()) {
+                    //TODO: instead of waiting 20 seconds, i should make a button appear on the main
+                    //screen that reads 'continue' and you solve the captcha and then click it and then
+                    //scraping resumes.
+
+                    // a button should show up in the main screen
+
+                    // this function should enter an indefinite loop that only breaks
+                    // when some external condition changes
+                    // that external condition would be changed by the clicking of that button    
+            
                     console.log("Bro we need you to do something about this situation, will give you 20 seconds.");
                     await this.wait(20000);
                 }
@@ -459,7 +466,7 @@ export class XBot {
             await this.page.keyboard.press('Enter');
 
             //HERE I GOTTA MAKE SURE I PROPERLY LOGGED IN
-
+            // TODO: i think this is outdated
             // check for Suspicious login prevented
             const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT, 5000);
             if (found) {
