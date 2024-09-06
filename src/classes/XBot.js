@@ -96,7 +96,7 @@ export class XBot {
                 success: true,
             }
             this.page = await browser.newPage();
-            // this.page.setDefaultTimeout(10000);
+            this.page.setDefaultTimeout(5000);
             return responseObject;
         }
     }
@@ -149,7 +149,7 @@ export class XBot {
 
         }
         catch (error) {
-            console.log("findAndClick: Error! ", error);
+            // console.log("findAndClick: Error! ", error);
             return false;
         }
     }
@@ -185,6 +185,24 @@ export class XBot {
     }
     getCurrentBotUrl() {
         return this.page.url();
+    }
+
+    async findTextInPage(targetText) {
+        const found = await this.page.evaluate((targetText) => {
+            return document.body.innerText.toLowerCase().includes(targetText.toLowerCase());
+        }, targetText);
+        console.log(targetText + " was found: " + found);
+        return found;
+    }
+    async findTextInFrame(iFrame, targetText) {
+
+        const found = await iFrame.evaluate((targetText) => {
+            return document.body.innerText.includes('your desired text');
+        }, targetText);
+
+        console.log(targetText + " was found: " + found);
+
+        return found;
     }
     async getLastTweetUrl() {
         let hasVisited = await this.goto("https://www.x.com" + "/" + process.env.TWITTER_BOT_USERNAME);
@@ -249,7 +267,7 @@ export class XBot {
 
     async twitterSuspects() {
         try {
-            const TwitterSuspects = await this.page.waitForXPath(`//*[contains(text(), '${process.env.SUSPICION_TEXT}')]`, { timeout: 10000 })
+            const TwitterSuspects = await this.page.waitForSelector(`//*[contains(text(), '${process.env.SUSPICION_TEXT}')]`, { timeout: 10000 })
             if (TwitterSuspects) {
                 console.log("Found SUSPICION_TEXT!")
                 return true;
@@ -266,24 +284,59 @@ export class XBot {
     }
     async twitterRequiresCaptcha() {
         try {
-            const TwitterSuspects = await this.page.waitForXPath(`//*[contains(text(), '${process.env.TWITTER_AUTHENTICATE_TEXT}')]`, { timeout: 10000 })
+            const TwitterSuspects = await this.page.waitForSelector(`//*[contains(text(), '${process.env.TWITTER_AUTHENTICATE_TEXT}')]`, { timeout: 5000 })
+
             if (TwitterSuspects) {
-                console.log("Found SUSPICION_TEXT!")
+                console.log("Found TWITTER_AUTHENTICATE_TEXT!")
                 return true;
             }
             else {
-                console.log("Did NOT find SUSPICION_TEXT!")
+                console.log("Did NOT find TWITTER_AUTHENTICATE_TEXT!")
                 return false;
             }
         }
         catch (error) {
-            console.log("twitterSuspects() exception! -> Did NOT find SUSPICION_TEXT!")
+            console.log("twitterRequiresCaptcha() exception! -> Did NOT find TWITTER_AUTHENTICATE_TEXT!")
             return false;
+        }
+    }
+    async unusualLoginDetected() {
+        try {
+            return await this.findTextInPage(process.env.TWITTER_UNUSUAL_LOGIN_TEXT);
+
+            const TwitterSuspects = await this.page.waitForSelector(`//*[contains(text(), '${process.env.TWITTER_UNUSUAL_LOGIN_TEXT}')]`, { timeout: 10000 })
+            if (TwitterSuspects) {
+                console.log("Found TWITTER_UNUSUAL_LOGIN_TEXT!")
+                return true;
+            }
+            else {
+                console.log("Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!")
+                return false;
+            }
+        }
+        catch (error) {
+            console.log("unusualLoginDetected() exception! -> Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!")
+            console.log(error);
+            return false;
+        }
+    }
+
+    async arkoseChallengeDetected() {
+
+        const arkoseFrame = await this.page.$('#arkoseFrame');
+
+        if (arkoseFrame) {
+            console.log("arkoseFrame exists! we need you to do stuff");
+            return true;
+            // return await this.findTextInFrame(arkoseFrame, process.env.TWITTER_AUTHENTICATE_TEXT);
+        }
+        else {
+            console.log("Bro the arkoseFrame div DOES NOT exists bro!");
         }
     }
     async twitterWantsVerification() {
         try {
-            const TwitterWantsToVerify = await this.page.waitForXPath(`//*[contains(text(), '${process.env.VERIFICATION_TEXT}')]`, { timeout: 10000 })
+            const TwitterWantsToVerify = await this.page.waitForSelector(`//*[contains(text(), '${process.env.VERIFICATION_TEXT}')]`, { timeout: 3000 })
             if (TwitterWantsToVerify) {
                 console.log("Alert: found VERIFICATION_TEXT!!");
                 const pageContent = await this.page.content();
@@ -315,7 +368,7 @@ export class XBot {
 
     async logOut() {
         // VOY POR ACA, este goto no anda
-        await this.goto("https://www.x.com/logout");
+        await this.goto("https://x.com/logout");
         let foundAndClicked = await this.findAndClick(process.env.TWITTER_LOGOUT_BUTTON);
         if (!foundAndClicked) {
             console.log("Cant't find TWITTER_LOGOUT_BUTTON");
@@ -365,10 +418,30 @@ export class XBot {
             if (!foundAndClicked) {
                 console.log("Can't find and click TWITTER_PASSWORD_INPUT");
                 // let's look for this text We need to make sure that you’re a real person.
-                if (this.twitterRequiresCaptcha()) {
+                // await this.wait(300000)
+                if (await this.twitterRequiresCaptcha()) {
                     console.log("Bro, you need to solve the puzzle!")
                 }
+                else if (await this.unusualLoginDetected()) {
+                    console.log("Bro, X detected an unusual login attempt! Will try to calm the bitch down.")
+                    try {
+                        await this.findAndType(process.env.TWITTER_UNUSUAL_LOGIN_EMAIL_INPUT, process.env.TWITTER_BOT_EMAIL);
+                        await this.findAndClick(process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON);
+                    }
+                    catch (error) {
+                        console.log(error)
+                        this.isBusy = false;
+                        return this.respond(false, "Could not go past unusual login attempt!");
+                    }
+
+                    // click TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON
+                }
+                else if (await this.arkoseChallengeDetected()) {
+                    console.log("Bro we need you to do something about this situation, will give you 20 seconds.");
+                    await this.wait(20000);
+                }
                 else {
+                    console.log("Bro, we're defeated by Twitter. Dang it.")
                     this.isBusy = false;
                     return this.respond(false, "Can't find and click TWITTER_PASSWORD_INPUT");
                 }
