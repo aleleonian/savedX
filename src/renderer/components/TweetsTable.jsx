@@ -72,7 +72,7 @@ const TweetsTable = ({ nodes }) => {
     }
 
     const columns = [
-        { label: 'Tweet', renderCell: (item) => item.tweetText },
+        { label: 'Tweet', renderCell: (item) => item.twitterHandle + ": " + item.tweetText },
     ];
     return (
         <>
