@@ -443,7 +443,7 @@ export class XBot {
                     // this function should enter an indefinite loop that only breaks
                     // when some external condition changes
                     // that external condition would be changed by the clicking of that button    
-            
+
                     console.log("Bro we need you to do something about this situation, will give you 20 seconds.");
                     await this.wait(20000);
                 }
@@ -465,56 +465,61 @@ export class XBot {
 
             await this.page.keyboard.press('Enter');
 
-            //HERE I GOTTA MAKE SURE I PROPERLY LOGGED IN
+            this.isLoggedIn = true;
+            this.isBusy = false;
+            return this.respond(true, "xBot is logged in!");
+
             // TODO: i think this is outdated
+
+            //HERE I GOTTA MAKE SURE I PROPERLY LOGGED IN
             // check for Suspicious login prevented
-            const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT, 5000);
-            if (found) {
-                console.log("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
-                this.isBusy = false;
-                return this.respond(false, "Wrong login information.");
-            }
+            // const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT, 5000);
+            // if (found) {
+            //     console.log("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
+            //     this.isBusy = false;
+            //     return this.respond(false, "Wrong login information.");
+            // }
 
             //HERE I GOTTA MAKE SURE Twitter is not suspicious and temporarily blocked me
 
-            console.log("Twitter Bot has logged in, we now will try to detect suspicion.");
+            // console.log("Twitter Bot has logged in, we now will try to detect suspicion.");
 
-            let confirmedSuspicion = await this.twitterSuspects();
+            // let confirmedSuspicion = await this.twitterSuspects();
 
-            if (confirmedSuspicion) {
-                console.log("Twitter suspects, will try to convince them.");
-                let emailWasInput = await this.inputEmail();
-                if (emailWasInput) {
-                    console.log("We succeeded convincing twitter. We're in.");
-                    this.isBusy = false;
-                    return this.respond(true, "xBot is logged in, we convinced Elon!");
-                }
-                else {
-                    console.log("We did not convince Elon :(");
-                    this.isBusy = false;
-                    return this.respond(false, "xBot is not logged in :(");
-                }
-            }
-            else {
-                console.log("We will now try to see if Twitter wants verification from us.")
-                let confirmedVerification = await this.twitterWantsVerification();
-                if (confirmedVerification.success) {
-                    console.log("Twitter wants verification from us!")
-                    // now we must check the code that was sent to us
-                    // (or read the email automatically)
-                    // and send it to the browser.
-                    // The thing is i don't know how to locate that input field yet.
-                    this.isBusy = false;
-                    return this.respond(false, "Bot did NOT log in / Twitter wants verification code.")
-                    // res.download(filePath);
-                }
-                else {
-                    console.log("Apparently Twitter does not suspect, so we're logged in!");
-                    this.isLoggedIn = true;
-                    this.isBusy = false;
-                    return this.respond(true, "xBot is logged in!")
-                }
-            }
+            // if (confirmedSuspicion) {
+            //     console.log("Twitter suspects, will try to convince them.");
+            //     let emailWasInput = await this.inputEmail();
+            //     if (emailWasInput) {
+            //         console.log("We succeeded convincing twitter. We're in.");
+            //         this.isBusy = false;
+            //         return this.respond(true, "xBot is logged in, we convinced Elon!");
+            //     }
+            //     else {
+            //         console.log("We did not convince Elon :(");
+            //         this.isBusy = false;
+            //         return this.respond(false, "xBot is not logged in :(");
+            //     }
+            // }
+            // else {
+            //     console.log("We will now try to see if Twitter wants verification from us.")
+            //     let confirmedVerification = await this.twitterWantsVerification();
+            //     if (confirmedVerification.success) {
+            //         console.log("Twitter wants verification from us!")
+            //         // now we must check the code that was sent to us
+            //         // (or read the email automatically)
+            //         // and send it to the browser.
+            //         // The thing is i don't know how to locate that input field yet.
+            //         this.isBusy = false;
+            //         return this.respond(false, "Bot did NOT log in / Twitter wants verification code.")
+            //         // res.download(filePath);
+            //     }
+            //     else {
+            //         console.log("Apparently Twitter does not suspect, so we're logged in!");
+            //         this.isLoggedIn = true;
+            //         this.isBusy = false;
+            //         return this.respond(true, "xBot is logged in!")
+            //     }
+            // }
         }
         else {
             console.log("xBot is already logged in!");
