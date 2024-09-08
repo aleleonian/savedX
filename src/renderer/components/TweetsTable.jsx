@@ -1,11 +1,15 @@
 import * as React from "react";
+import { useState } from "react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
 
+
 const TweetsTable = ({ nodes }) => {
 
     const [search, setSearch] = React.useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [tweetData, setTweetData] = useState('');
 
     let data = { nodes };
 
@@ -13,10 +17,40 @@ const TweetsTable = ({ nodes }) => {
         setSearch(event.target.value);
     };
 
+    const handleClose = () => {
+        setIsDialogOpen(false);
+        setTweetData('');
+    };
+
     data = {
         nodes: data.nodes.filter((item) =>
             item.tweetText.toLowerCase().includes(search.toLowerCase())
         ),
+    };
+
+    const displayTweet = (tweetData) => {
+        debugger;
+        setTweetData(tweetData);
+        setIsDialogOpen(true);
+    }
+
+    const TweetDialog = ({ tweetData, onClose }) => {
+        return (
+            <div style={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: '#fff',
+                padding: '20px',
+                boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+                zIndex: 1000,
+            }}>
+                <h3>Tweet Data</h3>
+                <p>{tweetData.tweetText}</p>
+                <button onClick={onClose}>Close</button>
+            </div>
+        );
     };
 
     const stripedTheme = {
@@ -72,7 +106,12 @@ const TweetsTable = ({ nodes }) => {
     }
 
     const columns = [
-        { label: 'Tweet', renderCell: (item) => item.twitterHandle + ": " + item.tweetText },
+        {
+            label: 'Tweet', renderCell: (item) => {
+                const columnContent = `${item.twitterHandle} : ${item.tweetText}`
+                return (<a onClick={() => { displayTweet(item) }}>{columnContent}</a>)
+            }
+        },
     ];
     return (
         <>
@@ -111,6 +150,8 @@ const TweetsTable = ({ nodes }) => {
                     ))}
                 </div>
             </div>
+
+            {isDialogOpen && <TweetDialog tweetData={tweetData} onClose={handleClose} />}
         </>
     );
 };
