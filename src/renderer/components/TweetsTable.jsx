@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
-
+import { TweetDetailDialog } from "./TweetDetailDialog";
 
 const TweetsTable = ({ nodes }) => {
 
@@ -29,29 +29,32 @@ const TweetsTable = ({ nodes }) => {
     };
 
     const displayTweet = (tweetData) => {
-        debugger;
         setTweetData(tweetData);
         setIsDialogOpen(true);
     }
 
-    const TweetDialog = ({ tweetData, onClose }) => {
-        return (
-            <div style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                backgroundColor: '#fff',
-                padding: '20px',
-                boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-                zIndex: 1000,
-            }}>
-                <h3>Tweet Data</h3>
-                <p>{tweetData.tweetText}</p>
-                <button onClick={onClose}>Close</button>
-            </div>
-        );
-    };
+    // const TweetDialog = ({ tweetData, onClose }) => {
+    //     return (
+    //         <div style={{
+    //             position: 'fixed',
+    //             top: '50%',
+    //             left: '50%',
+    //             transform: 'translate(-50%, -50%)',
+    //             backgroundColor: '#fff',
+    //             padding: '20px',
+    //             boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+    //             zIndex: 1000,
+    //         }}>
+    //             <h3>Tweet Detail</h3>
+
+    //             <p>{tweetData.tweetDate}</p>
+    //             <p>{tweetData.twitterHandle} | {tweetData.userName}</p>
+    //             <p>{tweetData.tweetText}</p>
+    //             {tweetData.tweetImageOrPoster && <img src={tweetData.tweetImageOrPoster} />}
+    //             <button onClick={onClose}>Close</button>
+    //         </div>
+    //     );
+    // };
 
     const stripedTheme = {
         BaseRow: `
@@ -151,7 +154,7 @@ const TweetsTable = ({ nodes }) => {
                 </div>
             </div>
 
-            {isDialogOpen && <TweetDialog tweetData={tweetData} onClose={handleClose} />}
+            <TweetDetailDialog open={isDialogOpen} tweetData={tweetData} onClose={handleClose} />
         </>
     );
 };
