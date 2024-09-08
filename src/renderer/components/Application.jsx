@@ -98,37 +98,19 @@ export const Application = () => {
     window.savedXApi.goFetchTweets();
   }
 
-  const parseTweetData = (tweetsArray) => {
-    return tweetsArray.map((tweet, index) => {
-      const $ = cheerio.load(tweet.htmlContent);
-      const username = $('[data-testid="User-Name"] > div > div > a > div > div > span').text();
-      const tweetText = $('div[data-testid="tweetText"] > span').text();
-
-      // $('[data-testid="User-Name"]').text(); <- this will return name, username and date all in one ine
-      
-      // $('[data-testid="User-Name"] a').eq(2).attr('href') is the original url for that saved tweet
-      
-      // if data-testid="videoPlayer" exists, then $('[data-testid="videoPlayer"] video').attr('poster');
-      // if ($('[data-testid="videoPlayer"]').length > 0) {
-      //   const videoPoster = $('[data-testid="videoPlayer"] video').attr('poster')
-      // }
-      // else {
-      //   const imgSrc = $('[data-testid="tweetPhoto"] img').attr('src');
-      // }
-
-      return {
-        id: tweet.id,
-        tweetText,
-        username,
-      }
-    })
-  }
+  // const parseTweetData = (tweetsArray) => {
+  //   return tweetsArray.map((tweet, index) => {
+  //     return {
+  //       id: tweet.id,
+  //     }
+  //   })
+  // }
   const displayTweetsData = (tweetsArray) => {
-    const nodes = parseTweetData(tweetsArray);
+    // const nodes = parseTweetData(tweetsArray);
     return (
 
       <div>
-        <TweetsTable nodes={nodes} />
+        <TweetsTable nodes={tweetsArray} />
       </div>
     );
   };

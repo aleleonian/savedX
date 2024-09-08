@@ -1,5 +1,7 @@
 const sqlite3 = require("sqlite3").verbose();
 const { promisify } = require("util");
+import cheerio from "cheerio";
+
 let db;
 
 export const openDb = (filePath) => {
@@ -31,11 +33,36 @@ export const storeTweets = async (tweetArray) => {
         htmlContent TEXT
       )`);
 
+  //VOY POR ACÁ: TENGO QUE GUARDAR LOS TWEETS DE ESTA MANERA
+  // $('[data-testid="User-Name"]').text(); <- this will return name, username and date all in one ine
+
+
+
   await Promise.all(
     tweetArray.map(async (tweet) => {
-      await db.run(`INSERT INTO tweets (indexId, htmlContent) VALUES (?, ?)`, [
+      const $ = cheerio.load(tweet.htmlContent);
+      const userNameData = $('[data-testid="User-Name"]').text().split("@");
+      tweet.userName = userNameData[0];
+      tweet.twitterHandle = "@" + userNameData[1].split("·")[0];
+      tweet.tweetDate = userNameData[1].split("·")[1];
+      tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
+      tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr('href');
+
+      if ($('[data-testid="videoPlayer"]').length > 0) {
+        tweet.tweetImageOrPoster = $('[data-testid="videoPlayer"] video').attr('poster')
+      }
+      else {
+        tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr('src');
+      }
+      await db.run(`INSERT INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [
         tweet.indexId,
         tweet.htmlContent,
+        tweet.userName,
+        tweet.twitterHandle,
+        tweet.tweetDate,
+        tweet.tweetImageOrPoster,
+        tweet.tweetText,
+        tweet.tweetUrl
       ]);
     })
   );
