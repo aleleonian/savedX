@@ -4,9 +4,11 @@ import * as dbTools from "./util/db";
 import * as common from "./util/common";
 import { sendMessageToMainWindow, encode } from "./util/messaging";
 
+let xBot;
+
 export async function goFetchTweets() {
     showProgress(encode(constants.progress.INIT_PROGRESS));
-    const xBot = new XBot();
+    xBot = new XBot();
     let result = await xBot.init();
     if (result.success) {
         showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN));
@@ -59,6 +61,10 @@ export async function goFetchTweetsFake() {
     showProgress(encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN, constants.progress.SCRAPED, constants.progress.LOGGED_OUT));
     await common.wait(2000);
     hideProgress();
+}
+export function stopScraping() {
+    console.log("xBot.goAheadScrape = false.")
+    xBot.goAheadScrape = false;
 }
 
 const showProgress = (encodedStages) => {

@@ -58,6 +58,11 @@ export const Progress = ({ state }) => {
         logoutText = "Logged out of X ✅";
     }
 
+
+    function stopScraping() {
+        window.savedXApi.stopScraping();
+    }
+
     return (
         <>
             <div className="container mx-auto text-center">
@@ -80,7 +85,7 @@ export const Progress = ({ state }) => {
                 </div>
 
                 <div>
-                    <button onClick={null}>Stop the scrape 🛑</button>
+                    <button onClick={stopScraping}>Stop the scrape 🛑</button>
                 </div>
             </div>
         </>

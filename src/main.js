@@ -2,7 +2,7 @@ require("dotenv").config();
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
-import { goFetchTweets, goFetchTweetsFake } from "./goFetchTweets";
+import { goFetchTweets, goFetchTweetsFake, stopScraping } from "./goFetchTweets";
 import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
 
 let mainWindow;
@@ -81,6 +81,13 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
   // const credentials = await dbTools.getXCredentials();
   // await goFetchTweetsFake();
   await goFetchTweets();
+});
+
+ipcMain.on("stop-scraping", async (event, data) => {
+  // const credentials = await dbTools.getXCredentials();
+  // await goFetchTweetsFake();
+  console.log("we gonna stop scraping then.")
+  await stopScraping();
 });
 
 ipcMain.on("read-tweets-from-db", async (event, data) => {

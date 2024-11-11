@@ -16,6 +16,7 @@ console.log("shell->", shell);
 
 contextBridge.exposeInMainWorld("savedXApi", {
   goFetchTweets: () => ipcRenderer.send("go-fetch-tweets"),
+  stopScraping: () => ipcRenderer.send("stop-scraping"),
   getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
   openUrl: (url) => {
     console.log("url->", url)

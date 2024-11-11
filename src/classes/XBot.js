@@ -45,6 +45,7 @@ export class XBot {
         this.queueTimer = false;
         this.monitorFlag = true;
         this.bookmarks = [];
+        this.goAheadScrape = true;
     }
 
     getId(divHtmlContent) {
@@ -646,7 +647,7 @@ export class XBot {
 
         let scrollPosition = 0;
 
-        while (true) {
+        while (this.goAheadScrape) {
             console.log("Gonna scroll...");
             await this.page.evaluate(() => {
                 window.scrollBy(0, window.innerHeight);
