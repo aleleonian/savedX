@@ -78,6 +78,10 @@ export const Progress = ({ state }) => {
                         {state.loggingOut && <ProgressIcon />}
                     </div>
                 </div>
+
+                <div>
+                    <button onClick={null}>Stop the scrape 🛑</button>
+                </div>
             </div>
         </>
     )

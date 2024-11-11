@@ -420,10 +420,11 @@ export class XBot {
                 }
                 else if (await this.unusualLoginDetected()) {
                     console.log("Bro, X detected an unusual login attempt! Will try to calm the bitch down.");
-                    await this.wait(15000);
+                    // await this.wait(15000);
                     try {
                         await this.findAndType(process.env.TWITTER_UNUSUAL_LOGIN_EMAIL_INPUT, process.env.TWITTER_BOT_EMAIL);
                         await this.findAndClick(process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON);
+                        // TODO here we should check for the 'incorrect, please try again' text.
                     }
                     catch (error) {
                         console.log(error)
@@ -453,7 +454,7 @@ export class XBot {
                     return this.respond(false, "Can't find and click TWITTER_PASSWORD_INPUT");
                 }
             }
-            else console.log("Found and clicked TWITTER_USERNAME_INPUT");
+            else console.log("Found and clicked TWITTER_PASSWORD_INPUT");
 
             foundAndTyped = await this.findAndType(process.env.TWITTER_PASSWORD_INPUT, process.env.TWITTER_BOT_PASSWORD);
             if (!foundAndTyped) {
@@ -464,6 +465,9 @@ export class XBot {
             console.log("Found and typed TWITTER_PASSWORD_INPUT");
 
             await this.page.keyboard.press('Enter');
+
+            // TODO: here we gotta makes ure we did not input a wrong password and
+            // we're back at the password input page
 
             this.isLoggedIn = true;
             this.isBusy = false;

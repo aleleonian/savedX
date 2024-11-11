@@ -3,7 +3,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
 import { goFetchTweets, goFetchTweetsFake } from "./goFetchTweets";
-import { sendMessageToMainWindow, setMainWindow }from "./util/messaging";
+import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
 
 let mainWindow;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -18,11 +18,14 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,   // Node.js features disabled
+      contextIsolation: true,
+      sandbox: false
     },
   });
 
   setMainWindow(mainWindow);
-  
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });

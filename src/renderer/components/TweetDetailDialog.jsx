@@ -18,6 +18,14 @@ function PaperComponent(props) {
     );
 }
 
+const handleClick = (path) => {
+    if (window.savedXApi && window.savedXApi.openUrl) {
+        window.savedXApi.openUrl("https://www.x.com" + path); // Open the external URL using the exposed API
+    } else {
+        console.error('The openUrl method is not available');
+    }
+}
+
 export function TweetDetailDialog({ open, onClose, tweetData }) {
     return (
         <React.Fragment>
@@ -30,13 +38,12 @@ export function TweetDetailDialog({ open, onClose, tweetData }) {
                 <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
                     Tweet Details
                 </DialogTitle>
-                <DialogContent>
-                    <h3>Tweet Detail</h3>
-
+                <DialogContent dividers={scroll === 'paper'}>
                     <p>{tweetData.tweetDate}</p>
                     <p>{tweetData.twitterHandle} | {tweetData.userName}</p>
                     <p>{tweetData.tweetText}</p>
-                    {tweetData.tweetImageOrPoster && <img src={tweetData.tweetImageOrPoster} />}
+                    {tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}><img src={tweetData.tweetImageOrPoster} /></a>}
+                    {!tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}>Tweet Url</a>}
                 </DialogContent>
                 <DialogActions>
                     <Button autoFocus onClick={onClose}>

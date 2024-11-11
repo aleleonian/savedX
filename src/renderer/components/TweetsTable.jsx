@@ -19,7 +19,7 @@ const TweetsTable = ({ nodes }) => {
 
     const handleClose = () => {
         setIsDialogOpen(false);
-        setTweetData('');
+        // setTweetData('');
     };
 
     data = {
@@ -32,29 +32,6 @@ const TweetsTable = ({ nodes }) => {
         setTweetData(tweetData);
         setIsDialogOpen(true);
     }
-
-    // const TweetDialog = ({ tweetData, onClose }) => {
-    //     return (
-    //         <div style={{
-    //             position: 'fixed',
-    //             top: '50%',
-    //             left: '50%',
-    //             transform: 'translate(-50%, -50%)',
-    //             backgroundColor: '#fff',
-    //             padding: '20px',
-    //             boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-    //             zIndex: 1000,
-    //         }}>
-    //             <h3>Tweet Detail</h3>
-
-    //             <p>{tweetData.tweetDate}</p>
-    //             <p>{tweetData.twitterHandle} | {tweetData.userName}</p>
-    //             <p>{tweetData.tweetText}</p>
-    //             {tweetData.tweetImageOrPoster && <img src={tweetData.tweetImageOrPoster} />}
-    //             <button onClick={onClose}>Close</button>
-    //         </div>
-    //     );
-    // };
 
     const stripedTheme = {
         BaseRow: `

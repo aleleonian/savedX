@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Notification } from "./Notification";
-import cheerio from "cheerio";
 import TweetsTable from "./TweetsTable";
 import { Title } from './Title';
 import * as constants from "../../util/constants";

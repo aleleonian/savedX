@@ -1,6 +1,6 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-const { ipcRenderer, contextBridge } = require("electron");
+const { ipcRenderer, contextBridge, shell } = require("electron");
 
 let domContentLoaded = false;
 
@@ -12,9 +12,15 @@ function dispatchNotification(eventType, message) {
   window.dispatchEvent(new CustomEvent(eventType, { detail: message }));
 }
 
+console.log("shell->", shell);
+
 contextBridge.exposeInMainWorld("savedXApi", {
   goFetchTweets: () => ipcRenderer.send("go-fetch-tweets"),
   getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
+  openUrl: (url) => {
+    console.log("url->", url)
+    shell.openExternal(url)
+  }
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {
