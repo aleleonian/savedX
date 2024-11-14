@@ -1,6 +1,7 @@
 import React from "react";
 import { Title } from "./Title";
 import { ProgressIcon } from "./ProgressIcon";
+import Button from '@mui/material/Button';
 
 const addClass = (classList, className) => {
     const classesArray = classList.split(/\s+/);
@@ -85,7 +86,10 @@ export const Progress = ({ state }) => {
                 </div>
 
                 <div>
-                    <button onClick={stopScraping}>Stop the scrape 🛑</button>
+                    {/* <button onClick={stopScraping}>Stop the scrape 🛑</button> */}
+                    <Button autoFocus onClick={stopScraping}>
+                        Stop the scrape 🛑
+                    </Button>
                 </div>
             </div>
         </>
