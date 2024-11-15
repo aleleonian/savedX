@@ -95,10 +95,14 @@ ipcMain.on("read-tweets-from-db", async (event, data) => {
 const init = async () => {
   // Check if the file exists
   let dbPath;
+  console.log("process.env.NODE_ENV->", process.env.NODE_ENV);
   dbPath =
-    process.env.NODE_ENV === "development"
+    process.env.NODE_ENV === "development" || process.env.NODE_ENV === "debug"
       ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
       : "./savedx.db";
+
+  console.log("dbPath>", dbPath);
+
   const openDbResult = await dbTools.openDb(dbPath);
   if (openDbResult) {
     const tweets = await dbTools.readAllTweets();

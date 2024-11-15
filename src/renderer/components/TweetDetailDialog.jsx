@@ -39,10 +39,9 @@ export function TweetDetailDialog({ open, onClose, tweetData }) {
                     Tweet Details
                 </DialogTitle>
                 <DialogContent dividers={scroll === 'paper'}>
-                    <p>{tweetData.tweetDate}</p>
-                    <p>{tweetData.twitterHandle} | {tweetData.userName}</p>
+                    <p><img src={tweetData.profilePicUrl}></img><b>{tweetData.userName}</b>&nbsp;{tweetData.twitterHandle}&nbsp;·&nbsp;{tweetData.tweetDate}</p>
                     <p>{tweetData.tweetText}</p>
-                    {tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}><img src={tweetData.tweetImageOrPoster} width='50%'/></a>}
+                    {tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}><img src={tweetData.tweetImageOrPoster} width='50%' /></a>}
                     {!tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}>Tweet Url</a>}
                 </DialogContent>
                 <DialogActions>

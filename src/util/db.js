@@ -46,6 +46,7 @@ export const storeTweets = async (tweetArray) => {
       tweet.tweetDate = userNameData[1].split("·")[1];
       tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
       tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr('href');
+      tweet.profilePicUrl = $('img').first().attr('src');
 
       if ($('[data-testid="videoPlayer"]').length > 0) {
         tweet.tweetImageOrPoster = $('[data-testid="videoPlayer"] video').attr('poster')
@@ -53,7 +54,7 @@ export const storeTweets = async (tweetArray) => {
       else {
         tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr('src');
       }
-      await db.run(`INSERT INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [
+      await db.run(`INSERT INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, profilePicUrl ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
         tweet.indexId,
         tweet.htmlContent,
         tweet.userName,
@@ -61,7 +62,8 @@ export const storeTweets = async (tweetArray) => {
         tweet.tweetDate,
         tweet.tweetImageOrPoster,
         tweet.tweetText,
-        tweet.tweetUrl
+        tweet.tweetUrl,
+        tweet.profilePicUrl
       ]);
     })
   );
