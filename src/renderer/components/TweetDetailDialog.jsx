@@ -7,6 +7,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
 
+import { Grid, TextField, Autocomplete, Chip } from "@mui/material";
+
 function PaperComponent(props) {
     return (
         <Draggable
