@@ -105,7 +105,24 @@ export const getXCredentials = async () => {
 };
 
 export const readAllTweets = async () => {
-  const query = `SELECT * FROM TWEETS ORDER BY indexId`;
+  // const query = `SELECT * FROM TWEETS ORDER BY indexId`;
+  const query = `
+  SELECT 
+    T.*, 
+    GROUP_CONCAT(TAG.name) AS tags
+FROM 
+    TWEETS T
+LEFT JOIN 
+    tweets_tags TT ON T.id = TT.tweetId
+LEFT JOIN 
+    tags TAG ON TT.tagId = TAG.id
+GROUP BY 
+    T.id
+ORDER BY 
+    T.indexId;
+
+  `
+
   try {
     const rows = await db.allAsync(query);
     return {

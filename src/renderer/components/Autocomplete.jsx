@@ -13,7 +13,7 @@ export const TweetTags = ({ initialTags, availableTags, onTagsChange }) => {
         <Autocomplete
             multiple
             freeSolo
-            options={availableTags}
+            options={tags}
             value={tags}
             onChange={handleChange}
             renderTags={(value, getTagProps) =>

@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
+import { useState } from 'react';
 
 import { Grid, TextField, Autocomplete, Chip } from "@mui/material";
 
@@ -28,7 +29,18 @@ const handleClick = (path) => {
     }
 }
 
-export function TweetDetailDialog({ open, onClose, tweetData }) {
+export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate }) {
+
+    if(tweetData === "") return null;
+    
+    debugger;
+    const [tags, setTags] = useState(tweetData.tags.split("," || []));
+
+    const handleTagsChange = (event, newTags) => {
+        setTags(newTags);
+        onTagsUpdate(newTags); // Notify parent or database
+    };
+
     return (
         <React.Fragment>
             <Dialog
@@ -53,6 +65,7 @@ export function TweetDetailDialog({ open, onClose, tweetData }) {
                                 <b>{tweetData.userName}</b>
                                 <span className="text-gray-600">@{tweetData.twitterHandle}</span>
                                 <span className="text-gray-400">· {tweetData.tweetDate}</span>
+                                <span className="text-gray-400">tags: {tweetData.tags}</span>
                             </div>
 
                             {/* Tweet text */}
@@ -73,7 +86,30 @@ export function TweetDetailDialog({ open, onClose, tweetData }) {
                 </DialogContent>
 
 
-                <DialogActions>
+                <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
+                    {/* Tag Input */}
+                    <Autocomplete
+                        fullWidth
+                        multiple
+                        freeSolo
+                        options={tags}
+                        value={tags}
+                        onChange={handleTagsChange}
+                        renderTags={(value, getTagProps) =>
+                            value.map((option, index) => (
+                                <Chip
+                                    key={index}
+                                    label={option}
+                                    {...getTagProps({ index })}
+                                    variant="outlined"
+                                />
+                            ))
+                        }
+                        renderInput={(params) => (
+                            <TextField {...params} label="Tags" placeholder="Add tags" />
+                        )}
+                        sx={{ marginTop: 1 }}
+                    />
                     <Button onClick={onClose}>
                         Close
                     </Button>

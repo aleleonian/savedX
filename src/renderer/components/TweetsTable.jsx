@@ -93,6 +93,13 @@ const TweetsTable = ({ nodes }) => {
             }
         },
     ];
+
+    const handleTagsUpdate = (newTags) => {
+        debugger;
+        console.log("Updated tags:", newTags);
+        // Update the database or state with the new tags
+    };
+
     return (
         <>
 
@@ -131,7 +138,12 @@ const TweetsTable = ({ nodes }) => {
                 </div>
             </div>
 
-            <TweetDetailDialog open={isDialogOpen} tweetData={tweetData} onClose={handleClose} />
+            <TweetDetailDialog
+                open={isDialogOpen}
+                tweetData={tweetData}
+                onTagsUpdate={handleTagsUpdate}
+                onClose={handleClose}
+            />
         </>
     );
 };
