@@ -91,6 +91,18 @@ ipcMain.on("read-tweets-from-db", async (event, data) => {
   sendMessageToMainWindow("SAVED_TWEETS", tweets.rows);
 });
 
+ipcMain.on("update-tags-for-tweet", async (event, tweetId, newTags) => {
+  // const tweets = await dbTools.readAllTweets();
+  // sendMessageToMainWindow("SAVED_TWEETS", tweets.rows);
+  console.log("tweetId->", tweetId);
+  console.log("newTags->", newTags);
+  const updateTagsResult = await dbTools.updateTags(tweetId, newTags);
+
+  //TODO VOY POR ACÁ. TENGO QUE COMUNICAR A REACT SI FUE BIEN
+  //O MAL EL UPDATE
+  console.log("updateTagsResult->", updateTagsResult);
+});
+
 
 const init = async () => {
   // Check if the file exists

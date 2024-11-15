@@ -4,6 +4,30 @@ import cheerio from "cheerio";
 
 let db;
 
+const runQuery = (query, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.run(query, params, function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(this);
+      }
+    });
+  });
+};
+
+const getQuery = (query, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.get(query, params, (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+};
+
 export const openDb = (filePath) => {
   return new Promise((resolve, reject) => {
     try {
@@ -31,10 +55,6 @@ export const storeTweets = async (tweetArray) => {
         indexId TEXT,
         htmlContent TEXT
       )`);
-
-  //VOY POR ACÁ: TENGO QUE GUARDAR LOS TWEETS DE ESTA MANERA
-  // $('[data-testid="User-Name"]').text(); <- this will return name, username and date all in one ine
-
 
 
   await Promise.all(
@@ -104,6 +124,38 @@ export const getXCredentials = async () => {
   }
 };
 
+export const updateTags = async (tweetId, newTags) => {
+  try {
+    // Remove all old tags for the tweet (start a transaction)
+    await runQuery('DELETE FROM tweets_tags WHERE tweetId = ?', [tweetId]);
+
+    // Process each tag in the newTags array
+    for (let tag of newTags) {
+      // Check if the tag exists in the tags table
+      const row = await getQuery('SELECT id FROM tags WHERE name = ?', [tag]);
+
+      if (row) {
+        // If the tag exists, insert the mapping into the tweets_tags table
+        await runQuery('INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)', [tweetId, row.id]);
+        console.log(`Added tag "${tag}" for tweetId: ${tweetId}`);
+      } else {
+        // If the tag doesn't exist, insert it into the tags table
+        const result = await runQuery('INSERT INTO tags (name) VALUES (?)', [tag]);
+
+        // Get the new tag id (from last inserted row)
+        const newTagId = result.lastID;
+
+        // Insert the relationship between tweet and tag into tweets_tags table
+        await runQuery('INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)', [tweetId, newTagId]);
+        console.log(`Added new tag "${tag}" for tweetId: ${tweetId}`);
+        return true;
+      }
+    }
+  } catch (err) {
+    console.error('Error updating tags:', err);
+    return false;
+  }
+}
 export const readAllTweets = async () => {
   // const query = `SELECT * FROM TWEETS ORDER BY indexId`;
   const query = `

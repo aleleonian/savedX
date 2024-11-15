@@ -19,7 +19,7 @@ const TweetsTable = ({ nodes }) => {
 
     const handleClose = () => {
         setIsDialogOpen(false);
-        // setTweetData('');
+        setTweetData(null);
     };
 
     data = {
@@ -93,10 +93,9 @@ const TweetsTable = ({ nodes }) => {
             }
         },
     ];
-
-    const handleTagsUpdate = (newTags) => {
-        debugger;
+    const handleTagsUpdate = (tweetId, newTags) => {
         console.log("Updated tags:", newTags);
+        window.savedXApi.updateTagsForTweet(tweetId, newTags);
         // Update the database or state with the new tags
     };
 

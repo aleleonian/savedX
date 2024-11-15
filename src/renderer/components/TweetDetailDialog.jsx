@@ -31,14 +31,18 @@ const handleClick = (path) => {
 
 export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate }) {
 
-    if(tweetData === "") return null;
-    
-    debugger;
-    const [tags, setTags] = useState(tweetData.tags.split("," || []));
+    if (tweetData === "" || tweetData == null) return null;
+    let tweetTags;
+    if (tweetData.tags) {
+        tweetTags = tweetData.tags.split(",");
+    }
+    else tweetTags = [];
+
+    const [tags, setTags] = useState(tweetTags);
 
     const handleTagsChange = (event, newTags) => {
         setTags(newTags);
-        onTagsUpdate(newTags); // Notify parent or database
+        onTagsUpdate(tweetData.id, newTags); // Notify parent or database
     };
 
     return (

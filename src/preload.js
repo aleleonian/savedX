@@ -19,9 +19,9 @@ contextBridge.exposeInMainWorld("savedXApi", {
   stopScraping: () => ipcRenderer.send("stop-scraping"),
   getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
   openUrl: (url) => {
-    console.log("url->", url)
     shell.openExternal(url)
-  }
+  },
+  updateTagsForTweet: (tweetId, newTags) => ipcRenderer.send("update-tags-for-tweet", tweetId, newTags)
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {
