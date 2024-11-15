@@ -46,7 +46,7 @@ export function TweetDetailDialog({ open, onClose, tweetData }) {
                     {!tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}>Tweet Url</a>}
                 </DialogContent>
                 <DialogActions>
-                    <Button autoFocus onClick={onClose}>
+                    <Button onClick={onClose}>
                         Close
                     </Button>
                 </DialogActions>
