@@ -12,7 +12,6 @@ export const openDb = (filePath) => {
           console.error("Error opening database:", err);
           resolve(false); // Database opening failed, resolve with false
         } else {
-          console.log("Database opened successfully");
           db.allAsync = promisify(db.all).bind(db);
           db.dbRun = promisify(db.run).bind(db);
           resolve(true); // Database opened successfully, resolve with true

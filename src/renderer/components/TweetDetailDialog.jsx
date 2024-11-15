@@ -42,7 +42,7 @@ export function TweetDetailDialog({ open, onClose, tweetData }) {
                     <p>{tweetData.tweetDate}</p>
                     <p>{tweetData.twitterHandle} | {tweetData.userName}</p>
                     <p>{tweetData.tweetText}</p>
-                    {tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}><img src={tweetData.tweetImageOrPoster} /></a>}
+                    {tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}><img src={tweetData.tweetImageOrPoster} width='50%'/></a>}
                     {!tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}>Tweet Url</a>}
                 </DialogContent>
                 <DialogActions>
