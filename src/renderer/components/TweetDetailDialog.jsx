@@ -36,14 +36,41 @@ export function TweetDetailDialog({ open, onClose, tweetData }) {
                 aria-labelledby="draggable-dialog-title"
             >
                 <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
-                    Tweet Details
                 </DialogTitle>
-                <DialogContent dividers={scroll === 'paper'}>
-                    <p><img src={tweetData.profilePicUrl} class="w-10 h-10 rounded-full"></img><b>{tweetData.userName}</b>&nbsp;{tweetData.twitterHandle}&nbsp;·&nbsp;{tweetData.tweetDate}</p>
-                    <p>{tweetData.tweetText}</p>
-                    {tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}><img src={tweetData.tweetImageOrPoster} width='50%' /></a>}
-                    {!tweetData.tweetImageOrPoster && <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}>Tweet Url</a>}
+                <DialogContent dividers={scroll === 'paper'} className="overflow-auto max-h-[400px]">
+                    <div className="flex space-x-4">
+                        {/* Profile Picture */}
+                        <div className="flex-shrink-0">
+                            <img src={tweetData.profilePicUrl} className="w-10 h-10 rounded-md" alt="profile pic" />
+                        </div>
+
+                        {/* Tweet content */}
+                        <div className="flex-1">
+                            {/* User details row */}
+                            <div className="flex items-center space-x-2">
+                                <b>{tweetData.userName}</b>
+                                <span className="text-gray-600">@{tweetData.twitterHandle}</span>
+                                <span className="text-gray-400">· {tweetData.tweetDate}</span>
+                            </div>
+
+                            {/* Tweet text */}
+                            <p className="mt-2">{tweetData.tweetText}</p>
+
+                            {/* Conditional tweet image display */}
+                            {tweetData.tweetImageOrPoster ? (
+                                <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}>
+                                    <img src={tweetData.tweetImageOrPoster} className="mt-2 rounded-lg" width="75%" alt="tweet image" />
+                                </a>
+                            ) : (
+                                <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)} className="text-blue-500">
+                                    Tweet Url
+                                </a>
+                            )}
+                        </div>
+                    </div>
                 </DialogContent>
+
+
                 <DialogActions>
                     <Button onClick={onClose}>
                         Close
