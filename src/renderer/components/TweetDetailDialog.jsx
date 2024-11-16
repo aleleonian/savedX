@@ -29,7 +29,7 @@ const handleClick = (path) => {
     }
 }
 
-export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allTags, updateTweet }) {
+export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allTags, updateTweetAndTags }) {
 
     if (tweetData == null) return null;
     // let tweetTags;
@@ -56,7 +56,7 @@ export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allT
         //array of tweets
         setTweetTags(newTags);
         //TODO now i must find out the ids of the chosen tags
-        updateTweet(tweetData.id, newTags);
+        updateTweetAndTags(tweetData.id, newTags);
         onTagsUpdate(tweetData.id, newTags); // Notify parent or database
     };
 
@@ -111,7 +111,7 @@ export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allT
                         fullWidth
                         multiple
                         freeSolo
-                        options={allTheTags.map(tag => tag.name)}
+                        options={allTheTags}
                         value={tweetTags}
                         onChange={(event, newValue) => handleTagsUpdate(newValue)}
                         renderTags={(value, getTagProps) =>

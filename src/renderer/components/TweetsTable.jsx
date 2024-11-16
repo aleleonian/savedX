@@ -5,16 +5,16 @@ import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
 
-const TweetsTable = ({ nodes, setTweetsData, tags }) => {
+const TweetsTable = ({ tweetsArray, setTweetsData, tags, setTags }) => {
 
     const [search, setSearch] = React.useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [tweetData, setTweetData] = useState(null);
-
-    let data = { nodes };
+    
+    let data = { tweetsArray };
 
     data = {
-        nodes: data.nodes.filter((item) =>
+        nodes: data.tweetsArray.filter((item) =>
             item.tweetText.toLowerCase().includes(search.toLowerCase())
         ),
     };
@@ -38,12 +38,15 @@ const TweetsTable = ({ nodes, setTweetsData, tags }) => {
 
         return updatedArray;
     };
-    const updateTweet = (tweetToBeUpdated, tweetTags) => {
+    const updateTweetAndTags = (tweetToBeUpdated, tweetTags) => {
         //here i must search for the tweetToBeUpdated id in dataNdoes;
         // then update it with the new tags
-        const updatedNodes = updateArrayItem(nodes, tweetToBeUpdated, { tags: tweetTags.join(",") });
+        const updatedNodes = updateArrayItem(tweetsArray, tweetToBeUpdated, { tags: tweetTags.join(",") });
         // then setTweetsData
         setTweetsData(updatedNodes);
+        // i now also have to update the local array of tags
+        debugger;
+        const tagsSet = new Set(tags);
     }
 
     const displayTweet = (tweetData) => {
@@ -161,7 +164,7 @@ const TweetsTable = ({ nodes, setTweetsData, tags }) => {
                 onTagsUpdate={handleTagsUpdate}
                 onClose={handleClose}
                 allTags={tags}
-                updateTweet={updateTweet}
+                updateTweetAndTags={updateTweetAndTags}
             />
         </>
     );

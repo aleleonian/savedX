@@ -149,8 +149,9 @@ export const updateTags = async (tweetId, newTags) => {
         await runQuery('INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)', [tweetId, newTagId]);
         console.log(`Added new tag "${tag}" for tweetId: ${tweetId}`);
       }
-      return true;
     }
+    return true;
+
   } catch (err) {
     console.error('Error updating tags:', err);
     return false;
@@ -159,11 +160,12 @@ export const updateTags = async (tweetId, newTags) => {
 
 export const readAllTags = async () => {
   try {
-    const rows = await db.allAsync('SELECT * FROM tags');
-    console.log("tags->", rows)
+    const rows = await db.allAsync('SELECT name FROM tags');
+    console.log("tags->", rows);
+    const tagNames = rows.map(row => row.name);
     return {
       success: true,
-      rows,
+      rows: tagNames,
     }
   }
   catch (error) {

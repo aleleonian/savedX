@@ -18,11 +18,13 @@ export const Application = () => {
     loggedOut: false,
   });
   const [tweetsData, setTweetsData] = useState(
-    JSON.parse(localStorage.getItem("tweetsData")) || null
+    // JSON.parse(localStorage.getItem("tweetsData")) || null
+    null
   );
 
   const [tags, setTags] = useState(
-    JSON.parse(localStorage.getItem("tags")) || null
+    // JSON.parse(localStorage.getItem("tags")) || null
+    null
   );
 
   useEffect(() => {
@@ -86,10 +88,11 @@ export const Application = () => {
 
     const contentEventListener = (event) => {
       setTweetsData(event.detail.tweets);
+      //TODO not sure about this localStorage thing
       localStorage.setItem("tweetsData", JSON.stringify(event.detail.tweets));
       setTags(event.detail.tags);
       localStorage.setItem("tags", JSON.stringify(event.detail.tags));
-      console.log("tags->", event.detail.tags)
+      // console.log("tags->", event.detail.tags)
     };
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("CONTENT", contentEventListener);
@@ -110,7 +113,7 @@ export const Application = () => {
   const displayTweetsData = (tweetsArray, tags) => {
     return (
       <div>
-        <TweetsTable nodes={tweetsArray} setTweetsData={setTweetsData} tags={tags} />
+        <TweetsTable tweetsArray={tweetsArray} setTweetsData={setTweetsData} tags={tags} setTags={setTags} />
       </div>
     );
   };
