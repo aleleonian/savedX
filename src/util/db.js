@@ -148,16 +148,34 @@ export const updateTags = async (tweetId, newTags) => {
         // Insert the relationship between tweet and tag into tweets_tags table
         await runQuery('INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)', [tweetId, newTagId]);
         console.log(`Added new tag "${tag}" for tweetId: ${tweetId}`);
-        return true;
       }
+      return true;
     }
   } catch (err) {
     console.error('Error updating tags:', err);
     return false;
   }
 }
+
+export const readAllTags = async () => {
+  try {
+    const rows = await db.allAsync('SELECT * FROM tags');
+    console.log("tags->", rows)
+    return {
+      success: true,
+      rows,
+    }
+  }
+  catch (error) {
+    console.log("readAllTags() error: ", error);
+    return {
+      success: false,
+      errorMessage: error
+    }
+  }
+}
+
 export const readAllTweets = async () => {
-  // const query = `SELECT * FROM TWEETS ORDER BY indexId`;
   const query = `
   SELECT 
     T.*, 

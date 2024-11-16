@@ -29,19 +29,34 @@ const handleClick = (path) => {
     }
 }
 
-export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate }) {
+export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allTags, updateTweet }) {
 
-    if (tweetData === "" || tweetData == null) return null;
-    let tweetTags;
-    if (tweetData.tags) {
-        tweetTags = tweetData.tags.split(",");
-    }
-    else tweetTags = [];
+    if (tweetData == null) return null;
+    // let tweetTags;
+    // if (tweetData.tags) {
+    //     tweetTags = tweetData.tags.split(",");
+    // }
+    // else tweetTags = [];
 
-    const [tags, setTags] = useState(tweetTags);
+    const [tweetTags, setTweetTags] = useState(tweetData.tags ? tweetData.tags.split(",") : []);
+    const [allTheTags, setAllTheTags] = useState(allTags);
 
-    const handleTagsChange = (event, newTags) => {
-        setTags(newTags);
+    // const findTagIds = (tagNameArray) => {
+    //     const tagIds = [];
+    //     for (let i = 0; i < tagNameArray.length; i++) {
+    //         const currentTagName = tagNameArray[i];
+    //         const desiredId = allTheTags.find(tag => tag.name === currentTagName).id;
+    //         if (desiredId) tagIds.push(desiredId);
+    //     }
+    //     return tagIds;
+    // }
+
+    const handleTagsUpdate = (newTags) => {
+        //TODO here i must update this particular tweet in the global
+        //array of tweets
+        setTweetTags(newTags);
+        //TODO now i must find out the ids of the chosen tags
+        updateTweet(tweetData.id, newTags);
         onTagsUpdate(tweetData.id, newTags); // Notify parent or database
     };
 
@@ -67,7 +82,7 @@ export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate }) {
                             {/* User details row */}
                             <div className="flex items-center space-x-2">
                                 <b>{tweetData.userName}</b>
-                                <span className="text-gray-600">@{tweetData.twitterHandle}</span>
+                                <span className="text-gray-600">{tweetData.twitterHandle}</span>
                                 <span className="text-gray-400">· {tweetData.tweetDate}</span>
                                 <span className="text-gray-400">tags: {tweetData.tags}</span>
                             </div>
@@ -96,9 +111,9 @@ export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate }) {
                         fullWidth
                         multiple
                         freeSolo
-                        options={tags}
-                        value={tags}
-                        onChange={handleTagsChange}
+                        options={allTheTags.map(tag => tag.name)}
+                        value={tweetTags}
+                        onChange={(event, newValue) => handleTagsUpdate(newValue)}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
                                 <Chip

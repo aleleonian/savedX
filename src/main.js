@@ -86,16 +86,24 @@ ipcMain.on("stop-scraping", async (event, data) => {
   await stopScraping();
 });
 
+//TODO ESTO ESTÁ AL PEDO O QUÉ
 ipcMain.on("read-tweets-from-db", async (event, data) => {
+  // TODO ADD ERROR CHECKING
   const tweets = await dbTools.readAllTweets();
-  sendMessageToMainWindow("SAVED_TWEETS", tweets.rows);
+
+  const readAllTagsResult = await dbTools.readAllTags();
+
+  let savedData = {};
+
+  if (tweets.success) savedData.tweets = tweets.rows;
+  if (readAllTagsResult.success) savedData.tags = readAllTagsResult.rows;
+
+  sendMessageToMainWindow("SAVED_TWEETS", savedData);
 });
 
 ipcMain.on("update-tags-for-tweet", async (event, tweetId, newTags) => {
   // const tweets = await dbTools.readAllTweets();
   // sendMessageToMainWindow("SAVED_TWEETS", tweets.rows);
-  console.log("tweetId->", tweetId);
-  console.log("newTags->", newTags);
   const updateTagsResult = await dbTools.updateTags(tweetId, newTags);
 
   //TODO VOY POR ACÁ. TENGO QUE COMUNICAR A REACT SI FUE BIEN
@@ -117,16 +125,25 @@ const init = async () => {
 
   const openDbResult = await dbTools.openDb(dbPath);
   if (openDbResult) {
+
     const tweets = await dbTools.readAllTweets();
+    const readAllTagsResult = await dbTools.readAllTags();
+
     if (!tweets.success) {
       const resultOBj = {};
       resultOBj.success = tweets.success;
       if (tweets.errorMessage) resultOBj.errorMessage = tweets.errorMessage
       return resultOBj;
     }
-    else {
-      sendMessageToMainWindow("CONTENT", tweets.rows)
-      return { success: true };
+    if (!readAllTagsResult.success) {
+      const resultOBj = {};
+      resultOBj.success = readAllTagsResult.success;
+      if (tweets.errorMessage) resultOBj.errorMessage = readAllTagsResult.errorMessage
+      return resultOBj;
     }
+
+    sendMessageToMainWindow("CONTENT", { tweets: tweets.rows, tags: readAllTagsResult.rows })
+    return { success: true };
+
   }
 }

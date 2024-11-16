@@ -12,7 +12,7 @@ function dispatchNotification(eventType, message) {
   window.dispatchEvent(new CustomEvent(eventType, { detail: message }));
 }
 
-console.log("shell->", shell);
+// console.log("shell->", shell);
 
 contextBridge.exposeInMainWorld("savedXApi", {
   goFetchTweets: () => ipcRenderer.send("go-fetch-tweets"),

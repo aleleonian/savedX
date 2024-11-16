@@ -5,13 +5,19 @@ import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
 
-const TweetsTable = ({ nodes }) => {
+const TweetsTable = ({ nodes, setTweetsData, tags }) => {
 
     const [search, setSearch] = React.useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [tweetData, setTweetData] = useState('');
+    const [tweetData, setTweetData] = useState(null);
 
     let data = { nodes };
+
+    data = {
+        nodes: data.nodes.filter((item) =>
+            item.tweetText.toLowerCase().includes(search.toLowerCase())
+        ),
+    };
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
@@ -22,11 +28,23 @@ const TweetsTable = ({ nodes }) => {
         setTweetData(null);
     };
 
-    data = {
-        nodes: data.nodes.filter((item) =>
-            item.tweetText.toLowerCase().includes(search.toLowerCase())
-        ),
+    const updateArrayItem = (array, id, newProperty) => {
+        // Make a copy of the array
+        const updatedArray = array.map(item =>
+            item.id === id
+                ? { ...item, ...newProperty } // Create a new object with updated properties
+                : item
+        );
+
+        return updatedArray;
     };
+    const updateTweet = (tweetToBeUpdated, tweetTags) => {
+        //here i must search for the tweetToBeUpdated id in dataNdoes;
+        // then update it with the new tags
+        const updatedNodes = updateArrayItem(nodes, tweetToBeUpdated, { tags: tweetTags.join(",") });
+        // then setTweetsData
+        setTweetsData(updatedNodes);
+    }
 
     const displayTweet = (tweetData) => {
         setTweetData(tweetData);
@@ -142,6 +160,8 @@ const TweetsTable = ({ nodes }) => {
                 tweetData={tweetData}
                 onTagsUpdate={handleTagsUpdate}
                 onClose={handleClose}
+                allTags={tags}
+                updateTweet={updateTweet}
             />
         </>
     );

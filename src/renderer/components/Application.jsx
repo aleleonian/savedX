@@ -21,6 +21,10 @@ export const Application = () => {
     JSON.parse(localStorage.getItem("tweetsData")) || null
   );
 
+  const [tags, setTags] = useState(
+    JSON.parse(localStorage.getItem("tags")) || null
+  );
+
   useEffect(() => {
     // Listen for messages from the preload script
     const notificationEventListener = (event) => {
@@ -81,8 +85,11 @@ export const Application = () => {
     }
 
     const contentEventListener = (event) => {
-      setTweetsData(event.detail);
-      localStorage.setItem("tweetsData", JSON.stringify(event.detail));
+      setTweetsData(event.detail.tweets);
+      localStorage.setItem("tweetsData", JSON.stringify(event.detail.tweets));
+      setTags(event.detail.tags);
+      localStorage.setItem("tags", JSON.stringify(event.detail.tags));
+      console.log("tags->", event.detail.tags)
     };
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("CONTENT", contentEventListener);
@@ -100,10 +107,10 @@ export const Application = () => {
     window.savedXApi.goFetchTweets();
   }
 
-  const displayTweetsData = (tweetsArray) => {
+  const displayTweetsData = (tweetsArray, tags) => {
     return (
       <div>
-        <TweetsTable nodes={tweetsArray} />
+        <TweetsTable nodes={tweetsArray} setTweetsData={setTweetsData} tags={tags} />
       </div>
     );
   };
@@ -128,7 +135,7 @@ export const Application = () => {
       <div className="text-center">
         {
           !progressState.active &&
-            tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData)
+            tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData, tags)
             :
             "There's nothing to show, bro 😣"
         }
