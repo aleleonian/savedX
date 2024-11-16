@@ -1,17 +1,26 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
+import { AppContext } from '../../context/AppContext';
 
-const TweetsTable = ({ tweetsArray, setTweetsData, tags, setTags }) => {
+// const TweetsTable = ({ tweetsArray, setTweetsData, tags, setTags }) => {
+const TweetsTable = () => {
 
+    const { state, updateState } = useContext(AppContext);
     const [search, setSearch] = React.useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [tweetData, setTweetData] = useState(null);
-    
-    let data = { tweetsArray };
+    const setTweetsData = (savedTweetsArray) => {
+        updateState('savedTweets', savedTweetsArray);
+    };
+    const setTags = (tagsArray) => {
+        updateState('tags', tagsArray);
+    };
+
+    let data = { tweetsArray: state.savedTweets };
 
     data = {
         nodes: data.tweetsArray.filter((item) =>
@@ -41,12 +50,16 @@ const TweetsTable = ({ tweetsArray, setTweetsData, tags, setTags }) => {
     const updateTweetAndTags = (tweetToBeUpdated, tweetTags) => {
         //here i must search for the tweetToBeUpdated id in dataNdoes;
         // then update it with the new tags
-        const updatedNodes = updateArrayItem(tweetsArray, tweetToBeUpdated, { tags: tweetTags.join(",") });
+        const updatedNodes = updateArrayItem(state.savedTweets, tweetToBeUpdated, { tags: tweetTags.join(",") });
         // then setTweetsData
         setTweetsData(updatedNodes);
         // i now also have to update the local array of tags
-        debugger;
-        const tagsSet = new Set(tags);
+        const tagsSet = new Set(state.tags);
+        for (let i = 0; i < tweetTags.length; i++) {
+            if (!tagsSet.has(tweetTags[i])) tagsSet.add(tweetTags[i]);
+        }
+        setTags(Array.from(tagsSet));
+
     }
 
     const displayTweet = (tweetData) => {
@@ -163,7 +176,7 @@ const TweetsTable = ({ tweetsArray, setTweetsData, tags, setTags }) => {
                 tweetData={tweetData}
                 onTagsUpdate={handleTagsUpdate}
                 onClose={handleClose}
-                allTags={tags}
+                allTags={state.tags}
                 updateTweetAndTags={updateTweetAndTags}
             />
         </>
