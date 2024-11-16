@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Notification } from "./Notification";
 import TweetsTable from "./TweetsTable";
 import { Title } from './Title';
 import * as constants from "../../util/constants";
 import { Progress } from "./Progress";
+import { AppContext } from '../../context/AppContext';
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
@@ -17,15 +18,25 @@ export const Application = () => {
     loggingOut: false,
     loggedOut: false,
   });
-  const [tweetsData, setTweetsData] = useState(
-    // JSON.parse(localStorage.getItem("tweetsData")) || null
-    null
-  );
+  const { state, updateState } = useContext(AppContext);
 
-  const [tags, setTags] = useState(
-    // JSON.parse(localStorage.getItem("tags")) || null
-    null
-  );
+  const setTweetsData = (savedTweetsArray) => {
+    updateState('savedTweets', savedTweetsArray);
+  };
+  const setTags = (tagsArray) => {
+    updateState('tags', tagsArray);
+  };
+
+  // const [tweetsData, setTweetsData] = useState(
+  //   // JSON.parse(localStorage.getItem("tweetsData")) || null
+  //   null
+  // );
+
+  // const [tags, setTags] = useState(
+  //   // JSON.parse(localStorage.getItem("tags")) || null
+  //   null
+  // );
+
 
   useEffect(() => {
     // Listen for messages from the preload script
@@ -87,6 +98,7 @@ export const Application = () => {
     }
 
     const contentEventListener = (event) => {
+
       setTweetsData(event.detail.tweets);
       //TODO not sure about this localStorage thing
       localStorage.setItem("tweetsData", JSON.stringify(event.detail.tweets));
@@ -113,7 +125,7 @@ export const Application = () => {
   const displayTweetsData = (tweetsArray, tags) => {
     return (
       <div>
-        <TweetsTable tweetsArray={tweetsArray} setTweetsData={setTweetsData} tags={tags} setTags={setTags} />
+        <TweetsTable tweetsArray={state.savedTweets} setTweetsData={setTweetsData} tags={state.tags} setTags={setTags} />
       </div>
     );
   };
@@ -138,7 +150,7 @@ export const Application = () => {
       <div className="text-center">
         {
           !progressState.active &&
-            tweetsData && tweetsData.length > 0 ? displayTweetsData(tweetsData, tags)
+            state.savedTweets && state.savedTweets.length > 0 ? displayTweetsData(state.savedTweets, state.tags)
             :
             "There's nothing to show, bro 😣"
         }
