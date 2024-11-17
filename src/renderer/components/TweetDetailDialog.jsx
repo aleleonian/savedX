@@ -70,8 +70,6 @@ export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, re
 
     if (tweetData == null) return null;
 
-    debugger;
-
     const setTweetsData = (savedTweetsArray) => {
         updateState('savedTweets', savedTweetsArray);
     };
@@ -91,7 +89,9 @@ export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, re
     }
 
     const handleRemoveTag = (tagToRemove) => {
+        // debugger;
         // delete this tag locally
+        setTweetTags(tweetTags.filter(tag => tag != tagToRemove))
         // delete this tag from the tag list
         setTags(state.tags.filter(tag => tag != tagToRemove));
         // delete this tag from every tweet
