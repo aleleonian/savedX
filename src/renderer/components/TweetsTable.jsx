@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState, useContext } from "react";
 import { CompactTable } from "@table-library/react-table-library/compact";
+import { DataTable } from "./DataTable";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
@@ -12,7 +13,7 @@ const TweetsTable = () => {
     const [search, setSearch] = React.useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [tweetData, setTweetData] = useState(null);
-    
+
     const setTweetsData = (savedTweetsArray) => {
         updateState('savedTweets', savedTweetsArray);
     };
@@ -149,12 +150,14 @@ const TweetsTable = () => {
                 </div>
             </div>
 
-            <CompactTable
+            {/* <CompactTable
                 columns={columns}
                 data={data}
                 theme={theme}
                 pagination={pagination}
-            />
+            /> */}
+
+            <DataTable nodes={data} clickHandler={displayTweet}/>
 
             <div className="search-box p-[11px] text-left flex justify-between">
                 <div>Total Pages: {pagination.state.getTotalPages(data.nodes)}</div>
