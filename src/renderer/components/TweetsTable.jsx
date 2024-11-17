@@ -1,15 +1,16 @@
 import * as React from "react";
 import { useState, useContext } from "react";
 import { DataTable } from "./DataTable";
-import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
 import { AppContext } from '../../context/AppContext';
+import { BasicSelect } from "./BasicSelect";
 
 const TweetsTable = () => {
 
     const { state, updateState } = useContext(AppContext);
-    const [search, setSearch] = React.useState("");
+    const [searchString, setSearchString] = useState("");
+    const [tagFilter, setTagFilter] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [tweetData, setTweetData] = useState(null);
 
@@ -21,15 +22,18 @@ const TweetsTable = () => {
     };
 
     let data = { tweetsArray: state.savedTweets };
-
     data = {
-        nodes: data.tweetsArray.filter((item) =>
-            item.tweetText.toLowerCase().includes(search.toLowerCase())
+        nodes: data.tweetsArray.filter((item) => {
+            if (tagFilter != "") {
+                return item.tags.split(",").includes(tagFilter)
+            }
+            return item.tweetText.toLowerCase().includes(searchString.toLowerCase())
+        }
         ),
     };
 
     const handleSearch = (event) => {
-        setSearch(event.target.value);
+        setSearchString(event.target.value);
     };
 
     const handleClose = () => {
@@ -84,6 +88,10 @@ const TweetsTable = () => {
         // Update the database or state with the new tags
     };
 
+    const handleSelectChange = (event) => {
+        setTagFilter(event.target.value);
+    }
+
     const handleTagsRemoval = (tag) => {
         window.savedXApi.removeTagFromDB(tag);
     }
@@ -96,12 +104,17 @@ const TweetsTable = () => {
                     Search by Tweet Text:
                 </div>
                 <div className='bg-red'>
-                    <input id="search" type="text" value={search} onChange={handleSearch} className='border' />
+                    <input id="search" type="text" value={searchString} onChange={handleSearch} className='border' />
                 </div>
             </div>
 
-            <DataTable nodes={data} clickHandler={displayTweet}/>
+            <DataTable nodes={data} clickHandler={displayTweet} />
 
+            <div className="search-box p-[11px] text-left flex justify-between">
+                <div>
+                    <BasicSelect tags={state.tags} handleSelectChange={handleSelectChange} />
+                </div>
+            </div>
             <div className="search-box p-[11px] text-left flex justify-between">
                 <div>Total Pages: {pagination.state.getTotalPages(data.nodes)}</div>
                 <div>

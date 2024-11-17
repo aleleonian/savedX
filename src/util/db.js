@@ -180,19 +180,18 @@ export const readAllTags = async () => {
 export const readAllTweets = async () => {
   const query = `
   SELECT 
-    T.*, 
-    GROUP_CONCAT(TAG.name) AS tags
-FROM 
-    TWEETS T
-LEFT JOIN 
-    tweets_tags TT ON T.id = TT.tweetId
-LEFT JOIN 
-    tags TAG ON TT.tagId = TAG.id
-GROUP BY 
-    T.id
-ORDER BY 
-    T.indexId;
-
+      T.*, 
+      IFNULL(GROUP_CONCAT(TAG.name), '[]') AS tags
+  FROM 
+      TWEETS T
+  LEFT JOIN 
+      tweets_tags TT ON T.id = TT.tweetId
+  LEFT JOIN 
+      tags TAG ON TT.tagId = TAG.id
+  GROUP BY 
+      T.id
+  ORDER BY 
+      T.indexId;
   `
 
   try {
