@@ -6,9 +6,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { AppContext } from '../../context/AppContext';
+import { Cancel } from '@mui/icons-material';
+import { IconButton, TextField, Autocomplete, Chip } from "@mui/material";
+// import { ipcRenderer } from 'electron';
+// const { ipcRenderer } = require("electron");
 
-import { Grid, TextField, Autocomplete, Chip } from "@mui/material";
+import { Notification } from "./Notification";
 
 function PaperComponent(props) {
     return (
@@ -29,39 +34,95 @@ const handleClick = (path) => {
     }
 }
 
-export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allTags, updateTweetAndTags }) {
-
+export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, removeTagFromDB, updateTweetAndTagsLocally }) {
     if (tweetData == null) return null;
-    // let tweetTags;
-    // if (tweetData.tags) {
-    //     tweetTags = tweetData.tags.split(",");
-    // }
-    // else tweetTags = [];
 
+    useEffect(() => {
+        // Listen for messages from the main process
+        ipcRenderer.on('NOTIFICATION', (event, data) => {
+            debugger;
+            if (event.detail) {
+                const data = event.detail.split("--");
+                setNotificationClass(data[0]);
+                setNotificationMessage(data[1]);
+                setTimeout(() => {
+                    setNotificationMessage(null);
+                }, 2000);
+            }
+        });
+
+        // Cleanup the listener on component unmount
+        return () => ipcRenderer.removeAllListeners('dialog-notification');
+    }, []);
+
+    const { state, updateState } = useContext(AppContext);
     const [tweetTags, setTweetTags] = useState(tweetData.tags ? tweetData.tags.split(",") : []);
-    const [allTheTags, setAllTheTags] = useState(allTags);
-
-    // const findTagIds = (tagNameArray) => {
-    //     const tagIds = [];
-    //     for (let i = 0; i < tagNameArray.length; i++) {
-    //         const currentTagName = tagNameArray[i];
-    //         const desiredId = allTheTags.find(tag => tag.name === currentTagName).id;
-    //         if (desiredId) tagIds.push(desiredId);
-    //     }
-    //     return tagIds;
-    // }
-
-    const handleTagsUpdate = (newTags) => {
-        //TODO here i must update this particular tweet in the global
-        //array of tweets
-        setTweetTags(newTags);
-        //TODO now i must find out the ids of the chosen tags
-        updateTweetAndTags(tweetData.id, newTags);
-        onTagsUpdate(tweetData.id, newTags); // Notify parent or database
+    const [notificationMessage, setNotificationMessage] = useState(null);
+    const [notificationClass, setNotificationClass] = useState(null);
+    const setTweetsData = (savedTweetsArray) => {
+        updateState('savedTweets', savedTweetsArray);
+    };
+    const setTags = (tagsArray) => {
+        updateState('tags', tagsArray);
     };
 
+    const handleTagsUpdate = (newTags) => {
+        setTweetTags(newTags);
+        updateTweetAndTagsLocally(tweetData.id, newTags);
+        updateTagsOnDB(tweetData.id, newTags);
+    };
+
+    function removeSubstring(originalString, substringToRemove) {
+        const regex = new RegExp(`\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`, 'g');
+        return originalString.replace(regex, '').trim();
+    }
+
+    const handleRemoveTag = (tagToRemove) => {
+        // delete this tag locally
+        // delete this tag from the tag list
+        setTags(state.tags.filter(tag => tag != tagToRemove));
+        // delete this tag from every tweet
+        const currentTweets = state.savedTweets;
+        // iterate the array
+        // find the tweet that contains the tagToRemove
+        for (let i = 0; i < currentTweets.length; i++) {
+            const currentTags = currentTweets[i].tags;
+            if (currentTags && currentTags.indexOf(tagToRemove) != -1) {
+                currentTweets[i].tags = removeSubstring(currentTags, tagToRemove);
+            }
+        }
+        setTweetsData(currentTweets)
+        // delete this tag from the db
+        removeTagFromDB(tagToRemove);
+        // delete this tag from tweets_tags
+        // delete this tag from tags
+    }
+
+    const renderOption = (props, option, { selected }) => {
+        return (
+            <li {...props} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{option}</span>
+                <IconButton
+                    size="small"
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering selection action
+                        handleRemoveTag(option);
+                    }}
+                    color="error"
+                >
+                    <Cancel fontSize="small" />
+                </IconButton>
+            </li>
+        );
+    };
     return (
         <React.Fragment>
+            {notificationMessage && (
+                <Notification
+                    notificationClass={notificationClass}
+                    notificationMessage={notificationMessage}
+                />
+            )}
             <Dialog
                 open={open}
                 onClose={onClose}
@@ -92,11 +153,17 @@ export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allT
 
                             {/* Conditional tweet image display */}
                             {tweetData.tweetImageOrPoster ? (
-                                <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)}>
+                                <a href={tweetData.tweetUrl} onClick={(e) => {
+                                    e.preventDefault();
+                                    handleClick(tweetData.tweetUrl)
+                                }}>
                                     <img src={tweetData.tweetImageOrPoster} className="mt-2 rounded-lg" width="75%" alt="tweet image" />
                                 </a>
                             ) : (
-                                <a href={tweetData.tweetUrl} onClick={() => handleClick(tweetData.tweetUrl)} className="text-blue-500">
+                                <a href={tweetData.tweetUrl} onClick={(e) => {
+                                    e.preventDefault();
+                                    handleClick(tweetData.tweetUrl)
+                                }} className="text-blue-500">
                                     Tweet Url
                                 </a>
                             )}
@@ -111,7 +178,7 @@ export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allT
                         fullWidth
                         multiple
                         freeSolo
-                        options={allTheTags}
+                        options={state.tags}
                         value={tweetTags}
                         onChange={(event, newValue) => handleTagsUpdate(newValue)}
                         renderTags={(value, getTagProps) =>
@@ -121,12 +188,14 @@ export function TweetDetailDialog({ open, onClose, tweetData, onTagsUpdate, allT
                                     label={option}
                                     {...getTagProps({ index })}
                                     variant="outlined"
+                                // onDelete={() => handleRemoveTag(option)}
                                 />
                             ))
                         }
                         renderInput={(params) => (
                             <TextField {...params} label="Tags" placeholder="Add tags" />
                         )}
+                        renderOption={renderOption} // Custom option renderer with a remove button
                         sx={{ marginTop: 1 }}
                     />
                     <Button onClick={onClose}>

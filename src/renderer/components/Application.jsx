@@ -125,7 +125,8 @@ export const Application = () => {
   const displayTweetsData = (tweetsArray, tags) => {
     return (
       <div>
-        <TweetsTable tweetsArray={state.savedTweets} setTweetsData={setTweetsData} tags={state.tags} setTags={setTags} />
+        {/* <TweetsTable tweetsArray={state.savedTweets} setTweetsData={setTweetsData} tags={state.tags} setTags={setTags} /> */}
+        <TweetsTable />
       </div>
     );
   };

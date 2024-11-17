@@ -209,3 +209,29 @@ ORDER BY
     };
   }
 };
+
+export const removeTagFromDB = async (tagName) => {
+  // Queries
+  const deleteFromTweetsTagsQuery = `DELETE FROM tweets_tags WHERE tagId = (SELECT id FROM tags WHERE name = ?)`;
+  const deleteTagQuery = `DELETE FROM tags WHERE name = ?`;
+
+  try {
+    // Start by deleting all references to the tag from the tweets_tags table
+    await db.runAsync(deleteFromTweetsTagsQuery, [tagName]);
+
+    // Now delete the tag itself from the tags table
+    await db.runAsync(deleteTagQuery, [tagName]);
+
+    console.log(`Successfully removed tag '${tagName}' from the system.`);
+    return {
+      success: true,
+      errorMessage: '👍🏼'
+    };;
+  } catch (error) {
+    console.error('Error removing tag from system:', error);
+    return {
+      success: false,
+      errorMessage: error
+    };
+  }
+};

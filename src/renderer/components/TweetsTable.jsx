@@ -6,7 +6,6 @@ import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
 import { AppContext } from '../../context/AppContext';
 
-// const TweetsTable = ({ tweetsArray, setTweetsData, tags, setTags }) => {
 const TweetsTable = () => {
 
     const { state, updateState } = useContext(AppContext);
@@ -47,7 +46,7 @@ const TweetsTable = () => {
 
         return updatedArray;
     };
-    const updateTweetAndTags = (tweetToBeUpdated, tweetTags) => {
+    const updateTweetAndTagsLocally = (tweetToBeUpdated, tweetTags) => {
         //here i must search for the tweetToBeUpdated id in dataNdoes;
         // then update it with the new tags
         const updatedNodes = updateArrayItem(state.savedTweets, tweetToBeUpdated, { tags: tweetTags.join(",") });
@@ -133,6 +132,10 @@ const TweetsTable = () => {
         // Update the database or state with the new tags
     };
 
+    const handleTagsRemoval = (tag) => {
+        window.savedXApi.removeTagFromDB(tag);
+    }
+
     return (
         <>
 
@@ -174,10 +177,10 @@ const TweetsTable = () => {
             <TweetDetailDialog
                 open={isDialogOpen}
                 tweetData={tweetData}
-                onTagsUpdate={handleTagsUpdate}
+                updateTagsOnDB={handleTagsUpdate}
+                removeTagFromDB={handleTagsRemoval}
                 onClose={handleClose}
-                allTags={state.tags}
-                updateTweetAndTags={updateTweetAndTags}
+                updateTweetAndTagsLocally={updateTweetAndTagsLocally}
             />
         </>
     );

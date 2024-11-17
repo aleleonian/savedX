@@ -21,7 +21,8 @@ contextBridge.exposeInMainWorld("savedXApi", {
   openUrl: (url) => {
     shell.openExternal(url)
   },
-  updateTagsForTweet: (tweetId, newTags) => ipcRenderer.send("update-tags-for-tweet", tweetId, newTags)
+  updateTagsForTweet: (tweetId, newTags) => ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
+  removeTagFromDB: (tag) => ipcRenderer.send('remove-tag-from-db', tag)
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {

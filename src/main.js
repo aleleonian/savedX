@@ -102,13 +102,21 @@ ipcMain.on("read-tweets-from-db", async (event, data) => {
 });
 
 ipcMain.on("update-tags-for-tweet", async (event, tweetId, newTags) => {
-  // const tweets = await dbTools.readAllTweets();
-  // sendMessageToMainWindow("SAVED_TWEETS", tweets.rows);
   const updateTagsResult = await dbTools.updateTags(tweetId, newTags);
 
   //TODO VOY POR ACÁ. TENGO QUE COMUNICAR A REACT SI FUE BIEN
   //O MAL EL UPDATE
   console.log("updateTagsResult->", updateTagsResult);
+});
+
+ipcMain.on("remove-tag-from-db", async (event, tag) => {
+  const removeTagFromDBResult = await dbTools.removeTagFromDB(tag);
+  //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
+  //O MAL EL UPDATE
+  if(!removeTagFromDBResult.success){
+    sendMessageToMainWindow("NOTIFICATION", `error--${removeTagFromDBResult.errorMessage} 😫`);
+  }
+  console.log("removeTagFromDBResult->", removeTagFromDBResult);
 });
 
 
