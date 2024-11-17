@@ -217,10 +217,10 @@ export const removeTagFromDB = async (tagName) => {
 
   try {
     // Start by deleting all references to the tag from the tweets_tags table
-    await db.runAsync(deleteFromTweetsTagsQuery, [tagName]);
+    await runQuery(deleteFromTweetsTagsQuery, [tagName]);
 
     // Now delete the tag itself from the tags table
-    await db.runAsync(deleteTagQuery, [tagName]);
+    await runQuery(deleteTagQuery, [tagName]);
 
     console.log(`Successfully removed tag '${tagName}' from the system.`);
     return {

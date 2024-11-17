@@ -12,6 +12,7 @@ const TweetsTable = () => {
     const [search, setSearch] = React.useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [tweetData, setTweetData] = useState(null);
+    
     const setTweetsData = (savedTweetsArray) => {
         updateState('savedTweets', savedTweetsArray);
     };

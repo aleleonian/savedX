@@ -56,11 +56,21 @@ export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, re
     }, []); // Empty dependency array ensures this effect runs only once after mount
 
     const { state, updateState } = useContext(AppContext);
-    const [tweetTags, setTweetTags] = useState(tweetData && tweetData.tags ? tweetData.tags.split(",") : []);
+    const [tweetTags, setTweetTags] = useState([]);
     const [notificationMessage, setNotificationMessage] = useState(null);
     const [notificationClass, setNotificationClass] = useState(null);
 
+    useEffect(() => {
+        // Make sure tweetData and tweetData.tags are available
+        if (tweetData && tweetData.tags) {
+            setTweetTags(tweetData.tags.split(","));
+        }
+        else setTweetTags([]);
+    }, [tweetData]);  // Dependency array to rerun when tweetData changes
+
     if (tweetData == null) return null;
+
+    debugger;
 
     const setTweetsData = (savedTweetsArray) => {
         updateState('savedTweets', savedTweetsArray);
