@@ -6,14 +6,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../../context/AppContext';
 import { Cancel } from '@mui/icons-material';
 import { IconButton, TextField, Autocomplete, Chip } from "@mui/material";
-// import { ipcRenderer } from 'electron';
-// const { ipcRenderer } = require("electron");
 
-import { Notification } from "./Notification";
+import { AlertDialog } from "./AlertDialog";
 
 function PaperComponent(props) {
     return (
@@ -35,30 +33,35 @@ const handleClick = (path) => {
 }
 
 export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, removeTagFromDB, updateTweetAndTagsLocally }) {
-    if (tweetData == null) return null;
 
     useEffect(() => {
-        // Listen for messages from the main process
-        ipcRenderer.on('NOTIFICATION', (event, data) => {
-            debugger;
+        // Listen for messages from the preload script
+        const notificationEventListener = (event) => {
             if (event.detail) {
                 const data = event.detail.split("--");
                 setNotificationClass(data[0]);
                 setNotificationMessage(data[1]);
-                setTimeout(() => {
-                    setNotificationMessage(null);
-                }, 2000);
+                // setTimeout(() => {
+                //     setNotificationMessage(null);
+                // }, 2000);
             }
-        });
+        };
 
-        // Cleanup the listener on component unmount
-        return () => ipcRenderer.removeAllListeners('dialog-notification');
-    }, []);
+        window.addEventListener("NOTIFICATION", notificationEventListener);
+
+        // Clean up event listener on component unmount
+        return () => {
+            window.removeEventListener("NOTIFICATION", notificationEventListener);
+        };
+    }, []); // Empty dependency array ensures this effect runs only once after mount
 
     const { state, updateState } = useContext(AppContext);
-    const [tweetTags, setTweetTags] = useState(tweetData.tags ? tweetData.tags.split(",") : []);
+    const [tweetTags, setTweetTags] = useState(tweetData && tweetData.tags ? tweetData.tags.split(",") : []);
     const [notificationMessage, setNotificationMessage] = useState(null);
     const [notificationClass, setNotificationClass] = useState(null);
+
+    if (tweetData == null) return null;
+
     const setTweetsData = (savedTweetsArray) => {
         updateState('savedTweets', savedTweetsArray);
     };
@@ -115,14 +118,9 @@ export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, re
             </li>
         );
     };
+
     return (
         <React.Fragment>
-            {notificationMessage && (
-                <Notification
-                    notificationClass={notificationClass}
-                    notificationMessage={notificationMessage}
-                />
-            )}
             <Dialog
                 open={open}
                 onClose={onClose}
@@ -138,6 +136,13 @@ export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, re
                             <img src={tweetData.profilePicUrl} className="w-10 h-10 rounded-md" alt="profile pic" />
                         </div>
 
+                        {notificationMessage && (
+                            <AlertDialog
+                                title="Woops!"
+                                message={notificationMessage}
+                                openFlag={true}
+                            />
+                        )}
                         {/* Tweet content */}
                         <div className="flex-1">
                             {/* User details row */}
