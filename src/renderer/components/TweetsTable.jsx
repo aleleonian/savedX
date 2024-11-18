@@ -24,10 +24,15 @@ const TweetsTable = () => {
     let data = { tweetsArray: state.savedTweets };
     data = {
         nodes: data.tweetsArray.filter((item) => {
+            let includeThisItem = true;
+
             if (tagFilter != "") {
-                return item.tags.split(",").includes(tagFilter)
+                includeThisItem = item.tags.split(",").includes(tagFilter)
             }
-            return item.tweetText.toLowerCase().includes(searchString.toLowerCase())
+            if (searchString != "") {
+                includeThisItem = item.tweetText.toLowerCase().includes(searchString.toLowerCase())
+            }
+            return includeThisItem;
         }
         ),
     };
@@ -88,8 +93,8 @@ const TweetsTable = () => {
         // Update the database or state with the new tags
     };
 
-    const handleSelectChange = (event) => {
-        setTagFilter(event.target.value);
+    const handleSelectChange = (filterString) => {
+        setTagFilter(filterString);
     }
 
     const handleTagsRemoval = (tag) => {

@@ -9,14 +9,19 @@ export function BasicSelect({ tags, handleSelectChange }) {
   const [tag, setTag] = React.useState('');
 
   const handleChange = (event) => {
-    setTag(event.target.value);
-    handleSelectChange(event);
+    let tagFilter = event.target.value;
+
+    if (tagFilter == 'clean-the-filter-123') {
+      tagFilter = '';
+    }
+    setTag(tagFilter);
+    handleSelectChange(tagFilter);
   };
 
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Choose Tag</InputLabel>
+        <InputLabel id="demo-simple-select-label">Tags</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
@@ -24,21 +29,17 @@ export function BasicSelect({ tags, handleSelectChange }) {
           label="Age"
           onChange={handleChange}
         >
-          <MenuItem
-            value="Clean tag filter"
-            key="Clean tag filter"
-          >
-
-          </MenuItem>
           {tags.map((tag) => (
-            <MenuItem
-              key={tag}
-              value={tag}
-            >
+            <MenuItem key={tag} value={tag}>
               {tag}
             </MenuItem>
           ))}
+          {/* Manual MenuItem */}
+          <MenuItem value="clean-the-filter-123" key="clean-tag-filter">
+            Clean tag filter
+          </MenuItem>
         </Select>
+
       </FormControl>
     </Box>
   );
