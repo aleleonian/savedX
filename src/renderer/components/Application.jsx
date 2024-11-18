@@ -8,6 +8,7 @@ import { AppContext } from '../../context/AppContext';
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(false)
   const [notificationClass, setNotificationClass] = useState(null);
   const [progressState, setProgressState] = useState({
     active: false,
@@ -19,6 +20,7 @@ export const Application = () => {
     loggedOut: false,
   });
   const { state, updateState } = useContext(AppContext);
+
 
   const setTweetsData = (savedTweetsArray) => {
     updateState('savedTweets', savedTweetsArray);
@@ -45,9 +47,6 @@ export const Application = () => {
         const data = event.detail.split("--");
         setNotificationClass(data[0]);
         setNotificationMessage(data[1]);
-        setTimeout(() => {
-          setNotificationMessage(null);
-        }, 2000);
       }
     };
 
@@ -97,6 +96,12 @@ export const Application = () => {
       });
     }
 
+    const disableGoFetchButtonEventListener = (event) => {
+      console.log("disableGoFetchButtonEventListener()!")
+      console.log("isDisabled->", isDisabled);
+      setIsDisabled(true);
+    }
+
     const contentEventListener = (event) => {
 
       setTweetsData(event.detail.tweets);
@@ -109,12 +114,15 @@ export const Application = () => {
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("CONTENT", contentEventListener);
     window.addEventListener("SHOW_PROGRESS", progressEventListener);
+    window.addEventListener("DISABLE_GO_FETCH_BUTTON", disableGoFetchButtonEventListener);
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
       window.removeEventListener("CONTENT", contentEventListener);
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
+      window.removeEventListener("DISABLE_GO_FETCH_BUTTON", disableGoFetchButtonEventListener);
+
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
@@ -156,7 +164,7 @@ export const Application = () => {
             "There's nothing to show, bro 😣"
         }
         <div className="text-center my-4">
-          <button className="btn btn-blue" onClick={goFetchTweets}>Go fetch tweets</button>
+          <button className="btn btn-blue" disabled={isDisabled} onClick={goFetchTweets}>Go fetch tweets</button>
         </div>
       </div>
     </section>

@@ -113,7 +113,7 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
   const removeTagFromDBResult = await dbTools.removeTagFromDB(tag);
   //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
   //O MAL EL UPDATE
-  if(!removeTagFromDBResult.success){
+  if (!removeTagFromDBResult.success) {
     sendMessageToMainWindow("NOTIFICATION", `error--${removeTagFromDBResult.errorMessage} 😫`);
   }
   console.log("removeTagFromDBResult->", removeTagFromDBResult);
@@ -153,5 +153,9 @@ const init = async () => {
     sendMessageToMainWindow("CONTENT", { tweets: tweets.rows, tags: readAllTagsResult.rows })
     return { success: true };
 
+  }
+  else {
+    sendMessageToMainWindow("NOTIFICATION", `error--There were issues opening / creating the db file 😫`);
+    sendMessageToMainWindow("DISABLE_GO_FETCH_BUTTON");
   }
 }

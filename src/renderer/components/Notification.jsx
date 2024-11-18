@@ -1,7 +1,10 @@
 import React from "react";
+import { TransitionAlerts } from './TransitionAlerts';
 
-export const Notification = ({notificationMessage, notificationClass}) => {
+export const Notification = ({ notificationMessage, notificationClass }) => {
   if (notificationMessage !== "" && notificationMessage) {
-    return <div className={notificationClass}>{notificationMessage}</div>;
+    return (
+      <TransitionAlerts severity={notificationClass} message={notificationMessage} />
+    );
   } else return null;
 };

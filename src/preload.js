@@ -35,6 +35,16 @@ ipcRenderer.on("NOTIFICATION", (event, message) => {
   }
 });
 
+ipcRenderer.on("DISABLE_GO_FETCH_BUTTON", () => {
+  console.log("DISABLE_GO_FETCH_BUTTON message from main:");
+  if (domContentLoaded) dispatchNotification("DISABLE_GO_FETCH_BUTTON");
+  else {
+    setTimeout(() => {
+      dispatchNotification("DISABLE_GO_FETCH_BUTTON");
+    }, 1500);
+  }
+});
+
 ipcRenderer.on("CONTENT", async (event, message) => {
   if (domContentLoaded) dispatchNotification("CONTENT", message);
   while (!domContentLoaded) {

@@ -43,6 +43,11 @@ body {
   @apply bg-blue-700;
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 th[role="columnheader"] {
   display: none;
 }

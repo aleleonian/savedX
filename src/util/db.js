@@ -1,7 +1,7 @@
 const sqlite3 = require("sqlite3").verbose();
 const { promisify } = require("util");
 import cheerio from "cheerio";
-
+const fs = require('fs');
 let db;
 
 const runQuery = (query, params = []) => {
@@ -28,23 +28,103 @@ const getQuery = (query, params = []) => {
   });
 };
 
+const createIfNotExist = (filePath) => {
+  if (!fs.existsSync(filePath)) {
+
+    console.log('Database file not found. Creating a new one...');
+
+    // Create a new database
+    db = new sqlite3.Database(filePath, (err) => {
+      if (err) {
+        console.error('Error creating the database:', err.message);
+        return {
+          success: false,
+          errorMessage: err.message
+        }
+      }
+      console.log('New database created.');
+    });
+
+    // Initialize schema
+    db.serialize(() => {
+      db.run(`
+        CREATE TABLE "tweets" (
+          "id"	INTEGER,
+          "indexId"	TEXT NOT NULL,
+          "htmlContent"	TEXT NOT NULL,
+          "userName"	TEXT,
+          "twitterHandle"	INTEGER,
+          "tweetText"	TEXT,
+          "tweetUrl"	TEXT,
+          "tweetImageOrPoster"	TEXT,
+          "tweetDate"	TEXT,
+          "profilePicUrl"	TEXT NOT NULL,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        )
+      `);
+
+      db.run(`
+        CREATE TABLE "tags" (
+          "id"	INTEGER NOT NULL,
+          "name"	INTEGER NOT NULL UNIQUE,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        )
+      `);
+
+      db.run(`
+      CREATE TABLE "tweets_tags" (
+        "tweetId"	INTEGER,
+        "tagId"	INTEGER,
+        FOREIGN KEY("tweetId") REFERENCES "tweets"("id"),
+        FOREIGN KEY("tagId") REFERENCES "tags"("id")
+      )
+      `);
+      console.log('Database schema initialized.');
+    });
+
+    // Close the DB connection
+    db.close((err) => {
+      if (err) {
+        console.error('Error closing the database:', err.message);
+      }
+      console.log('Database connection closed.');
+    });
+
+    return {
+      success: true,
+    }
+  }
+  console.log("DB file exists.");
+
+  return {
+    success: true,
+  }
+}
+
 export const openDb = (filePath) => {
   return new Promise((resolve, reject) => {
+    resolve(false);
+    return;
     try {
+      const openOrCreateResult = createIfNotExist(filePath);
+      if (!openOrCreateResult.success) {
+        resolve(false);
+        return;
+      }
       db = new sqlite3.Database(filePath, (err) => {
         if (err) {
           console.error("Error opening database:", err);
-          resolve(false); // Database opening failed, resolve with false
+          resolve(false);
+          return;
         } else {
           db.allAsync = promisify(db.all).bind(db);
           db.dbRun = promisify(db.run).bind(db);
-          resolve(true); // Database opened successfully, resolve with true
+          resolve(true);
         }
       });
     } catch (err) {
-      // File doesn't exist, handle the error
-      console.error("File does not exist:", err);
-      resolve(false); // File does not exist, resolve with false
+      console.error("Error opening or creating db file:", err);
+      resolve(false);
     }
   });
 };
@@ -108,7 +188,9 @@ export const setDb = (dbConnection) => {
 };
 
 export const closeDb = () => {
-  return db.close();
+  if (db) {
+    return db.close();
+  }
 };
 
 export const getXCredentials = async () => {
@@ -183,7 +265,7 @@ export const readAllTweets = async () => {
       T.*, 
       IFNULL(GROUP_CONCAT(TAG.name), '[]') AS tags
   FROM 
-      TWEETS T
+      tweets T
   LEFT JOIN 
       tweets_tags TT ON T.id = TT.tweetId
   LEFT JOIN 
