@@ -132,6 +132,9 @@ const init = async () => {
   console.log("dbPath>", dbPath);
 
   const openDbResult = await dbTools.openDb(dbPath);
+  // VOY POR ACÁ, ESTE openDbResult da false
+  console.log("openDbResult->", openDbResult);
+
   if (openDbResult) {
 
     const tweets = await dbTools.readAllTweets();

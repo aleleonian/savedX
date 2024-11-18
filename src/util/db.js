@@ -2,7 +2,28 @@ const sqlite3 = require("sqlite3").verbose();
 const { promisify } = require("util");
 import cheerio from "cheerio";
 const fs = require('fs');
+
 let db;
+
+function createDatabase(filePath) {
+  return new Promise((resolve, reject) => {
+    db = new sqlite3.Database(filePath, (err) => {
+      if (err) {
+        console.error('Error creating the database:', err.message);
+        reject({
+          success: false,
+          errorMessage: err.message
+        });
+      } else {
+        console.log('New database created.');
+        resolve({
+          success: true,
+          db // Return the database object for further operations
+        });
+      }
+    });
+  });
+}
 
 const runQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
@@ -16,6 +37,19 @@ const runQuery = (query, params = []) => {
   });
 };
 
+const dbClose = () => {
+  return new Promise((resolve, reject) => {
+    db.close((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve("Database connection closed successfully.");
+      }
+    });
+  });
+};
+
+
 const getQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.get(query, params, (err, row) => {
@@ -28,72 +62,85 @@ const getQuery = (query, params = []) => {
   });
 };
 
-const createIfNotExist = (filePath) => {
+const createIfNotExist = async (filePath) => {
   if (!fs.existsSync(filePath)) {
 
     console.log('Database file not found. Creating a new one...');
 
-    // Create a new database
-    db = new sqlite3.Database(filePath, (err) => {
-      if (err) {
-        console.error('Error creating the database:', err.message);
-        return {
-          success: false,
-          errorMessage: err.message
-        }
+    try {
+      // Create a new database
+      // db = new sqlite3.Database(filePath, (err) => {
+      //   if (err) {
+      //     console.error('Error creating the database:', err.message);
+      //     return {
+      //       success: false,
+      //       errorMessage: err.message
+      //     }
+      //   }
+      //   console.log('New database created.');
+      // });
+
+      const createDatabaseResult = await createDatabase(filePath);
+      if (!createDatabaseResult.success) {
+        return createDatabaseResult;
       }
-      console.log('New database created.');
-    });
+      else db = createDatabaseResult.db;
+      // Initialize schema
 
-    // Initialize schema
-    db.serialize(() => {
-      db.run(`
-        CREATE TABLE "tweets" (
-          "id"	INTEGER,
-          "indexId"	TEXT NOT NULL,
-          "htmlContent"	TEXT NOT NULL,
-          "userName"	TEXT,
-          "twitterHandle"	INTEGER,
-          "tweetText"	TEXT,
-          "tweetUrl"	TEXT,
-          "tweetImageOrPoster"	TEXT,
-          "tweetDate"	TEXT,
-          "profilePicUrl"	TEXT NOT NULL,
-          PRIMARY KEY("id" AUTOINCREMENT)
-        )
-      `);
-
-      db.run(`
-        CREATE TABLE "tags" (
-          "id"	INTEGER NOT NULL,
-          "name"	INTEGER NOT NULL UNIQUE,
-          PRIMARY KEY("id" AUTOINCREMENT)
-        )
-      `);
-
-      db.run(`
-      CREATE TABLE "tweets_tags" (
-        "tweetId"	INTEGER,
-        "tagId"	INTEGER,
-        FOREIGN KEY("tweetId") REFERENCES "tweets"("id"),
-        FOREIGN KEY("tagId") REFERENCES "tags"("id")
+      await runQuery(`
+      CREATE TABLE "tweets" (
+        "id"	INTEGER,
+        "indexId"	TEXT NOT NULL,
+        "htmlContent"	TEXT NOT NULL,
+        "userName"	TEXT,
+        "twitterHandle"	INTEGER,
+        "tweetText"	TEXT,
+        "tweetUrl"	TEXT,
+        "tweetImageOrPoster"	TEXT,
+        "tweetDate"	TEXT,
+        "profilePicUrl"	TEXT NOT NULL,
+        PRIMARY KEY("id" AUTOINCREMENT)
       )
       `);
+      await runQuery(`
+      CREATE TABLE "tags" (
+        "id"	INTEGER NOT NULL,
+        "name"	INTEGER NOT NULL UNIQUE,
+        PRIMARY KEY("id" AUTOINCREMENT)
+      )
+      `);
+      await runQuery(`
+    CREATE TABLE "tweets_tags" (
+      "tweetId"	INTEGER,
+      "tagId"	INTEGER,
+      FOREIGN KEY("tweetId") REFERENCES "tweets"("id"),
+      FOREIGN KEY("tagId") REFERENCES "tags"("id")
+    )
+      `);
+      await runQuery(`
+    CREATE TABLE "config" (
+      "TWITTER_BOT_USERNAME"	TEXT NOT NULL,
+      "TWITTER_BOT_PASSWORD"	TEXT NOT NULL,
+      "TWITTER_BOT_EMAIL"	INTEGER NOT NULL
+    )
+     `);
+
       console.log('Database schema initialized.');
-    });
+      
+      await dbClose();
 
-    // Close the DB connection
-    db.close((err) => {
-      if (err) {
-        console.error('Error closing the database:', err.message);
+      return {
+        success: true,
       }
-      console.log('Database connection closed.');
-    });
-
-    return {
-      success: true,
+    }
+    catch (error) {
+      console.log("Error creating DB file! ", error);
+      return {
+        success: false,
+      }
     }
   }
+
   console.log("DB file exists.");
 
   return {
@@ -103,8 +150,6 @@ const createIfNotExist = (filePath) => {
 
 export const openDb = (filePath) => {
   return new Promise((resolve, reject) => {
-    resolve(false);
-    return;
     try {
       const openOrCreateResult = createIfNotExist(filePath);
       if (!openOrCreateResult.success) {
@@ -119,6 +164,7 @@ export const openDb = (filePath) => {
         } else {
           db.allAsync = promisify(db.all).bind(db);
           db.dbRun = promisify(db.run).bind(db);
+          db.closeAsync = promisify(db.close.bind(db));
           resolve(true);
         }
       });
@@ -289,7 +335,7 @@ export const readAllTweets = async () => {
       errorMessage: `Could not read tweets: ${error}`
     };
   }
-};
+}
 
 export const removeTagFromDB = async (tagName) => {
   // Queries
