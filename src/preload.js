@@ -19,10 +19,11 @@ contextBridge.exposeInMainWorld("savedXApi", {
   stopScraping: () => ipcRenderer.send("stop-scraping"),
   getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
   openUrl: (url) => {
-    shell.openExternal(url)
+    shell.openExternal(url);
   },
-  updateTagsForTweet: (tweetId, newTags) => ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
-  removeTagFromDB: (tag) => ipcRenderer.send('remove-tag-from-db', tag)
+  updateTagsForTweet: (tweetId, newTags) =>
+    ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
+  removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {
@@ -36,7 +37,6 @@ ipcRenderer.on("NOTIFICATION", (event, message) => {
 });
 
 ipcRenderer.on("DISABLE_GO_FETCH_BUTTON", () => {
-  console.log("DISABLE_GO_FETCH_BUTTON message from main:");
   if (domContentLoaded) dispatchNotification("DISABLE_GO_FETCH_BUTTON");
   else {
     setTimeout(() => {
@@ -54,6 +54,14 @@ ipcRenderer.on("CONTENT", async (event, message) => {
 });
 
 ipcRenderer.on("SHOW_PROGRESS", async (event, message) => {
-  console.log("preload.js->SHOW_PROGRESS:", message);
   dispatchNotification("SHOW_PROGRESS", message);
+});
+
+ipcRenderer.on("SHOW_CONFIG_DIALOG", () => {
+  if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG");
+  else {
+    setTimeout(() => {
+      dispatchNotification("SHOW_CONFIG_DIALOG");
+    }, 1500);
+  }
 });

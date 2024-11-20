@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Notification } from "./Notification";
+import { ConfigDialog } from "./ConfigDialog";
 import TweetsTable from "./TweetsTable";
-import { Title } from './Title';
+import { Title } from "./Title";
 import * as constants from "../../util/constants";
 import { Progress } from "./Progress";
-import { AppContext } from '../../context/AppContext';
+import { AppContext } from "../../context/AppContext";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
-  const [isDisabled, setIsDisabled] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(false);
   const [notificationClass, setNotificationClass] = useState(null);
   const [progressState, setProgressState] = useState({
     active: false,
@@ -19,14 +20,14 @@ export const Application = () => {
     loggingOut: false,
     loggedOut: false,
   });
+  const [openConfigDialog, setOpenConfigDialog] = useState(false);
   const { state, updateState } = useContext(AppContext);
 
-
   const setTweetsData = (savedTweetsArray) => {
-    updateState('savedTweets', savedTweetsArray);
+    updateState("savedTweets", savedTweetsArray);
   };
   const setTags = (tagsArray) => {
-    updateState('tags', tagsArray);
+    updateState("tags", tagsArray);
   };
 
   // const [tweetsData, setTweetsData] = useState(
@@ -38,7 +39,6 @@ export const Application = () => {
   //   // JSON.parse(localStorage.getItem("tags")) || null
   //   null
   // );
-
 
   useEffect(() => {
     // Listen for messages from the preload script
@@ -94,16 +94,18 @@ export const Application = () => {
 
         return newShowProgress;
       });
-    }
+    };
 
     const disableGoFetchButtonEventListener = (event) => {
-      console.log("disableGoFetchButtonEventListener()!")
-      console.log("isDisabled->", isDisabled);
       setIsDisabled(true);
-    }
+    };
+
+    const showConfigDialogEventListener = (event) => {
+      debugger;
+      setOpenConfigDialog(true);
+    };
 
     const contentEventListener = (event) => {
-
       setTweetsData(event.detail.tweets);
       //TODO not sure about this localStorage thing
       localStorage.setItem("tweetsData", JSON.stringify(event.detail.tweets));
@@ -114,15 +116,28 @@ export const Application = () => {
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("CONTENT", contentEventListener);
     window.addEventListener("SHOW_PROGRESS", progressEventListener);
-    window.addEventListener("DISABLE_GO_FETCH_BUTTON", disableGoFetchButtonEventListener);
+    window.addEventListener(
+      "DISABLE_GO_FETCH_BUTTON",
+      disableGoFetchButtonEventListener
+    );
+    window.addEventListener(
+      "SHOW_CONFIG_DIALOG",
+      showConfigDialogEventListener
+    );
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
       window.removeEventListener("CONTENT", contentEventListener);
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
-      window.removeEventListener("DISABLE_GO_FETCH_BUTTON", disableGoFetchButtonEventListener);
-
+      window.removeEventListener(
+        "DISABLE_GO_FETCH_BUTTON",
+        disableGoFetchButtonEventListener
+      );
+      window.removeEventListener(
+        "SHOW_CONFIG_DIALOG",
+        showConfigDialogEventListener
+      );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
@@ -144,7 +159,7 @@ export const Application = () => {
       <>
         <Progress state={progressState} />
       </>
-    )
+    );
   }
   return (
     <section className="home">
@@ -156,15 +171,23 @@ export const Application = () => {
           notificationMessage={notificationMessage}
         />
       )}
+
+      {openConfigDialog && <ConfigDialog />}
+
       <div className="text-center">
-        {
-          !progressState.active &&
-            state.savedTweets && state.savedTweets.length > 0 ? displayTweetsData(state.savedTweets, state.tags)
-            :
-            "There's nothing to show, bro 😣"
-        }
+        {!progressState.active &&
+        state.savedTweets &&
+        state.savedTweets.length > 0
+          ? displayTweetsData(state.savedTweets, state.tags)
+          : "There's nothing to show, bro 😣"}
         <div className="text-center my-4">
-          <button className="btn btn-blue" disabled={isDisabled} onClick={goFetchTweets}>Go fetch tweets</button>
+          <button
+            className="btn btn-blue"
+            disabled={isDisabled}
+            onClick={goFetchTweets}
+          >
+            Go fetch tweets
+          </button>
         </div>
       </div>
     </section>

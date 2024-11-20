@@ -87,12 +87,18 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
   // await goFetchTweetsFake();
   const checkUserAndPassResponse = await checkUserAndPass();
   if (checkUserAndPassResponse.success) {
-    await goFetchTweets();
+    const data = checkUserAndPassResponse.data;
+    await goFetchTweets(
+      data.TWITTER_BOT_USERNAME,
+      data.TWITTER_BOT_PASSWORD,
+      data.TWITTER_BOT_EMAIL
+    );
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
       `error--Bro, there's no user and pass 😫`
     );
+    sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
   }
 });
 

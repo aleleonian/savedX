@@ -206,7 +206,7 @@ export class XBot {
         return found;
     }
     async getLastTweetUrl() {
-        let hasVisited = await this.goto("https://www.x.com" + "/" + process.env.TWITTER_BOT_USERNAME);
+        let hasVisited = await this.goto("https://www.x.com" + "/" + this.botUsername);
         if (!hasVisited) return false;
 
         let foundAndClicked = await this.findAndClick(process.env.TWITTER_LAST_POST_IN_PROFILE);
@@ -375,7 +375,7 @@ export class XBot {
         this.isLoggedIn = false;
         return true;
     }
-    async loginToX() {
+    async loginToX(botUsername, botPassword, botEmail) {
         this.isBusy = true;
 
         if (!this.isLoggedIn) {
@@ -395,7 +395,7 @@ export class XBot {
             }
             console.log("Found and clicked TWITTER_USERNAME_INPUT");
 
-            let foundAndTyped = await this.findAndType(process.env.TWITTER_USERNAME_INPUT, process.env.TWITTER_BOT_USERNAME);
+            let foundAndTyped = await this.findAndType(process.env.TWITTER_USERNAME_INPUT, this.botUsername);
             if (!foundAndTyped) {
                 console.log("Can't find and type TWITTER_USERNAME_INPUT");
                 this.isBusy = false;
