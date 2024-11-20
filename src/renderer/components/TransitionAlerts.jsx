@@ -7,6 +7,12 @@ import CloseIcon from '@mui/icons-material/Close';
 
 export function TransitionAlerts({severity, message}) {
   const [open, setOpen] = React.useState(true);
+  const formattedText = message.split("\n").map((line, index) => (
+    <React.Fragment key={index}>
+      {line}
+      <br />
+    </React.Fragment>
+  ));
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -27,7 +33,7 @@ export function TransitionAlerts({severity, message}) {
           sx={{ mb: 2 }}
           severity={severity}
         >
-          {message}
+          {formattedText}
         </Alert>
       </Collapse>
     </Box>

@@ -1,7 +1,8 @@
 const sqlite3 = require("sqlite3").verbose();
 const { promisify } = require("util");
+import { returnError, returnSuccess } from "./common";
 import cheerio from "cheerio";
-const fs = require('fs');
+const fs = require("fs");
 
 let db;
 
@@ -9,29 +10,29 @@ function createDatabase(filePath) {
   return new Promise((resolve, reject) => {
     db = new sqlite3.Database(filePath, (err) => {
       if (err) {
-        console.error('Error creating the database:', err.message);
+        console.error("Error creating the database:", err.message);
         reject({
           success: false,
-          errorMessage: err.message
+          errorMessage: err.message,
         });
       } else {
-        console.log('New database created.');
+        console.log("New database created.");
         resolve({
           success: true,
-          db // Return the database object for further operations
+          db, // Return the database object for further operations
         });
       }
     });
   });
 }
 
-const runQuery = (query, params = []) => {
+export const runQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(query, params, function (err) {
       if (err) {
-        reject(err);
+        reject(returnError(err));
       } else {
-        resolve(this);
+        resolve(returnSuccess(this));
       }
     });
   });
@@ -49,14 +50,13 @@ const dbClose = () => {
   });
 };
 
-
-const getQuery = (query, params = []) => {
+export const getQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.get(query, params, (err, row) => {
       if (err) {
-        reject(err);
+        reject(createError(err));
       } else {
-        resolve(row);
+        resolve(returnSuccess(row));
       }
     });
   });
@@ -64,8 +64,7 @@ const getQuery = (query, params = []) => {
 
 const createIfNotExist = async (filePath) => {
   if (!fs.existsSync(filePath)) {
-
-    console.log('Database file not found. Creating a new one...');
+    console.log("Database file not found. Creating a new one...");
 
     try {
       // Create a new database
@@ -83,8 +82,7 @@ const createIfNotExist = async (filePath) => {
       const createDatabaseResult = await createDatabase(filePath);
       if (!createDatabaseResult.success) {
         return createDatabaseResult;
-      }
-      else db = createDatabaseResult.db;
+      } else db = createDatabaseResult.db;
       // Initialize schema
 
       await runQuery(`
@@ -125,19 +123,18 @@ const createIfNotExist = async (filePath) => {
     )
      `);
 
-      console.log('Database schema initialized.');
-      
+      console.log("Database schema initialized.");
+
       await dbClose();
 
       return {
         success: true,
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       console.log("Error creating DB file! ", error);
       return {
         success: false,
-      }
+      };
     }
   }
 
@@ -145,13 +142,13 @@ const createIfNotExist = async (filePath) => {
 
   return {
     success: true,
-  }
-}
+  };
+};
 
 export const openDb = (filePath) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const openOrCreateResult = createIfNotExist(filePath);
+      const openOrCreateResult = await createIfNotExist(filePath);
       if (!openOrCreateResult.success) {
         resolve(false);
         return;
@@ -162,9 +159,9 @@ export const openDb = (filePath) => {
           resolve(false);
           return;
         } else {
-          db.allAsync = promisify(db.all).bind(db);
-          db.dbRun = promisify(db.run).bind(db);
-          db.closeAsync = promisify(db.close.bind(db));
+          // db.allAsync = promisify(db.all).bind(db);
+          // db.dbRun = promisify(db.run).bind(db);
+          // db.closeAsync = promisify(db.close.bind(db));
           resolve(true);
         }
       });
@@ -176,12 +173,11 @@ export const openDb = (filePath) => {
 };
 
 export const storeTweets = async (tweetArray) => {
-  await db.dbRun(`CREATE TABLE IF NOT EXISTS tweets (
+  await runQuery(`CREATE TABLE IF NOT EXISTS tweets (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         indexId TEXT,
         htmlContent TEXT
       )`);
-
 
   await Promise.all(
     tweetArray.map(async (tweet) => {
@@ -191,41 +187,47 @@ export const storeTweets = async (tweetArray) => {
       tweet.twitterHandle = "@" + userNameData[1].split("·")[0];
       tweet.tweetDate = userNameData[1].split("·")[1];
       tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
-      tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr('href');
-      tweet.profilePicUrl = $('img').first().attr('src');
+      tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr("href");
+      tweet.profilePicUrl = $("img").first().attr("src");
 
       if ($('[data-testid="videoPlayer"]').length > 0) {
-        tweet.tweetImageOrPoster = $('[data-testid="videoPlayer"] video').attr('poster')
+        tweet.tweetImageOrPoster = $('[data-testid="videoPlayer"] video').attr(
+          "poster"
+        );
+      } else {
+        tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr(
+          "src"
+        );
       }
-      else {
-        tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr('src');
-      }
-      await db.run(`INSERT INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, profilePicUrl ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-        tweet.indexId,
-        tweet.htmlContent,
-        tweet.userName,
-        tweet.twitterHandle,
-        tweet.tweetDate,
-        tweet.tweetImageOrPoster,
-        tweet.tweetText,
-        tweet.tweetUrl,
-        tweet.profilePicUrl
-      ]);
+      await db.run(
+        `INSERT INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, profilePicUrl ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          tweet.indexId,
+          tweet.htmlContent,
+          tweet.userName,
+          tweet.twitterHandle,
+          tweet.tweetDate,
+          tweet.tweetImageOrPoster,
+          tweet.tweetText,
+          tweet.tweetUrl,
+          tweet.profilePicUrl,
+        ]
+      );
     })
   );
 };
 export const deleteTweets = async (tweetArray) => {
   const query = `DELETE FROM TWEETS`;
   try {
-    await db.allAsync(query);
+    await runQuery(query);
     return {
       success: true,
-    }
+    };
   } catch (error) {
     console.error("deleteTweets: Error executing query:", error);
     return {
       success: false,
-      errorMessage: `Could not delete tweets: ${error}`
+      errorMessage: `Could not delete tweets: ${error}`,
     };
   }
 };
@@ -239,13 +241,14 @@ export const closeDb = () => {
   }
 };
 
+// TODO deprecated
 export const getXCredentials = async () => {
   console.log("getXCredentials()");
   const query = "SELECT * FROM users";
   try {
-    const rows = await db.allAsync(query);
-    if (rows.length < 1) return false;
-    return rows[0];
+    const getQueryResponse = await getQuery(query);
+    if (!getQueryResponse.data) return false;
+    return returnSuccess(getQueryResponse.data);
   } catch (error) {
     console.error("Error executing query:", error);
     return false;
@@ -255,55 +258,75 @@ export const getXCredentials = async () => {
 export const updateTags = async (tweetId, newTags) => {
   try {
     // Remove all old tags for the tweet (start a transaction)
-    await runQuery('DELETE FROM tweets_tags WHERE tweetId = ?', [tweetId]);
+    await runQuery("DELETE FROM tweets_tags WHERE tweetId = ?", [tweetId]);
 
     // Process each tag in the newTags array
     for (let tag of newTags) {
       // Check if the tag exists in the tags table
-      const row = await getQuery('SELECT id FROM tags WHERE name = ?', [tag]);
+      const getQueryResponse = await getQuery(
+        "SELECT id FROM tags WHERE name = ?",
+        [tag]
+      );
 
-      if (row) {
+      if (getQueryResponse.data) {
         // If the tag exists, insert the mapping into the tweets_tags table
-        await runQuery('INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)', [tweetId, row.id]);
+        // TODO error check this runQuery call
+        await runQuery(
+          "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
+          [tweetId, getQueryResponse.data.id]
+        );
         console.log(`Added tag "${tag}" for tweetId: ${tweetId}`);
       } else {
         // If the tag doesn't exist, insert it into the tags table
-        const result = await runQuery('INSERT INTO tags (name) VALUES (?)', [tag]);
+        const runQueryResponse = await runQuery("INSERT INTO tags (name) VALUES (?)", [
+          tag,
+        ]);
 
         // Get the new tag id (from last inserted row)
-        const newTagId = result.lastID;
+        const newTagId = runQueryResponse.data.lastID;
 
         // Insert the relationship between tweet and tag into tweets_tags table
-        await runQuery('INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)', [tweetId, newTagId]);
+        // TODO error check this runQuery call
+        await runQuery(
+          "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
+          [tweetId, newTagId]
+        );
         console.log(`Added new tag "${tag}" for tweetId: ${tweetId}`);
       }
     }
     return true;
-
   } catch (err) {
-    console.error('Error updating tags:', err);
+    console.error("Error updating tags:", err);
     return false;
   }
-}
+};
 
 export const readAllTags = async () => {
   try {
-    const rows = await db.allAsync('SELECT name FROM tags');
-    console.log("tags->", rows);
-    const tagNames = rows.map(row => row.name);
-    return {
-      success: true,
-      rows: tagNames,
+    const getQueryResponse = await getQuery("SELECT name FROM tags");
+    console.log("tags->", getQueryResponse);
+    let tagNames;
+    if (getQueryResponse.data) {
+      tagNames = getQueryResponse.data.map((row) => row.name);
+      return {
+        success: true,
+        getQueryResponse: tagNames,
+      };
+    } else {
+      return {
+        success: false,
+        errorMessage:
+          "No tags came back from the DB, for some reason. Maybe there are none?",
+      };
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.log("readAllTags() error: ", error);
     return {
       success: false,
-      errorMessage: error
-    }
+      errorMessage: error,
+    };
   }
-}
+};
 
 export const readAllTweets = async () => {
   const query = `
@@ -320,22 +343,29 @@ export const readAllTweets = async () => {
       T.id
   ORDER BY 
       T.indexId;
-  `
+  `;
 
   try {
-    const rows = await db.allAsync(query);
-    return {
-      success: true,
-      rows,
+    const getQueryResponse = await getQuery(query);
+    if (getQueryResponse.data) {
+      return {
+        success: true,
+        rows: getQueryResponse.data,
+      };
+    } else {
+      return {
+        success: false,
+        errorMessage: "No data came back from the DB, maybe db is empty?",
+      };
     }
   } catch (error) {
     console.error("Error executing query:", error);
     return {
       success: false,
-      errorMessage: `Could not read tweets: ${error}`
+      errorMessage: `Could not read tweets: ${error}`,
     };
   }
-}
+};
 
 export const removeTagFromDB = async (tagName) => {
   // Queries
@@ -352,13 +382,13 @@ export const removeTagFromDB = async (tagName) => {
     console.log(`Successfully removed tag '${tagName}' from the system.`);
     return {
       success: true,
-      errorMessage: '👍🏼'
-    };;
+      errorMessage: "👍🏼",
+    };
   } catch (error) {
-    console.error('Error removing tag from system:', error);
+    console.error("Error removing tag from system:", error);
     return {
       success: false,
-      errorMessage: error
+      errorMessage: error,
     };
   }
 };

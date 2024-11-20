@@ -2,7 +2,13 @@ require("dotenv").config();
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
-import { goFetchTweets, goFetchTweetsFake, stopScraping } from "./goFetchTweets";
+import { checkUserAndPass } from "./util/account";
+
+import {
+  goFetchTweets,
+  goFetchTweetsFake,
+  stopScraping,
+} from "./goFetchTweets";
 import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
 
 let mainWindow;
@@ -18,15 +24,15 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: false,   // Node.js features disabled
+      nodeIntegration: false, // Node.js features disabled
       contextIsolation: true,
-      sandbox: false
+      sandbox: false,
     },
   });
 
   setMainWindow(mainWindow);
 
-  mainWindow.on('closed', () => {
+  mainWindow.on("closed", () => {
     mainWindow = null;
   });
 
@@ -40,7 +46,7 @@ const createWindow = () => {
   }
 
   // Open the DevTools console
-  mainWindow.webContents.openDevTools({ mode: 'detach' });
+  mainWindow.webContents.openDevTools({ mode: "detach" });
 };
 
 // This method will be called when Electron has finished
@@ -50,7 +56,10 @@ app.whenReady().then(async () => {
   createWindow();
   const initStatus = await init();
   if (!initStatus.success) {
-    sendMessageToMainWindow("NOTIFICATION", `error--${initStatus.errorMessage}`);
+    sendMessageToMainWindow(
+      "NOTIFICATION",
+      `error--${initStatus.errorMessage}`
+    );
   }
 });
 
@@ -76,13 +85,21 @@ app.on("before-quit", () => {
 ipcMain.on("go-fetch-tweets", async (event, data) => {
   // const credentials = await dbTools.getXCredentials();
   // await goFetchTweetsFake();
-  await goFetchTweets();
+  const checkUserAndPassResponse = await checkUserAndPass();
+  if (checkUserAndPassResponse.success) {
+    await goFetchTweets();
+  } else {
+    sendMessageToMainWindow(
+      "NOTIFICATION",
+      `error--Bro, there's no user and pass 😫`
+    );
+  }
 });
 
 ipcMain.on("stop-scraping", async (event, data) => {
   // const credentials = await dbTools.getXCredentials();
   // await goFetchTweetsFake();
-  console.log("we gonna stop scraping then.")
+  console.log("we gonna stop scraping then.");
   await stopScraping();
 });
 
@@ -114,11 +131,13 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
   //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
   //O MAL EL UPDATE
   if (!removeTagFromDBResult.success) {
-    sendMessageToMainWindow("NOTIFICATION", `error--${removeTagFromDBResult.errorMessage} 😫`);
+    sendMessageToMainWindow(
+      "NOTIFICATION",
+      `error--${removeTagFromDBResult.errorMessage} 😫`
+    );
   }
   console.log("removeTagFromDBResult->", removeTagFromDBResult);
 });
-
 
 const init = async () => {
   // Check if the file exists
@@ -136,29 +155,37 @@ const init = async () => {
   console.log("openDbResult->", openDbResult);
 
   if (openDbResult) {
-
     const tweets = await dbTools.readAllTweets();
     const readAllTagsResult = await dbTools.readAllTags();
+    let resultOBj = {};
+    resultOBj.success = true;
 
     if (!tweets.success) {
-      const resultOBj = {};
       resultOBj.success = tweets.success;
-      if (tweets.errorMessage) resultOBj.errorMessage = tweets.errorMessage
-      return resultOBj;
+      if (tweets.errorMessage) resultOBj.errorMessage = tweets.errorMessage;
     }
+
     if (!readAllTagsResult.success) {
-      const resultOBj = {};
       resultOBj.success = readAllTagsResult.success;
-      if (tweets.errorMessage) resultOBj.errorMessage = readAllTagsResult.errorMessage
-      return resultOBj;
+      if (tweets.errorMessage) {
+        if (resultOBj.errorMessage) {
+          resultOBj.errorMessage += "\n" + readAllTagsResult.errorMessage;
+        } else resultOBj.errorMessage = readAllTagsResult.errorMessage;
+      }
     }
 
-    sendMessageToMainWindow("CONTENT", { tweets: tweets.rows, tags: readAllTagsResult.rows })
-    return { success: true };
+    if (!resultOBj.success) return resultOBj;
 
-  }
-  else {
-    sendMessageToMainWindow("NOTIFICATION", `error--There were issues opening / creating the db file 😫`);
+    sendMessageToMainWindow("CONTENT", {
+      tweets: tweets.rows,
+      tags: readAllTagsResult.rows,
+    });
+    return resultOBj;
+  } else {
+    sendMessageToMainWindow(
+      "NOTIFICATION",
+      `error--There were issues opening / creating the db file 😫`
+    );
     sendMessageToMainWindow("DISABLE_GO_FETCH_BUTTON");
   }
-}
+};
