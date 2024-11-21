@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld("savedXApi", {
   updateTagsForTweet: (tweetId, newTags) =>
     ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
   removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
+  getConfigData: ()=> ipcRenderer.send('fetch-config-data')
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {

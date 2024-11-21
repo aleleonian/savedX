@@ -145,6 +145,18 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
   console.log("removeTagFromDBResult->", removeTagFromDBResult);
 });
 
+ipcMain.on('fetch-config-data', async (event, query, params) => {
+  // try {
+  //   const result = await dbTools.getQuery(query, params); // A DB helper function
+  //   return result; // This will be sent to the renderer
+  // } catch (err) {
+  //   throw new Error('Error fetching data from DB');
+  // }
+  //VOY POR ACÁ.
+  // TEIN QUE RETRIEVE CONFIG DATA DE LA DB Y MANDARLA BACK A REACT
+  console.log('fetch-config-data from main.js')
+});
+
 const init = async () => {
   // Check if the file exists
   let dbPath;
