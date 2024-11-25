@@ -109,25 +109,10 @@ ipcMain.on("stop-scraping", async (event, data) => {
   await stopScraping();
 });
 
-//TODO ESTO ESTÁ AL PEDO O QUÉ
-ipcMain.on("read-tweets-from-db", async (event, data) => {
-  // TODO ADD ERROR CHECKING
-  const tweets = await dbTools.readAllTweets();
-
-  const readAllTagsResult = await dbTools.readAllTags();
-
-  let savedData = {};
-
-  if (tweets.success) savedData.tweets = tweets.rows;
-  if (readAllTagsResult.success) savedData.tags = readAllTagsResult.rows;
-
-  sendMessageToMainWindow("SAVED_TWEETS", savedData);
-});
-
 ipcMain.on("update-tags-for-tweet", async (event, tweetId, newTags) => {
   const updateTagsResult = await dbTools.updateTags(tweetId, newTags);
 
-  //TODO VOY POR ACÁ. TENGO QUE COMUNICAR A REACT SI FUE BIEN
+  //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
   //O MAL EL UPDATE
   console.log("updateTagsResult->", updateTagsResult);
 });
@@ -145,7 +130,7 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
   console.log("removeTagFromDBResult->", removeTagFromDBResult);
 });
 
-ipcMain.on('fetch-config-data', async (event, query, params) => {
+ipcMain.on('fetch-config-data', async () => {
   // try {
   //   const result = await dbTools.getQuery(query, params); // A DB helper function
   //   return result; // This will be sent to the renderer
@@ -154,7 +139,10 @@ ipcMain.on('fetch-config-data', async (event, query, params) => {
   // }
   //VOY POR ACÁ.
   // TEIN QUE RETRIEVE CONFIG DATA DE LA DB Y MANDARLA BACK A REACT
-  console.log('fetch-config-data from main.js')
+  console.log('fetch-config-data from main.js');
+  const checkUserAndPassResponse = await checkUserAndPass();
+  console.log("checkUserAndPassResponse->", JSON.stringify(checkUserAndPassResponse));
+  sendMessageToMainWindow("CONFIG_DATA", checkUserAndPassResponse);
 });
 
 const init = async () => {

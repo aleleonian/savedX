@@ -13,7 +13,7 @@ export const checkUserAndPass = () => {
         data.TWITTER_BOT_PASSWORD &&
         data.TWITTER_BOT_EMAIL
       ) {
-        resolve(returnSuccess(getQueryResponse));
+        resolve(returnSuccess(data));
       } else {
         resolve(returnError("Missing config data 🙈"));
       }

@@ -24,7 +24,7 @@ contextBridge.exposeInMainWorld("savedXApi", {
   updateTagsForTweet: (tweetId, newTags) =>
     ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
   removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
-  getConfigData: ()=> ipcRenderer.send('fetch-config-data')
+  getConfigData: () => ipcRenderer.send("fetch-config-data"),
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {
@@ -63,6 +63,15 @@ ipcRenderer.on("SHOW_CONFIG_DIALOG", () => {
   else {
     setTimeout(() => {
       dispatchNotification("SHOW_CONFIG_DIALOG");
+    }, 1500);
+  }
+});
+
+ipcRenderer.on("CONFIG_DATA", (event, message) => {
+  if (domContentLoaded) dispatchNotification("CONFIG_DATA", message);
+  else {
+    setTimeout(() => {
+      dispatchNotification("CONFIG_DATA", message);
     }, 1500);
   }
 });

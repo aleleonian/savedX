@@ -9,7 +9,7 @@ import Draggable from "react-draggable";
 import { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
 import { Cancel } from "@mui/icons-material";
-import { IconButton, TextField, Autocomplete, Chip } from "@mui/material";
+import { IconButton, TextField, Autocomplete } from "@mui/material";
 
 import { AlertDialog } from "./AlertDialog";
 
@@ -32,16 +32,7 @@ const handleClick = (path) => {
   }
 };
 
-export function ConfigDialog({
-  open,
-  onClose,
-  tweetData,
-  updateTagsOnDB,
-  removeTagFromDB,
-  updateTweetAndTagsLocally,
-}) {
-  debugger;
-
+export function ConfigDialog({ open, onClose }) {
   useEffect(() => {
     // Listen for messages from the preload script
     const notificationEventListener = (event) => {
@@ -52,93 +43,29 @@ export function ConfigDialog({
       }
     };
 
-    window.addEventListener("NOTIFICATION", notificationEventListener);
+    const configDataDialogEventListener = (event) => {
+      if (event.detail) {
+        if (event.detail.success) {
+        }
+      }
+    };
 
+    window.addEventListener("NOTIFICATION", notificationEventListener);
+    window.addEventListener("CONFIG_DATA", configDataDialogEventListener);
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
+      window.removeEventListener("CONFIG_DATA", configDataDialogEventListener);
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
   const { state, updateState } = useContext(AppContext);
-  const [tweetTags, setTweetTags] = useState([]);
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
 
   useEffect(() => {
     window.savedXApi.getConfigData();
   }, []);
-
-  if (tweetData == null) return null;
-
-  const setTweetsData = (savedTweetsArray) => {
-    updateState("savedTweets", savedTweetsArray);
-  };
-  const setTags = (tagsArray) => {
-    updateState("tags", tagsArray);
-  };
-
-  const handleTagsUpdate = (newTags) => {
-    setTweetTags(newTags);
-    updateTweetAndTagsLocally(tweetData.id, newTags);
-    updateTagsOnDB(tweetData.id, newTags);
-  };
-
-  function removeSubstring(originalString, substringToRemove) {
-    const regex = new RegExp(
-      `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g"
-    );
-    return originalString.replace(regex, "").trim();
-  }
-
-  const handleRemoveTag = (tagToRemove) => {
-    // debugger;
-    // delete this tag locally
-    setTweetTags(tweetTags.filter((tag) => tag != tagToRemove));
-    // delete this tag from the tag list
-    setTags(state.tags.filter((tag) => tag != tagToRemove));
-    // delete this tag from every tweet
-    const currentTweets = state.savedTweets;
-    // iterate the array
-    // find the tweet that contains the tagToRemove
-    for (let i = 0; i < currentTweets.length; i++) {
-      const currentTags = currentTweets[i].tags;
-      if (currentTags && currentTags.indexOf(tagToRemove) != -1) {
-        currentTweets[i].tags = removeSubstring(currentTags, tagToRemove);
-      }
-    }
-    setTweetsData(currentTweets);
-    // delete this tag from the db
-    removeTagFromDB(tagToRemove);
-    // delete this tag from tweets_tags
-    // delete this tag from tags
-  };
-
-  const renderOption = (props, option, { selected }) => {
-    return (
-      <li
-        {...props}
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <span>{option}</span>
-        <IconButton
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent triggering selection action
-            handleRemoveTag(option);
-          }}
-          color="error"
-        >
-          <Cancel fontSize="small" />
-        </IconButton>
-      </li>
-    );
-  };
 
   return (
     <React.Fragment>
@@ -158,13 +85,7 @@ export function ConfigDialog({
         >
           <div className="flex space-x-4">
             {/* Profile Picture */}
-            <div className="flex-shrink-0">
-              <img
-                src={tweetData.profilePicUrl}
-                className="w-10 h-10 rounded-md"
-                alt="profile pic"
-              />
-            </div>
+            <div className="flex-shrink-0"></div>
 
             {notificationMessage && (
               <AlertDialog
@@ -176,44 +97,12 @@ export function ConfigDialog({
             {/* Tweet content */}
             <div className="flex-1">
               {/* User details row */}
-              <div className="flex items-center space-x-2">
-                <b>{tweetData.userName}</b>
-                <span className="text-gray-600">{tweetData.twitterHandle}</span>
-                <span className="text-gray-400">· {tweetData.tweetDate}</span>
-                <span className="text-gray-400">tags: {tweetData.tags}</span>
-              </div>
-
+              <div className="flex items-center space-x-2"></div>
+            
               {/* Tweet text */}
-              <p className="mt-2">{tweetData.tweetText}</p>
+              <p className="mt-2"></p>
 
               {/* Conditional tweet image display */}
-              {tweetData.tweetImageOrPoster ? (
-                <a
-                  href={tweetData.tweetUrl}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleClick(tweetData.tweetUrl);
-                  }}
-                >
-                  <img
-                    src={tweetData.tweetImageOrPoster}
-                    className="mt-2 rounded-lg"
-                    width="75%"
-                    alt="tweet image"
-                  />
-                </a>
-              ) : (
-                <a
-                  href={tweetData.tweetUrl}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleClick(tweetData.tweetUrl);
-                  }}
-                  className="text-blue-500"
-                >
-                  Tweet Url
-                </a>
-              )}
             </div>
           </div>
         </DialogContent>
@@ -221,31 +110,6 @@ export function ConfigDialog({
         <DialogActions
           sx={{ display: "flex", justifyContent: "space-between" }}
         >
-          {/* Tag Input */}
-          <Autocomplete
-            fullWidth
-            multiple
-            freeSolo
-            options={state.tags}
-            value={tweetTags}
-            onChange={(event, newValue) => handleTagsUpdate(newValue)}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  key={index}
-                  label={option}
-                  {...getTagProps({ index })}
-                  variant="outlined"
-                  // onDelete={() => handleRemoveTag(option)}
-                />
-              ))
-            }
-            renderInput={(params) => (
-              <TextField {...params} label="Tags" placeholder="Add tags" />
-            )}
-            renderOption={renderOption} // Custom option renderer with a remove button
-            sx={{ marginTop: 1 }}
-          />
           <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Dialog>

@@ -101,7 +101,6 @@ export const Application = () => {
     };
 
     const showConfigDialogEventListener = (event) => {
-      debugger;
       setOpenConfigDialog(true);
     };
 
@@ -145,6 +144,10 @@ export const Application = () => {
     window.savedXApi.goFetchTweets();
   }
 
+  const handleClose = () => {
+    setOpenConfigDialog(false);
+  };
+
   const displayTweetsData = (tweetsArray, tags) => {
     return (
       <div>
@@ -172,7 +175,9 @@ export const Application = () => {
         />
       )}
 
-      {openConfigDialog && <ConfigDialog />}
+      {openConfigDialog && (
+        <ConfigDialog open={openConfigDialog} onClose={handleClose} />
+      )}
 
       <div className="text-center">
         {!progressState.active &&
