@@ -44,6 +44,7 @@ export const Application = () => {
     // Listen for messages from the preload script
     const notificationEventListener = (event) => {
       if (event.detail) {
+        debugger;
         const data = event.detail.split("--");
         setNotificationClass(data[0]);
         setNotificationMessage(data[1]);
@@ -101,6 +102,7 @@ export const Application = () => {
     };
 
     const showConfigDialogEventListener = (event) => {
+      debugger;
       setOpenConfigDialog(true);
     };
 
@@ -145,6 +147,7 @@ export const Application = () => {
   }
 
   const handleClose = () => {
+    debugger;
     setOpenConfigDialog(false);
   };
 
