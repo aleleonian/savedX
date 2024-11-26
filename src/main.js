@@ -153,6 +153,11 @@ ipcMain.on("update-config-data", async (event, formData) => {
     const updateConfigDataResponse = await updateConfigData(formData);
     if (updateConfigDataResponse.success) {
       sendMessageToMainWindow("NOTIFICATION", `success--Config data updated!`);
+    } else {
+      sendMessageToMainWindow(
+        "NOTIFICATION",
+        `error--Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
+      );
     }
   } catch (error) {
     sendMessageToMainWindow(
