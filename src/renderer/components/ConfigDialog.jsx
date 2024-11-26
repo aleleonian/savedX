@@ -1,5 +1,4 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -7,11 +6,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
 import { useState, useContext, useEffect } from "react";
-import { AppContext } from "../../context/AppContext";
-import { Cancel } from "@mui/icons-material";
-import { IconButton, TextField, Autocomplete } from "@mui/material";
+import { TextField, Button, Container, Typography, Box } from "@mui/material";
 
-import { AlertDialog } from "./AlertDialog";
+import { Notification } from "./Notification";
 
 function PaperComponent(props) {
   return (
@@ -23,14 +20,6 @@ function PaperComponent(props) {
     </Draggable>
   );
 }
-
-const handleClick = (path) => {
-  if (window.savedXApi && window.savedXApi.openUrl) {
-    window.savedXApi.openUrl("https://www.x.com" + path); // Open the external URL using the exposed API
-  } else {
-    console.error("The openUrl method is not available");
-  }
-};
 
 export function ConfigDialog({ open, onClose }) {
   useEffect(() => {
@@ -59,13 +48,36 @@ export function ConfigDialog({ open, onClose }) {
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
-  const { state, updateState } = useContext(AppContext);
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
 
   useEffect(() => {
     window.savedXApi.getConfigData();
   }, []);
+
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    email: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form Data:", formData);
+    debugger;
+    if (formData.username && formData.password && formData.email) {
+      window.savedXApi.updateConfigData(formData);
+    }
+  };
+
+  const handleAlertClose = () => {
+    setNotificationMessage(null);
+  };
 
   return (
     <React.Fragment>
@@ -83,33 +95,76 @@ export function ConfigDialog({ open, onClose }) {
           dividers={scroll === "paper"}
           className="overflow-auto max-h-[400px]"
         >
-          <div className="flex space-x-4">
-            {/* Profile Picture */}
-            <div className="flex-shrink-0"></div>
+          {notificationMessage && (
+            <Notification
+              notificationClass={notificationClass}
+              notificationMessage={notificationMessage}
+              handleAlertClose={handleAlertClose}
+            />
+          )}
 
-            {notificationMessage && (
-              <AlertDialog
-                title="Woops!"
-                message={notificationMessage}
-                openFlag={true}
-              />
-            )}
-            {/* Tweet content */}
-            <div className="flex-1">
-              {/* User details row */}
-              <div className="flex items-center space-x-2"></div>
-            
-              {/* Tweet text */}
-              <p className="mt-2"></p>
-
-              {/* Conditional tweet image display */}
-            </div>
-          </div>
+          <Container>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginTop: 2,
+              }}
+            >
+              <Typography variant="h5">Configure your account</Typography>
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                sx={{ mt: 3, width: "100%" }}
+              >
+                <TextField
+                  fullWidth
+                  label="Username"
+                  name="username"
+                  variant="outlined"
+                  margin="normal"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Password"
+                  name="password"
+                  variant="outlined"
+                  margin="normal"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  variant="outlined"
+                  margin="normal"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+                <Button
+                  type="Save"
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 3 }}
+                  fullWidth
+                >
+                  Submit
+                </Button>
+              </Box>
+            </Box>
+          </Container>
         </DialogContent>
 
-        <DialogActions
-          sx={{ display: "flex", justifyContent: "space-between" }}
-        >
+        <DialogActions sx={{ display: "flex", justifyContent: "right" }}>
           <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Dialog>

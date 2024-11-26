@@ -2,7 +2,7 @@ require("dotenv").config();
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
-import { checkUserAndPass } from "./util/account";
+import { checkUserAndPass, updateConfigData } from "./util/account";
 
 import {
   goFetchTweets,
@@ -132,17 +132,36 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
   console.log("removeTagFromDBResult->", removeTagFromDBResult);
 });
 
-ipcMain.on('fetch-config-data', async () => {
+ipcMain.on("fetch-config-data", async () => {
   // try {
   //   const result = await dbTools.getQuery(query, params); // A DB helper function
   //   return result; // This will be sent to the renderer
   // } catch (err) {
   //   throw new Error('Error fetching data from DB');
   // }
-  console.log('fetch-config-data from main.js');
+  console.log("fetch-config-data from main.js");
   const checkUserAndPassResponse = await checkUserAndPass();
-  console.log("checkUserAndPassResponse->", JSON.stringify(checkUserAndPassResponse));
+  console.log(
+    "checkUserAndPassResponse->",
+    JSON.stringify(checkUserAndPassResponse)
+  );
   sendMessageToMainWindow("CONFIG_DATA", checkUserAndPassResponse);
+});
+
+// updateConfigData: (formData)=> ipcRenderer.send('update-config-data', formData)
+
+ipcMain.on("update-config-data", async (event, formData) => {
+  try {
+    const updateConfigDataResponse = await updateConfigData(formData);
+    if (updateConfigDataResponse.success) {
+      sendMessageToMainWindow("NOTIFICATION", `success--Config data updated!`);
+    }
+  } catch (error) {
+    sendMessageToMainWindow(
+      "NOTIFICATION",
+      `error--Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
+    );
+  }
 });
 
 const init = async () => {

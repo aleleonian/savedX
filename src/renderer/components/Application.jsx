@@ -44,7 +44,6 @@ export const Application = () => {
     // Listen for messages from the preload script
     const notificationEventListener = (event) => {
       if (event.detail) {
-        debugger;
         const data = event.detail.split("--");
         setNotificationClass(data[0]);
         setNotificationMessage(data[1]);
@@ -102,7 +101,6 @@ export const Application = () => {
     };
 
     const showConfigDialogEventListener = (event) => {
-      debugger;
       setOpenConfigDialog(true);
     };
 
@@ -147,14 +145,16 @@ export const Application = () => {
   }
 
   const handleClose = () => {
-    debugger;
     setOpenConfigDialog(false);
+  };
+
+  const handleAlertClose = () => {
+    setNotificationMessage(null);
   };
 
   const displayTweetsData = (tweetsArray, tags) => {
     return (
       <div>
-        {/* <TweetsTable tweetsArray={state.savedTweets} setTweetsData={setTweetsData} tags={state.tags} setTags={setTags} /> */}
         <TweetsTable />
       </div>
     );
@@ -175,6 +175,7 @@ export const Application = () => {
         <Notification
           notificationClass={notificationClass}
           notificationMessage={notificationMessage}
+          handleAlertClose={handleAlertClose}
         />
       )}
 

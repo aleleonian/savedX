@@ -12,6 +12,6 @@ export const returnError = (errorMessage) => {
 export const returnSuccess = (data) => {
   let responseObj = {};
   responseObj.success = true;
-  responseObj.data = data;
+  if (data) responseObj.data = data;
   return responseObj;
 };
