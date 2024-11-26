@@ -46,6 +46,9 @@ export class XBot {
         this.monitorFlag = true;
         this.bookmarks = [];
         this.goAheadScrape = true;
+        this.botUsername;
+        this.botPassword;
+        this.botEmail;
     }
 
     getId(divHtmlContent) {

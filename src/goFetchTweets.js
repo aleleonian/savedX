@@ -7,22 +7,25 @@ import { sendMessageToMainWindow, encode } from "./util/messaging";
 let xBot;
 
 export async function goFetchTweets(botUsername, botPassword, botEmail) {
-    
-  this.botUsername = botUsername;
-  this.botPassword = botPassword;
-  this.botEmail = botEmail;
+  console.log("botUsername->", botUsername);
+  console.log("botPassword->", botPassword);
+  console.log("botEmail->", botEmail);
 
   showProgress(encode(constants.progress.INIT_PROGRESS));
   xBot = new XBot();
+  xBot.botUsername = botUsername;
+  xBot.botPassword = botPassword;
+  xBot.botEmail = botEmail;
+
   let result = await xBot.init();
   if (result.success) {
     showProgress(
       encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN)
     );
     result = await xBot.loginToX(
-      this.botUsername,
-      this.botPassword,
-      this.botEmail
+      xBot.botUsername,
+      xBot.botPassword,
+      xBot.botEmail
     );
     if (result.success) {
       showProgress(

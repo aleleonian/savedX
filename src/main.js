@@ -94,8 +94,6 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
       data.TWITTER_BOT_EMAIL
     );
   } else {
-    //VOY POR ACÁ
-    //TODO la notification se ve a veces y el SHOW_CONFIG_DIALOG no se muestra.
     sendMessageToMainWindow(
       "NOTIFICATION",
       `error--Bro, there's no user and pass 😫`
@@ -165,7 +163,6 @@ ipcMain.on("update-config-data", async (event, formData) => {
 });
 
 const init = async () => {
-  // Check if the file exists
   let dbPath;
   console.log("process.env.NODE_ENV->", process.env.NODE_ENV);
   dbPath =
