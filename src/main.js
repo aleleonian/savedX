@@ -94,11 +94,8 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
       data.TWITTER_BOT_EMAIL
     );
   } else {
-    sendMessageToMainWindow(
-      "NOTIFICATION",
-      `error--Bro, there's no user and pass 😫`
-    );
     sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
+    sendMessageToMainWindow("ALERT", `Bro, there's no user and pass 😫`);
   }
 });
 
@@ -155,14 +152,14 @@ ipcMain.on("update-config-data", async (event, formData) => {
       sendMessageToMainWindow("NOTIFICATION", `success--Config data updated!`);
     } else {
       sendMessageToMainWindow(
-        "NOTIFICATION",
-        `error--Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
+        "ALERT",
+        `Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
       );
     }
   } catch (error) {
     sendMessageToMainWindow(
-      "NOTIFICATION",
-      `error--Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
+      "ALERT",
+      `Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
     );
   }
 });

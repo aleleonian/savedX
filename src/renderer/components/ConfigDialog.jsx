@@ -68,8 +68,6 @@ export function ConfigDialog({ open, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    debugger;
     if (formData.username && formData.password && formData.email) {
       window.savedXApi.updateConfigData(formData);
     }

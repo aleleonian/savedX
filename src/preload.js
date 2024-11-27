@@ -62,6 +62,10 @@ ipcRenderer.on("SHOW_PROGRESS", async (event, message) => {
   dispatchNotification("SHOW_PROGRESS", message);
 });
 
+ipcRenderer.on("ALERT", async (event, message) => {
+  dispatchNotification("ALERT", message);
+});
+
 ipcRenderer.on("SHOW_CONFIG_DIALOG", () => {
   if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG");
   else {

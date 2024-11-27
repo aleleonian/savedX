@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Notification } from "./Notification";
+import { AlertDialog } from "./AlertDialog";
 import { ConfigDialog } from "./ConfigDialog";
 import TweetsTable from "./TweetsTable";
 import { Title } from "./Title";
@@ -9,6 +10,7 @@ import { AppContext } from "../../context/AppContext";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [notificationClass, setNotificationClass] = useState(null);
   const [progressState, setProgressState] = useState({
@@ -47,6 +49,13 @@ export const Application = () => {
         const data = event.detail.split("--");
         setNotificationClass(data[0]);
         setNotificationMessage(data[1]);
+      }
+    };
+
+    const alertEventListener = (event) => {
+      if (event.detail) {
+        const data = event.detail;
+        setAlertMessage(data);
       }
     };
 
@@ -113,6 +122,7 @@ export const Application = () => {
       // console.log("tags->", event.detail.tags)
     };
     window.addEventListener("NOTIFICATION", notificationEventListener);
+    window.addEventListener("ALERT", alertEventListener);
     window.addEventListener("CONTENT", contentEventListener);
     window.addEventListener("SHOW_PROGRESS", progressEventListener);
     window.addEventListener(
@@ -127,6 +137,7 @@ export const Application = () => {
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
+      window.removeEventListener("ALERT", alertEventListener);
       window.removeEventListener("CONTENT", contentEventListener);
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
       window.removeEventListener(
@@ -170,6 +181,15 @@ export const Application = () => {
   return (
     <section className="home">
       <Title />
+
+      {alertMessage && (
+        <AlertDialog
+          title={"Ouch!"}
+          message={alertMessage}
+          openFlag={true}
+          cleanUp={() => setAlertMessage(null)}
+        />
+      )}
 
       {notificationMessage && (
         <Notification

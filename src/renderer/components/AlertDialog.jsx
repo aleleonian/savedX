@@ -7,11 +7,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-export const AlertDialog = ({ openFlag, title, message }) => {
+export const AlertDialog = ({ openFlag, title, message, cleanUp }) => {
     const [open, setOpen] = useState(openFlag);
 
     const handleClose = () => {
         setOpen(false);
+        cleanUp();
     };
 
     return (
@@ -20,6 +21,7 @@ export const AlertDialog = ({ openFlag, title, message }) => {
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
+            sx={{ zIndex: 1500 }}
         >
             <DialogTitle id="alert-dialog-title">
                 {title}

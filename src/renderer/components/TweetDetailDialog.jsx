@@ -89,7 +89,7 @@ export function TweetDetailDialog({ open, onClose, tweetData, updateTagsOnDB, re
     }
 
     const handleRemoveTag = (tagToRemove) => {
-        // debugger;
+        // 
         // delete this tag locally
         setTweetTags(tweetTags.filter(tag => tag != tagToRemove))
         // delete this tag from the tag list
