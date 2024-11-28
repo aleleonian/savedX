@@ -426,7 +426,7 @@ export class XBot {
                     console.log("Bro, X detected an unusual login attempt! Will try to calm the bitch down.");
                     // await this.wait(15000);
                     try {
-                        await this.findAndType(process.env.TWITTER_UNUSUAL_LOGIN_EMAIL_INPUT, process.env.TWITTER_BOT_EMAIL);
+                        await this.findAndType(process.env.TWITTER_UNUSUAL_LOGIN_EMAIL_INPUT, this.botEmail);
                         await this.findAndClick(process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON);
                         // TODO here we should check for the 'incorrect, please try again' text.
                     }
@@ -460,7 +460,7 @@ export class XBot {
             }
             else console.log("Found and clicked TWITTER_PASSWORD_INPUT");
 
-            foundAndTyped = await this.findAndType(process.env.TWITTER_PASSWORD_INPUT, process.env.TWITTER_BOT_PASSWORD);
+            foundAndTyped = await this.findAndType(process.env.TWITTER_PASSWORD_INPUT, this.botUsername);
             if (!foundAndTyped) {
                 console.log("Can't find and type TWITTER_PASSWORD_INPUT");
                 this.isBusy = false;
@@ -544,7 +544,7 @@ export class XBot {
         }
         console.log("Found TWITTER_EMAIL_INPUT");
 
-        let foundAndTyped = await this.findAndType(process.env.TWITTER_EMAIL_INPUT, process.env.TWITTER_BOT_EMAIL);
+        let foundAndTyped = await this.findAndType(process.env.TWITTER_EMAIL_INPUT, this.botEmail);
         if (!foundAndTyped) {
             console.log("Can't find and type TWITTER_EMAIL_INPUT");
             return false;

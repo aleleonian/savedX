@@ -1,3 +1,4 @@
+//TODO is this deprecated?
 const puppeteer = require('puppeteer');
 
 const BROWSER_OPEN_FAIL = 0;
@@ -81,7 +82,7 @@ export const loginToX = async (username, password) => {
         }
         console.log("Found and clicked TWITTER_USERNAME_INPUT");
 
-        let foundAndTyped = await findAndType(page, process.env.TWITTER_USERNAME_INPUT, process.env.TWITTER_BOT_USERNAME);
+        let foundAndTyped = await findAndType(page, process.env.TWITTER_USERNAME_INPUT, this.botUsername);
         if (!foundAndTyped) {
             console.log("Can't find and type TWITTER_USERNAME_INPUT");
             isBusy = false;
@@ -105,7 +106,7 @@ export const loginToX = async (username, password) => {
         }
         console.log("Found and clicked TWITTER_USERNAME_INPUT");
 
-        foundAndTyped = await findAndType(page, process.env.TWITTER_PASSWORD_INPUT, process.env.TWITTER_BOT_PASSWORD);
+        foundAndTyped = await findAndType(page, process.env.TWITTER_PASSWORD_INPUT, this.botPassword);
         if (!foundAndTyped) {
             console.log("Can't find and type TWITTER_PASSWORD_INPUT");
             isBusy = false;
