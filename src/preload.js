@@ -66,11 +66,12 @@ ipcRenderer.on("ALERT", async (event, message) => {
   dispatchNotification("ALERT", message);
 });
 
-ipcRenderer.on("SHOW_CONFIG_DIALOG", () => {
-  if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG");
+ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
+  console.log("SHOW_CONFIG_DIALOG preload configData:", configData);
+  if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
   else {
     setTimeout(() => {
-      dispatchNotification("SHOW_CONFIG_DIALOG");
+      dispatchNotification("SHOW_CONFIG_DIALOG", configData);
     }, 1500);
   }
 });

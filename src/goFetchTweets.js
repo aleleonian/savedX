@@ -17,11 +17,16 @@ export async function goFetchTweets(botUsername, botPassword, botEmail) {
   xBot.botPassword = botPassword;
   xBot.botEmail = botEmail;
 
+  console.log("xBot.botUsername->", xBot.botUsername);
+  console.log("xBot.botPassword->", xBot.botPassword);
+  console.log("xBot.botEmail->", xBot.botEmail);
+
   let result = await xBot.init();
   if (result.success) {
     showProgress(
       encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN)
     );
+    //TODO something's wrong with the passwords
     result = await xBot.loginToX(
       xBot.botUsername,
       xBot.botPassword,
@@ -65,7 +70,7 @@ export async function goFetchTweets(botUsername, botPassword, botEmail) {
       hideProgress();
     } else {
       hideProgress();
-      sendMessageToMainWindow("NOTIFICATION", `error--Could not log into X 😫`);
+      sendMessageToMainWindow("NOTIFICATION", `error--Could not log into X 😫 : ${result.message}`);
       await xBot.closeBrowser();
       return;
     }

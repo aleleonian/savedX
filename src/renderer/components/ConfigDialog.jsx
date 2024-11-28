@@ -21,7 +21,7 @@ function PaperComponent(props) {
   );
 }
 
-export function ConfigDialog({ open, onClose }) {
+export function ConfigDialog({ open, onClose, configData }) {
   useEffect(() => {
     // Listen for messages from the preload script
     const notificationEventListener = (event) => {
@@ -56,9 +56,9 @@ export function ConfigDialog({ open, onClose }) {
   }, []);
 
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    email: "",
+    username: configData?.TWITTER_BOT_USERNAME ?? "",
+    password: configData?.TWITTER_BOT_PASSWORD ?? "",
+    email: configData?.TWITTER_BOT_EMAIL ?? "",
   });
 
   const handleChange = (e) => {

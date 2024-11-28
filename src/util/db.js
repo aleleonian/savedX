@@ -54,10 +54,21 @@ export const getQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.get(query, params, (err, row) => {
       if (err) {
-        console.log("getQuery err->", err);
         reject(returnError(err));
       } else {
         resolve(returnSuccess(row));
+      }
+    });
+  });
+};
+
+export const getAllQuery = (query, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.all(query, params, (err, rows) => {
+      if (err) {
+        reject(returnError(err));
+      } else {
+        resolve(returnSuccess(rows)); // rows is an array of all matched rows
       }
     });
   });
@@ -68,18 +79,6 @@ const createIfNotExist = async (filePath) => {
     console.log("Database file not found. Creating a new one...");
 
     try {
-      // Create a new database
-      // db = new sqlite3.Database(filePath, (err) => {
-      //   if (err) {
-      //     console.error('Error creating the database:', err.message);
-      //     return {
-      //       success: false,
-      //       errorMessage: err.message
-      //     }
-      //   }
-      //   console.log('New database created.');
-      // });
-
       const createDatabaseResult = await createDatabase(filePath);
       if (!createDatabaseResult.success) {
         return createDatabaseResult;
@@ -279,9 +278,10 @@ export const updateTags = async (tweetId, newTags) => {
         console.log(`Added tag "${tag}" for tweetId: ${tweetId}`);
       } else {
         // If the tag doesn't exist, insert it into the tags table
-        const runQueryResponse = await runQuery("INSERT INTO tags (name) VALUES (?)", [
-          tag,
-        ]);
+        const runQueryResponse = await runQuery(
+          "INSERT INTO tags (name) VALUES (?)",
+          [tag]
+        );
 
         // Get the new tag id (from last inserted row)
         const newTagId = runQueryResponse.data.lastID;
@@ -304,16 +304,13 @@ export const updateTags = async (tweetId, newTags) => {
 
 export const readAllTags = async () => {
   try {
-    const getQueryResponse = await getQuery("SELECT name FROM tags");
+    const getQueryResponse = await getAllQuery("SELECT name FROM tags");
     let tagNames = [];
     if (getQueryResponse.data) {
-      if (Array.isArray(getQueryResponse.data)) {
-        tagNames = getQueryResponse.data.map((row) => row.name);
-      }
-      else tagNames.push(getQueryResponse.data.name);
+      tagNames = getQueryResponse.data.map((row) => row.name);
       return {
         success: true,
-        getQueryResponse: tagNames,
+        rows: tagNames,
       };
     } else {
       return {
@@ -349,7 +346,8 @@ export const readAllTweets = async () => {
   `;
 
   try {
-    const getQueryResponse = await getQuery(query);
+    const getQueryResponse = await getAllQuery(query);
+
     if (getQueryResponse.data) {
       return {
         success: true,

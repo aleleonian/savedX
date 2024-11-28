@@ -7,7 +7,7 @@ import Select from '@mui/material/Select';
 
 export function BasicSelect({ tags, handleSelectChange }) {
   const [tag, setTag] = React.useState('');
-
+  
   const handleChange = (event) => {
     let tagFilter = event.target.value;
 

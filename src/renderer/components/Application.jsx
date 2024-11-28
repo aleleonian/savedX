@@ -23,6 +23,7 @@ export const Application = () => {
     loggedOut: false,
   });
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
+  const [configData, setConfigData] = useState(null);
   const { state, updateState } = useContext(AppContext);
 
   const setTweetsData = (savedTweetsArray) => {
@@ -110,6 +111,10 @@ export const Application = () => {
     };
 
     const showConfigDialogEventListener = (event) => {
+      const configData = event.detail;
+      if (configData) {
+        setConfigData(configData);
+      }
       setOpenConfigDialog(true);
     };
 
@@ -200,7 +205,11 @@ export const Application = () => {
       )}
 
       {openConfigDialog && (
-        <ConfigDialog open={openConfigDialog} onClose={handleClose} />
+        <ConfigDialog
+          open={openConfigDialog}
+          onClose={handleClose}
+          configData={configData}
+        />
       )}
 
       <div className="text-center">

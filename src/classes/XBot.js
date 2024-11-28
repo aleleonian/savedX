@@ -416,7 +416,7 @@ export class XBot {
 
       let foundAndTyped = await this.findAndType(
         process.env.TWITTER_USERNAME_INPUT,
-        this.botUsername
+        botUsername
       );
       if (!foundAndTyped) {
         console.log("Can't find and type TWITTER_USERNAME_INPUT");
@@ -458,16 +458,12 @@ export class XBot {
           try {
             const findAndTypeResult = await this.findAndType(
               process.env.TWITTER_UNUSUAL_LOGIN_EMAIL_INPUT,
-              this.botEmail
+              botEmail
             );
-            console.log("findAndTypeResult->", findAndTypeResult);
             //TODO what if findAndTypeResult is false?
             const findAndClickResult = await this.findAndClick(
               process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON
             );
-            console.log("findAndClickResult->", findAndClickResult);
-            await this.wait(1500);
-            // TODO here we should check for the 'incorrect, please try again' text.
             const findTextInPageResult = await this.findTextInPage(
               "please try again"
             );
@@ -514,10 +510,9 @@ export class XBot {
         }
       } else console.log("Found and clicked TWITTER_PASSWORD_INPUT");
 
-      console.log("we're at line 463");
       foundAndTyped = await this.findAndType(
         process.env.TWITTER_PASSWORD_INPUT,
-        this.botUsername
+        botPassword
       );
       if (!foundAndTyped) {
         console.log("Can't find and type TWITTER_PASSWORD_INPUT");
@@ -528,11 +523,26 @@ export class XBot {
         );
       }
       console.log("Found and typed TWITTER_PASSWORD_INPUT");
-
       await this.page.keyboard.press("Enter");
+      await this.wait(3000);
 
-      // TODO: here we gotta makes ure we did not input a wrong password and
-      // we're back at the password input page
+      const wrongPassword = await this.findTextInPage("wrong password");
+      console.log("wrongPassword->", wrongPassword);
+      if (wrongPassword) {
+        return this.respond(false, "Your password is bad.");
+      }
+
+      const blockedAttempt = await this.findTextInPage(
+        "We blocked an attempt to access your account because"
+      );
+      if (blockedAttempt) {
+        return this.respond(
+          false,
+          "We're temporarily blocked for some reason."
+        );
+      }
+
+      //TODO gotta check for In order to protect your account from suspicious activity
 
       this.isLoggedIn = true;
       this.isBusy = false;
@@ -608,7 +618,7 @@ export class XBot {
 
     let foundAndTyped = await this.findAndType(
       process.env.TWITTER_EMAIL_INPUT,
-      this.botEmail
+      botEmail
     );
     if (!foundAndTyped) {
       console.log("Can't find and type TWITTER_EMAIL_INPUT");

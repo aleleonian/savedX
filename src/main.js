@@ -1,8 +1,9 @@
 require("dotenv").config();
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
 import { checkUserAndPass, updateConfigData } from "./util/account";
+import { menuTemplate } from "./data/menu-template";
 
 import {
   goFetchTweets,
@@ -29,6 +30,10 @@ const createWindow = () => {
       sandbox: false,
     },
   });
+
+  // Build and set the menu
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
 
   setMainWindow(mainWindow);
 
@@ -128,18 +133,9 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
 });
 
 ipcMain.on("fetch-config-data", async () => {
-  // try {
-  //   const result = await dbTools.getQuery(query, params); // A DB helper function
-  //   return result; // This will be sent to the renderer
-  // } catch (err) {
-  //   throw new Error('Error fetching data from DB');
-  // }
-  console.log("fetch-config-data from main.js");
   const checkUserAndPassResponse = await checkUserAndPass();
   sendMessageToMainWindow("CONFIG_DATA", checkUserAndPassResponse);
 });
-
-// updateConfigData: (formData)=> ipcRenderer.send('update-config-data', formData)
 
 ipcMain.on("update-config-data", async (event, formData) => {
   try {
@@ -149,14 +145,13 @@ ipcMain.on("update-config-data", async (event, formData) => {
     } else {
       sendMessageToMainWindow(
         "ALERT",
-        `Trouble updating config data mai fren:  ${JSON.stringify(updateConfigDataResponse.errorMessage)}`
+        `Trouble updating config data mai fren:  ${JSON.stringify(
+          updateConfigDataResponse.errorMessage
+        )}`
       );
     }
   } catch (error) {
-    sendMessageToMainWindow(
-      "ALERT",
-      `Trouble updating config data: ${error}`
-    );
+    sendMessageToMainWindow("ALERT", `Trouble updating config data: ${error}`);
   }
 });
 
@@ -171,12 +166,12 @@ const init = async () => {
   console.log("dbPath>", dbPath);
 
   const openDbResult = await dbTools.openDb(dbPath);
-  // VOY POR ACÁ, ESTE openDbResult da false
-  console.log("openDbResult->", openDbResult);
 
   if (openDbResult) {
     const tweets = await dbTools.readAllTweets();
     const readAllTagsResult = await dbTools.readAllTags();
+    console.log("readAllTagsResult->", readAllTagsResult);
+    
     let resultOBj = {};
     resultOBj.success = true;
 
