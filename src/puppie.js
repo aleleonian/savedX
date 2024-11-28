@@ -73,45 +73,45 @@ export const loginToX = async (username, password) => {
         }
         console.log("We're at https://www.x.com");
 
-        let foundAndClicked = await findAndClick(page, process.env.TWEETER_USERNAME_INPUT);
+        let foundAndClicked = await findAndClick(page, process.env.TWITTER_USERNAME_INPUT);
         if (!foundAndClicked) {
-            console.log("Can't find TWEETER_USERNAME_INPUT");
+            console.log("Can't find TWITTER_USERNAME_INPUT");
             isBusy = false;
-            return respond(false, "Can't find TWEETER_USERNAME_INPUT");
+            return respond(false, "Can't find TWITTER_USERNAME_INPUT");
         }
-        console.log("Found and clicked TWEETER_USERNAME_INPUT");
+        console.log("Found and clicked TWITTER_USERNAME_INPUT");
 
-        let foundAndTyped = await findAndType(page, process.env.TWEETER_USERNAME_INPUT, process.env.TWEETER_BOT_USERNAME);
+        let foundAndTyped = await findAndType(page, process.env.TWITTER_USERNAME_INPUT, process.env.TWITTER_BOT_USERNAME);
         if (!foundAndTyped) {
-            console.log("Can't find and type TWEETER_USERNAME_INPUT");
+            console.log("Can't find and type TWITTER_USERNAME_INPUT");
             isBusy = false;
-            return respond(false, "Can't find and type TWEETER_USERNAME_INPUT");
+            return respond(false, "Can't find and type TWITTER_USERNAME_INPUT");
         }
-        console.log("Found and typed TWEETER_USERNAME_INPUT");
+        console.log("Found and typed TWITTER_USERNAME_INPUT");
 
-        foundAndClicked = await findAndClick(page, process.env.TWEETER_USERNAME_SUBMIT_BUTTON);
+        foundAndClicked = await findAndClick(page, process.env.TWITTER_USERNAME_SUBMIT_BUTTON);
         if (!foundAndClicked) {
-            console.log("Can't find and click TWEETER_USERNAME_SUBMIT_BUTTON");
+            console.log("Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON");
             isBusy = false;
-            return respond(false, "Can't find and click TWEETER_USERNAME_SUBMIT_BUTTON");
+            return respond(false, "Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON");
         }
-        console.log("Found and clicked TWEETER_USERNAME_SUBMIT_BUTTON");
+        console.log("Found and clicked TWITTER_USERNAME_SUBMIT_BUTTON");
 
-        foundAndClicked = await findAndClick(page, process.env.TWEETER_PASSWORD_INPUT);
+        foundAndClicked = await findAndClick(page, process.env.TWITTER_PASSWORD_INPUT);
         if (!foundAndClicked) {
-            console.log("Can't find and click TWEETER_PASSWORD_INPUT");
+            console.log("Can't find and click TWITTER_PASSWORD_INPUT");
             isBusy = false;
-            return respond(false, "Can't find and click TWEETER_PASSWORD_INPUT");
+            return respond(false, "Can't find and click TWITTER_PASSWORD_INPUT");
         }
-        console.log("Found and clicked TWEETER_USERNAME_INPUT");
+        console.log("Found and clicked TWITTER_USERNAME_INPUT");
 
-        foundAndTyped = await findAndType(page, process.env.TWEETER_PASSWORD_INPUT, process.env.TWEETER_BOT_PASSWORD);
+        foundAndTyped = await findAndType(page, process.env.TWITTER_PASSWORD_INPUT, process.env.TWITTER_BOT_PASSWORD);
         if (!foundAndTyped) {
-            console.log("Can't find and type TWEETER_PASSWORD_INPUT");
+            console.log("Can't find and type TWITTER_PASSWORD_INPUT");
             isBusy = false;
-            return respond(false, "Can't find and type TWEETER_PASSWORD_INPUT");
+            return respond(false, "Can't find and type TWITTER_PASSWORD_INPUT");
         }
-        console.log("Found and typed TWEETER_PASSWORD_INPUT");
+        console.log("Found and typed TWITTER_PASSWORD_INPUT");
 
         await page.keyboard.press('Enter');
 
