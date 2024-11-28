@@ -54,7 +54,8 @@ export const getQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.get(query, params, (err, row) => {
       if (err) {
-        reject(createError(err));
+        console.log("getQuery err->", err);
+        reject(returnError(err));
       } else {
         resolve(returnSuccess(row));
       }
@@ -304,10 +305,12 @@ export const updateTags = async (tweetId, newTags) => {
 export const readAllTags = async () => {
   try {
     const getQueryResponse = await getQuery("SELECT name FROM tags");
-    console.log("tags->", getQueryResponse);
-    let tagNames;
+    let tagNames = [];
     if (getQueryResponse.data) {
-      tagNames = getQueryResponse.data.map((row) => row.name);
+      if (Array.isArray(getQueryResponse.data)) {
+        tagNames = getQueryResponse.data.map((row) => row.name);
+      }
+      else tagNames.push(getQueryResponse.data.name);
       return {
         success: true,
         getQueryResponse: tagNames,

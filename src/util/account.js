@@ -18,7 +18,8 @@ export const checkUserAndPass = () => {
         resolve(returnError("Missing config data 🙈"));
       }
     } catch (error) {
-      resolve(returnError(error));
+      console.log("checkUserAndPassPromise error->", error);
+      resolve(error.errorMessage ? error.errorMessage : JSON.stringify(error));
     }
   });
 };
@@ -34,12 +35,14 @@ export const updateConfigData = (formData) => {
       );
 
       if (getQueryResponse.success) {
-        resolve(returnSuccess());
+        resolve(getQueryResponse);
       } else {
-        resolve(returnError("Failed to update config data 🙈 -"));
+        getQueryResponse.errorMessage = "Failed to update config data 🙈 : " + getQueryResponse.errorMessage;
+        resolve(getQueryResponse);
       }
     } catch (error) {
-      resolve(returnError(error));
+      console.log("updateConfigData-> error", error)
+      reject(error.errorMessage ? error.errorMessage : JSON.stringify(error));
     }
   });
 };

@@ -136,10 +136,6 @@ ipcMain.on("fetch-config-data", async () => {
   // }
   console.log("fetch-config-data from main.js");
   const checkUserAndPassResponse = await checkUserAndPass();
-  console.log(
-    "checkUserAndPassResponse->",
-    JSON.stringify(checkUserAndPassResponse)
-  );
   sendMessageToMainWindow("CONFIG_DATA", checkUserAndPassResponse);
 });
 
@@ -153,13 +149,13 @@ ipcMain.on("update-config-data", async (event, formData) => {
     } else {
       sendMessageToMainWindow(
         "ALERT",
-        `Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
+        `Trouble updating config data mai fren:  ${JSON.stringify(updateConfigDataResponse.errorMessage)}`
       );
     }
   } catch (error) {
     sendMessageToMainWindow(
       "ALERT",
-      `Trouble updating config data: ${updateConfigDataResponse.errorMessage}`
+      `Trouble updating config data: ${error}`
     );
   }
 });
