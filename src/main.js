@@ -170,7 +170,6 @@ const init = async () => {
   if (openDbResult) {
     const tweets = await dbTools.readAllTweets();
     const readAllTagsResult = await dbTools.readAllTags();
-    console.log("readAllTagsResult->", readAllTagsResult);
     
     let resultOBj = {};
     resultOBj.success = true;

@@ -332,7 +332,7 @@ export const readAllTweets = async () => {
   const query = `
   SELECT 
       T.*, 
-      IFNULL(GROUP_CONCAT(TAG.name), '[]') AS tags
+      IFNULL(GROUP_CONCAT(TAG.name), '') AS tags
   FROM 
       tweets T
   LEFT JOIN 
@@ -381,15 +381,9 @@ export const removeTagFromDB = async (tagName) => {
     await runQuery(deleteTagQuery, [tagName]);
 
     console.log(`Successfully removed tag '${tagName}' from the system.`);
-    return {
-      success: true,
-      errorMessage: "👍🏼",
-    };
+    return returnSuccess();
   } catch (error) {
     console.error("Error removing tag from system:", error);
-    return {
-      success: false,
-      errorMessage: error,
-    };
+    return returnError(error.errorMessage);
   }
 };

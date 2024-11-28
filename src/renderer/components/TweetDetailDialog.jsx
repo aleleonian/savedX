@@ -40,7 +40,6 @@ export function TweetDetailDialog({
   removeTagFromDB,
   updateTweetAndTagsLocally,
 }) {
-
   useEffect(() => {
     // Listen for messages from the preload script
     const notificationEventListener = (event) => {
@@ -70,6 +69,7 @@ export function TweetDetailDialog({
   useEffect(() => {
     // Make sure tweetData and tweetData.tags are available
     if (tweetData && tweetData.tags) {
+        
       setTweetTags(tweetData.tags.split(","));
     } else setTweetTags([]);
   }, [tweetData]); // Dependency array to rerun when tweetData changes
@@ -234,9 +234,9 @@ export function TweetDetailDialog({
             options={state.tags}
             value={tweetTags}
             onChange={(event, newValue) => handleTagsUpdate(newValue)}
-            renderTags={(value, getTagProps) =>
-              state.tags.length > 0 &&
-              value.map((option, index) => (
+            renderTags={(value, getTagProps) => {
+              
+              return value.map((option, index) => (
                 <Chip
                   key={index}
                   label={option}
@@ -244,8 +244,8 @@ export function TweetDetailDialog({
                   variant="outlined"
                   // onDelete={() => handleRemoveTag(option)}
                 />
-              ))
-            }
+              ));
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Tags" placeholder="Add tags" />
             )}
