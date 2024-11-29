@@ -51,6 +51,7 @@ ipcRenderer.on("DISABLE_GO_FETCH_BUTTON", () => {
 });
 
 ipcRenderer.on("CONTENT", async (event, message) => {
+  console.log("CONTENT preload: ", message);
   if (domContentLoaded) dispatchNotification("CONTENT", message);
   while (!domContentLoaded) {
     await new Promise((resolve) => setTimeout(resolve, 1000));

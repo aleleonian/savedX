@@ -119,12 +119,8 @@ export const Application = () => {
     };
 
     const contentEventListener = (event) => {
-      setTweetsData(event.detail.tweets);
-      //TODO not sure about this localStorage thing
-      localStorage.setItem("tweetsData", JSON.stringify(event.detail.tweets));
-      setTags(event.detail.tags);
-      localStorage.setItem("tags", JSON.stringify(event.detail.tags));
-      // console.log("tags->", event.detail.tags)
+      if (event.detail.tweets) setTweetsData(event.detail.tweets);
+      if (event.detail.tags) setTags(event.detail.tags);
     };
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("ALERT", alertEventListener);

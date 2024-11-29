@@ -15,3 +15,8 @@ export const returnSuccess = (data) => {
   if (data) responseObj.data = data;
   return responseObj;
 };
+
+export const generateHash = (data) => {
+  const crypto = require('crypto');
+  return crypto.createHash('sha256').update(data).digest('hex');
+};

@@ -7,7 +7,6 @@ import { sendMessageToMainWindow, encode } from "./util/messaging";
 let xBot;
 
 export async function goFetchTweets(botUsername, botPassword, botEmail) {
-
   showProgress(encode(constants.progress.INIT_PROGRESS));
   xBot = new XBot();
   xBot.botUsername = botUsername;
@@ -51,7 +50,6 @@ export async function goFetchTweets(botUsername, botPassword, botEmail) {
           constants.progress.SCRAPED
         )
       );
-      await dbTools.deleteTweets();
       await dbTools.storeTweets(bookmarks);
       await xBot.wait(3000);
       await xBot.logOut();
@@ -67,14 +65,18 @@ export async function goFetchTweets(botUsername, botPassword, botEmail) {
       hideProgress();
     } else {
       hideProgress();
-      sendMessageToMainWindow("NOTIFICATION", `error--Could not log into X 😫 : ${result.message}`);
+      sendMessageToMainWindow(
+        "NOTIFICATION",
+        `error--Could not log into X 😫 : ${result.message}`
+      );
       await xBot.closeBrowser();
       return;
     }
     await xBot.closeBrowser();
     const tweets = await dbTools.readAllTweets();
+    console.log("tweets->", tweets);
     hideProgress();
-    sendMessageToMainWindow("CONTENT", tweets.rows);
+    sendMessageToMainWindow("CONTENT", { tweets: tweets.rows });
   } else {
     hideProgress();
     sendMessageToMainWindow("NOTIFICATION", `error--Trouble with XBot.init()`);

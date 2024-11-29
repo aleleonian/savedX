@@ -1,5 +1,4 @@
 const sqlite3 = require("sqlite3").verbose();
-const { promisify } = require("util");
 import { returnError, returnSuccess } from "./common";
 import cheerio from "cheerio";
 const fs = require("fs");
@@ -86,20 +85,20 @@ const createIfNotExist = async (filePath) => {
       // Initialize schema
 
       await runQuery(`
-      CREATE TABLE "tweets" (
-        "id"	INTEGER,
-        "indexId"	TEXT NOT NULL,
-        "htmlContent"	TEXT NOT NULL,
-        "userName"	TEXT,
-        "twitterHandle"	INTEGER,
-        "tweetText"	TEXT,
-        "tweetUrl"	TEXT,
-        "tweetImageOrPoster"	TEXT,
-        "tweetDate"	TEXT,
-        "profilePicUrl"	TEXT NOT NULL,
-        PRIMARY KEY("id" AUTOINCREMENT)
-      )
+        CREATE TABLE "tweets" (
+          "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+          "indexId" TEXT NOT NULL,
+          "htmlContent" TEXT NOT NULL,
+          "userName" TEXT,
+          "twitterHandle" INTEGER,
+          "tweetText" TEXT,
+          "tweetUrl" TEXT UNIQUE,
+          "tweetImageOrPoster" TEXT,
+          "tweetDate" TEXT,
+          "profilePicUrl" TEXT NOT NULL
+        )
       `);
+
       await runQuery(`
       CREATE TABLE "tags" (
         "id"	INTEGER NOT NULL,
@@ -159,9 +158,6 @@ export const openDb = (filePath) => {
           resolve(false);
           return;
         } else {
-          // db.allAsync = promisify(db.all).bind(db);
-          // db.dbRun = promisify(db.run).bind(db);
-          // db.closeAsync = promisify(db.close.bind(db));
           resolve(true);
         }
       });
@@ -173,14 +169,9 @@ export const openDb = (filePath) => {
 };
 
 export const storeTweets = async (tweetArray) => {
-  await runQuery(`CREATE TABLE IF NOT EXISTS tweets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        indexId TEXT,
-        htmlContent TEXT
-      )`);
-
   await Promise.all(
     tweetArray.map(async (tweet) => {
+
       const $ = cheerio.load(tweet.htmlContent);
       const userNameData = $('[data-testid="User-Name"]').text().split("@");
       tweet.userName = userNameData[0];
@@ -200,7 +191,8 @@ export const storeTweets = async (tweetArray) => {
         );
       }
       await db.run(
-        `INSERT INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, profilePicUrl ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT OR IGNORE INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, profilePicUrl) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           tweet.indexId,
           tweet.htmlContent,
@@ -321,10 +313,7 @@ export const readAllTags = async () => {
     }
   } catch (error) {
     console.log("readAllTags() error: ", error);
-    return {
-      success: false,
-      errorMessage: error,
-    };
+    return returnError(error.errorMessage);
   }
 };
 
@@ -361,10 +350,7 @@ export const readAllTweets = async () => {
     }
   } catch (error) {
     console.error("Error executing query:", error);
-    return {
-      success: false,
-      errorMessage: `Could not read tweets: ${error}`,
-    };
+    return returnError(error.errorMessage);
   }
 };
 
