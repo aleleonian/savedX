@@ -99,14 +99,10 @@ export function TweetDetailDialog({
 
   const handleRemoveTag = (tagToRemove) => {
     //
-    // delete this tag locally
     setTweetTags(tweetTags.filter((tag) => tag != tagToRemove));
     // delete this tag from the tag list
     setTags(state.tags.filter((tag) => tag != tagToRemove));
-    // delete this tag from every tweet
     const currentTweets = state.savedTweets;
-    // iterate the array
-    // find the tweet that contains the tagToRemove
     for (let i = 0; i < currentTweets.length; i++) {
       const currentTags = currentTweets[i].tags;
       if (currentTags && currentTags.indexOf(tagToRemove) != -1) {
@@ -116,8 +112,6 @@ export function TweetDetailDialog({
     setTweetsData(currentTweets);
     // delete this tag from the db
     removeTagFromDB(tagToRemove);
-    // delete this tag from tweets_tags
-    // delete this tag from tags
   };
 
   const renderOption = (props, option, { selected }) => {

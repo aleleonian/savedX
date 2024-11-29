@@ -1,5 +1,11 @@
 require("dotenv").config();
-const { app, BrowserWindow, ipcMain, Menu } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  globalShortcut,
+} = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
 import { checkUserAndPass, updateConfigData } from "./util/account";
@@ -17,7 +23,6 @@ let mainWindow;
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
-
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -85,6 +90,23 @@ app.on("before-quit", () => {
   dbTools.closeDb();
   // Save data, perform cleanup, etc.
 });
+
+app.whenReady().then(() => {
+  const contents = mainWindow.webContents;
+
+  // Register a 'CommandOrControl+C' shortcut listener.
+  globalShortcut.register("CommandOrControl+C", () => {
+    // Do stuff when 'CommandOrControl+C' is pressed.
+    contents.copy();
+  });
+
+  // Register a 'CommandOrControl+V' shortcut listener.
+  globalShortcut.register("CommandOrControl+V", () => {
+    // Do stuff when 'CommandOrControl+V' is pressed.
+    contents.paste();
+  });
+});
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.on("go-fetch-tweets", async (event, data) => {
@@ -170,7 +192,7 @@ const init = async () => {
   if (openDbResult) {
     const tweets = await dbTools.readAllTweets();
     const readAllTagsResult = await dbTools.readAllTags();
-    
+
     let resultOBj = {};
     resultOBj.success = true;
 
