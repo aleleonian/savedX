@@ -464,10 +464,15 @@ export class XBot {
             const findAndClickResult = await this.findAndClick(
               process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON
             );
+            //TODO this is not being found despite apparently having to be the case 
+            //when my login data is bullshit
+            //TODO implement a web server to live debug wtf is going on the
+            //remote chrome
             const findTextInPageResult = await this.findTextInPage(
               "please try again"
             );
             console.log("findTextInPageResult->", findTextInPageResult);
+            await this.wait(10000);
             // if(findTextInPageResult) then hay que abortar la misión.
             if (findTextInPageResult) {
               return this.respond(

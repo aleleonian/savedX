@@ -4,7 +4,6 @@ const {
   BrowserWindow,
   ipcMain,
   Menu,
-  globalShortcut,
 } = require("electron");
 const path = require("node:path");
 import * as dbTools from "./util/db";
@@ -56,7 +55,8 @@ const createWindow = () => {
   }
 
   // Open the DevTools console
-  mainWindow.webContents.openDevTools({ mode: "detach" });
+  // mainWindow.webContents.openDevTools({ mode: "detach" });
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -91,21 +91,6 @@ app.on("before-quit", () => {
   // Save data, perform cleanup, etc.
 });
 
-app.whenReady().then(() => {
-  const contents = mainWindow.webContents;
-
-  // Register a 'CommandOrControl+C' shortcut listener.
-  globalShortcut.register("CommandOrControl+C", () => {
-    // Do stuff when 'CommandOrControl+C' is pressed.
-    contents.copy();
-  });
-
-  // Register a 'CommandOrControl+V' shortcut listener.
-  globalShortcut.register("CommandOrControl+V", () => {
-    // Do stuff when 'CommandOrControl+V' is pressed.
-    contents.paste();
-  });
-});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
