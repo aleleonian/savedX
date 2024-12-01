@@ -379,6 +379,43 @@ export class XBot {
         return await this.browser.close();
     }
 
+    async lookForWrongLoginInfoDialog(textToLookFor) {
+        try {
+            const timeout = 10000;
+            const pollInterval = 200;
+
+            const dialogAppeared = await new Promise((resolve) => {
+                const startTime = Date.now();
+                const interval = setInterval(async () => {
+                    const findTextInPageResult = await this.findTextInPage(
+                        textToLookFor
+                    );
+
+                    if (findTextInPageResult) {
+                        clearInterval(interval);
+                        resolve(true);
+                    }
+
+                    if (Date.now() - startTime > timeout) {
+                        clearInterval(interval);
+                        resolve(false);
+                    }
+                }, pollInterval);
+            });
+
+            if (dialogAppeared) {
+                console.log('Error dialog detected.');
+                return true;
+            } else {
+                console.log('Error dialog did not appear within the timeout.');
+                return false;
+            }
+
+        } catch (error) {
+            console.error('An error occurred:', error);
+            return false;
+        }
+    }
     async logOut() {
         await this.goto("https://x.com/logout");
         let foundAndClicked = await this.findAndClick(
@@ -441,63 +478,17 @@ export class XBot {
             }
             console.log("Found and clicked TWITTER_USERNAME_SUBMIT_BUTTON");
 
-
-            //TODO we now must look for the 'wrong username' text
-            let findTextInPageResult;
-            // const findTextInPageResult = await this.findTextInPage(
-            //     "please try again"
-            // );
-            // console.log("findTextInPageResult->", findTextInPageResult);
-
-            try {
-                // Set a timeout period for checking
-                const timeout = 10000;
-                const pollInterval = 200; // Check every 200 ms
-
-                const dialogAppeared = await new Promise((resolve) => {
-                    const startTime = Date.now();
-                    const interval = setInterval(async () => {
-                        const findTextInPageResult = await this.findTextInPage(
-                            "we could not find your account"
-                        );
-
-                        if (findTextInPageResult) {
-                            clearInterval(interval);
-                            resolve(true);
-                        }
-
-                        if (Date.now() - startTime > timeout) {
-                            clearInterval(interval);
-                            resolve(false);
-                        }
-                    }, pollInterval);
-                });
-
-                if (dialogAppeared) {
-                    console.log('Error dialog detected.');
-                    findTextInPageResult = true;
-                } else {
-                    console.log('Error dialog did not appear within the timeout.');
-                    findTextInPageResult = false;
-                }
-
-            } catch (error) {
-                console.error('An error occurred:', error);
-            }
-
-            // await this.wait(200000);
-            // if(findTextInPageResult) then hay que abortar la misión.
-            if (findTextInPageResult) {
+            if (await this.lookForWrongLoginInfoDialog("we could not find your account")) {
                 return this.respond(
                     false,
                     "Bro, your username is fucked up."
                 );
             }
 
-
             foundAndClicked = await this.findAndClick(
                 process.env.TWITTER_PASSWORD_INPUT
             );
+
             if (!foundAndClicked) {
                 console.log("Can't find and click TWITTER_PASSWORD_INPUT");
                 // let's look for this text We need to make sure that you’re a real person.
@@ -623,11 +614,18 @@ export class XBot {
             await this.page.keyboard.press("Enter");
             await this.wait(3000);
 
-            const wrongPassword = await this.findTextInPage("wrong password");
-            console.log("wrongPassword->", wrongPassword);
-            if (wrongPassword) {
-                return this.respond(false, "Your password is bad.");
+            if (await this.lookForWrongLoginInfoDialog("wrong password")) {
+                return this.respond(
+                    false,
+                    "Bro, your password is messed up."
+                );
             }
+
+            // const wrongPassword = await this.findTextInPage("wrong password");
+            // console.log("wrongPassword->", wrongPassword);
+            // if (wrongPassword) {
+            //     return this.respond(false, "Your password is bad.");
+            // }
 
             const blockedAttempt = await this.findTextInPage(
                 "We blocked an attempt to access your account because"
