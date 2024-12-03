@@ -1,0 +1,25 @@
+<button aria-label="Bookmarked" role="button"
+    class="css-175oi2r r-1777fci r-bt1l66 r-bztko3 r-lrvibr r-1loqt21 r-1ny4l3l" data-testid="removeBookmark"
+    type="button">
+    <div dir="ltr"
+        class="css-146c3p1 r-bcqeeo r-1ttztb7 r-qvutc0 r-37j5jr r-a023e6 r-rjixqe r-16dba41 r-1awozwy r-6koalj r-1h0z5md r-o7ynqc r-clp7b1 r-3s2u2q r-1cvl2hr"
+        style="text-overflow: unset;">
+        <div class="css-175oi2r r-xoduu5">
+            <div
+                class="css-175oi2r r-xoduu5 r-1p0dtai r-1d2f490 r-u8s1d r-zchlnj r-ipm5af r-1niwhzg r-sdzlij r-xf4iuw r-o7ynqc r-6416eg r-1ny4l3l">
+            </div><svg viewBox="0 0 24 24" aria-hidden="true"
+                class="r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-lrvibr r-m6rgpd r-1xvli5t r-1hdv0qi">
+                <g>
+                    <path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5z"></path>
+                </g>
+            </svg>
+        </div>
+    </div>
+</button>
+
+
+// Wait for the button with the specific data-testid to appear
+await page.waitForSelector('[data-testid="removeBookmark"]');
+
+// Click the button
+await page.click('[data-testid="removeBookmark"]');

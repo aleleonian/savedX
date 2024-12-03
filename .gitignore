@@ -92,7 +92,6 @@ old.env
 
 # Electron-Forge
 out/
-noupload/
 src/data/*.db
 *.db
 
