@@ -381,7 +381,7 @@ export class XBot {
 
     async lookForWrongLoginInfoDialog(textToLookFor) {
         try {
-            const timeout = 10000;
+            const timeout = 5000;
             const pollInterval = 200;
 
             const dialogAppeared = await new Promise((resolve) => {
@@ -513,54 +513,10 @@ export class XBot {
                         //when my login data is bullshit
                         //TODO implement a web server to live debug wtf is going on the
                         //remote chrome
-                        let findTextInPageResult;
-                        // const findTextInPageResult = await this.findTextInPage(
-                        //     "please try again"
-                        // );
-                        // console.log("findTextInPageResult->", findTextInPageResult);
-
-                        try {
-                            // Set a timeout period for checking
-                            const timeout = 5000;
-                            const pollInterval = 200; // Check every 200 ms
-
-                            const dialogAppeared = await new Promise((resolve) => {
-                                const startTime = Date.now();
-                                const interval = setInterval(async () => {
-                                    const findTextInPageResult = await this.findTextInPage(
-                                        "please try again"
-                                    );
-
-                                    if (findTextInPageResult) {
-                                        clearInterval(interval);
-                                        resolve(true);
-                                    }
-
-                                    if (Date.now() - startTime > timeout) {
-                                        clearInterval(interval);
-                                        resolve(false);
-                                    }
-                                }, pollInterval);
-                            });
-
-                            if (dialogAppeared) {
-                                console.log('Error dialog detected.');
-                                findTextInPageResult = true;
-                            } else {
-                                console.log('Error dialog did not appear within the timeout.');
-                                findTextInPageResult = false;
-                            }
-
-                        } catch (error) {
-                            console.error('An error occurred:', error);
-                        }
-
-                        // await this.wait(200000);
-                        // if(findTextInPageResult) then hay que abortar la misión.
-                        if (findTextInPageResult) {
+                        if (await this.lookForWrongLoginInfoDialog("please try again")) {
                             return this.respond(
                                 false,
-                                "Can't login, probably due to a faulty email address."
+                                "Bro, your password is messed up."
                             );
                         }
                     } catch (error) {
