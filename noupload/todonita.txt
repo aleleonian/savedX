@@ -1,1 +1,4 @@
 + dar la opción de guardar una copia de los tweets
++ add a layer of if (process.ENV.DEBUG) para debugear.
++ que se baje la configuración de los selectors desde latigo.com.ar/savedX
++ capacity to delete saved tweets
