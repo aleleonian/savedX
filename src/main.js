@@ -5,6 +5,7 @@ import { startExpressServer } from "./webserver";
 import * as dbTools from "./util/db";
 import { checkUserAndPass, updateConfigData } from "./util/account";
 import { menuTemplate } from "./data/menu-template";
+import { XBot } from "./classes/XBot";
 
 import {
   goFetchTweets,
@@ -14,6 +15,8 @@ import {
 import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
 
 let mainWindow;
+let xBot;
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
   app.quit();
@@ -73,6 +76,8 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+  xBot = new XBot();
+
   createWindow();
   const initStatus = await init();
   if (!initStatus.success) {
@@ -80,6 +85,9 @@ app.whenReady().then(async () => {
       "NOTIFICATION",
       `error--${initStatus.errorMessage}`
     );
+  }
+  if (process.env.DEBUG) {
+    startExpressServer(xBot); // Start the Express server here
   }
 });
 
@@ -91,11 +99,11 @@ app.on("activate", () => {
   }
 });
 
-app.on("ready", () => {
-  if (process.env.DEBUG) {
-    startExpressServer(); // Start the Express server here
-  }
-});
+// app.on("ready", () => {
+//   if (process.env.DEBUG) {
+//     startExpressServer(xBot); // Start the Express server here
+//   }
+// });
 
 app.on("window-all-closed", () => {
   app.quit();
@@ -116,6 +124,7 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
   if (checkUserAndPassResponse.success) {
     const data = checkUserAndPassResponse.data;
     await goFetchTweets(
+      xBot,
       data.TWITTER_BOT_USERNAME,
       data.TWITTER_BOT_PASSWORD,
       data.TWITTER_BOT_EMAIL

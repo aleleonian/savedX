@@ -4,11 +4,8 @@ import * as dbTools from "./util/db";
 import * as common from "./util/common";
 import { sendMessageToMainWindow, encode } from "./util/messaging";
 
-let xBot;
-
-export async function goFetchTweets(botUsername, botPassword, botEmail) {
+export async function goFetchTweets(xBot, botUsername, botPassword, botEmail) {
   showProgress(encode(constants.progress.INIT_PROGRESS));
-  xBot = new XBot();
   xBot.botUsername = botUsername;
   xBot.botPassword = botPassword;
   xBot.botEmail = botEmail;
