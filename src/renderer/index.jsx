@@ -31,8 +31,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-console.log("window.env.DEBUG->", window.env.DEBUG);
-
 root.render(
   <AppProvider>
     <Application />

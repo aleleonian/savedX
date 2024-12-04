@@ -12,30 +12,28 @@ function dispatchNotification(eventType, message) {
   window.dispatchEvent(new CustomEvent(eventType, { detail: message }));
 }
 
-// console.log("shell->", shell);
-
-contextBridge.exposeInMainWorld("savedXApi", {
+/// Single object to expose all APIs
+const api = {
   goFetchTweets: () => ipcRenderer.send("go-fetch-tweets"),
   stopScraping: () => ipcRenderer.send("stop-scraping"),
   getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
-  openUrl: (url) => {
-    shell.openExternal(url);
-  },
-  updateTagsForTweet: (tweetId, newTags) =>
-    ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
+  openUrl: (url) => shell.openExternal(url),
+  updateTagsForTweet: (tweetId, newTags) => ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
   removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
   getConfigData: () => ipcRenderer.send("fetch-config-data"),
-  updateConfigData: (formData) => {
-    // console.log("updateConfigData()->", formData);
-    ipcRenderer.send("update-config-data", formData);
-  },
-});
+  updateConfigData: (formData) => ipcRenderer.send("update-config-data", formData),
+  DEBUG: process.env.DEBUG  // Pass DEBUG directly
+};
 
-//TODO VOY por aquí tratando de que el renderer reconozca process.env.DEBUG
-console.log('DEBUG in preload:', process.env.DEBUG); 
+let debugValueSet = false;
 
-contextBridge.exposeInMainWorld('env', {
-  DEBUG: process.env.DEBUG  // Ensure it converts to a boolean
+ipcRenderer.on('env-debug', (event, debugValue) => {
+  api.DEBUG = debugValue;
+  debugValueSet = true;
+  // Only expose API once the DEBUG value is set
+  if (debugValueSet) {
+    contextBridge.exposeInMainWorld('savedXApi', api);
+  }
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {

@@ -25,6 +25,7 @@ export const Application = () => {
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
   const [configData, setConfigData] = useState(null);
   const { state, updateState } = useContext(AppContext);
+  const [debugValue, setDebugValue] = useState(null);
 
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
@@ -42,6 +43,19 @@ export const Application = () => {
   //   // JSON.parse(localStorage.getItem("tags")) || null
   //   null
   // );
+
+  useEffect(() => {
+    // Wait for savedXApi.DEBUG to be set
+    const interval = setInterval(() => {
+      if (window.savedXApi && window.savedXApi.DEBUG !== undefined) {
+        debugger;
+        setDebugValue(window.savedXApi.DEBUG);
+        clearInterval(interval);
+      }
+    }, 100); // Check every 100ms until the value is set
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     // Listen for messages from the preload script
@@ -210,8 +224,8 @@ export const Application = () => {
 
       <div className="text-center">
         {!progressState.active &&
-        state.savedTweets &&
-        state.savedTweets.length > 0
+          state.savedTweets &&
+          state.savedTweets.length > 0
           ? displayTweetsData(state.savedTweets, state.tags)
           : "There's nothing to show, bro 😣"}
         <div className="text-center my-4">

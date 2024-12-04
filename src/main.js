@@ -27,8 +27,7 @@ const createWindow = () => {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: true,
-      additionalArguments: [`--debug=${process.env.DEBUG}`]
-      // sandbox: false,
+      sandbox: false,
     },
   });
 
@@ -38,8 +37,16 @@ const createWindow = () => {
 
   setMainWindow(mainWindow);
 
+  mainWindow.webContents.on('devtools-opened', () => {
+    console.log('DevTools event triggered');
+  });
+
   mainWindow.on("closed", () => {
     mainWindow = null;
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('env-debug', process.env.DEBUG || "NO-SETEADO");
   });
 
   // and load the index.html of the app.
@@ -51,7 +58,6 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools console
   // mainWindow.webContents.openDevTools({ mode: "detach" });
   mainWindow.webContents.openDevTools();
 };
@@ -79,7 +85,6 @@ app.on("activate", () => {
 });
 
 app.on("ready", () => {
-  createWindow();
   if (process.env.DEBUG) {
     startExpressServer(); // Start the Express server here
   }
