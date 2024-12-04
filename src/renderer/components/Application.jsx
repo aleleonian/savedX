@@ -43,7 +43,7 @@ export const Application = () => {
     const interval = setInterval(() => {
       if (window.savedXApi && window.savedXApi.DEBUG !== undefined) {
         setIsDebug(Boolean(window.savedXApi.DEBUG));
-        console.log("Debug is on, baby!", Boolean(window.savedXApi.DEBUG));
+        console.log("isDebug: ", Boolean(window.savedXApi.DEBUG));
         clearInterval(interval);
       }
     }, 100); // Check every 100ms until the value is set

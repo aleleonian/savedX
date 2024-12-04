@@ -37,16 +37,23 @@ const createWindow = () => {
 
   setMainWindow(mainWindow);
 
-  mainWindow.webContents.on('devtools-opened', () => {
-    console.log('DevTools event triggered');
-  });
-
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('env-debug', process.env.DEBUG || "NO-SETEADO");
+
+    const debugEnvVar = (() => {
+      try {
+        const value = JSON.parse(process.env.DEBUG);
+        return value;
+      } catch (error) {
+        console.error("Error occurred:", error);
+        return false;
+      }
+    })();
+
+    sendMessageToMainWindow('env-debug', debugEnvVar || false);
   });
 
   // and load the index.html of the app.
@@ -188,7 +195,7 @@ ipcMain.on("open-debug-session", async (event) => {
   }
 });
 
-console.log("DEBUG in main process:", process.env.DEBUG);
+console.log("DEBUG in main process:", JSON.parse(process.env.DEBUG));
 
 const init = async () => {
   let dbPath;
