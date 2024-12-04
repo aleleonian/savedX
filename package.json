@@ -47,6 +47,7 @@
     "dompurify": "^3.1.0",
     "dotenv": "^16.4.5",
     "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.21.1",
     "postcss": "^8.4.38",
     "puppeteer": "^22.6.2",
     "puppeteer-extra": "^3.3.6",

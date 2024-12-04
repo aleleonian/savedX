@@ -1,11 +1,7 @@
 require("dotenv").config();
-const {
-  app,
-  BrowserWindow,
-  ipcMain,
-  Menu,
-} = require("electron");
+const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const path = require("node:path");
+import { startExpressServer } from "./webserver";
 import * as dbTools from "./util/db";
 import { checkUserAndPass, updateConfigData } from "./util/account";
 import { menuTemplate } from "./data/menu-template";
@@ -29,9 +25,10 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: false, // Node.js features disabled
+      nodeIntegration: true,
       contextIsolation: true,
-      sandbox: false,
+      additionalArguments: [`--debug=${process.env.DEBUG}`]
+      // sandbox: false,
     },
   });
 
@@ -81,6 +78,13 @@ app.on("activate", () => {
   }
 });
 
+app.on("ready", () => {
+  createWindow();
+  if (process.env.DEBUG) {
+    startExpressServer(); // Start the Express server here
+  }
+});
+
 app.on("window-all-closed", () => {
   app.quit();
 });
@@ -90,7 +94,6 @@ app.on("before-quit", () => {
   dbTools.closeDb();
   // Save data, perform cleanup, etc.
 });
-
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
@@ -161,6 +164,8 @@ ipcMain.on("update-config-data", async (event, formData) => {
     sendMessageToMainWindow("ALERT", `Trouble updating config data: ${error}`);
   }
 });
+
+console.log("DEBUG in main process:", process.env.DEBUG);
 
 const init = async () => {
   let dbPath;

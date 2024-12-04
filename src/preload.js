@@ -31,6 +31,13 @@ contextBridge.exposeInMainWorld("savedXApi", {
   },
 });
 
+//TODO VOY por aquí tratando de que el renderer reconozca process.env.DEBUG
+console.log('DEBUG in preload:', process.env.DEBUG); 
+
+contextBridge.exposeInMainWorld('env', {
+  DEBUG: process.env.DEBUG  // Ensure it converts to a boolean
+});
+
 ipcRenderer.on("NOTIFICATION", (event, message) => {
   console.log("message from main:", message);
   if (domContentLoaded) dispatchNotification("NOTIFICATION", message);
