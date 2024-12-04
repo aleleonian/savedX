@@ -8,6 +8,7 @@ export const AppProvider = ({ children }) => {
     const [state, setState] = useState({
         savedTweets: [],
         tags: [],
+        isDebug: false,
     });
 
     const updateState = (key, value) => {

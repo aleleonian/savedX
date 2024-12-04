@@ -7,6 +7,7 @@ import { Title } from "./Title";
 import * as constants from "../../util/constants";
 import { Progress } from "./Progress";
 import { AppContext } from "../../context/AppContext";
+import Button from "@mui/material/Button";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
@@ -25,7 +26,6 @@ export const Application = () => {
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
   const [configData, setConfigData] = useState(null);
   const { state, updateState } = useContext(AppContext);
-  const [debugValue, setDebugValue] = useState(null);
 
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
@@ -34,22 +34,16 @@ export const Application = () => {
     updateState("tags", tagsArray);
   };
 
-  // const [tweetsData, setTweetsData] = useState(
-  //   // JSON.parse(localStorage.getItem("tweetsData")) || null
-  //   null
-  // );
-
-  // const [tags, setTags] = useState(
-  //   // JSON.parse(localStorage.getItem("tags")) || null
-  //   null
-  // );
+  const setIsDebug = (isDebug) => {
+    updateState("isDebug", isDebug);
+  }
 
   useEffect(() => {
     // Wait for savedXApi.DEBUG to be set
     const interval = setInterval(() => {
       if (window.savedXApi && window.savedXApi.DEBUG !== undefined) {
-        debugger;
-        setDebugValue(window.savedXApi.DEBUG);
+        setIsDebug(Boolean(window.savedXApi.DEBUG));
+        console.log("Debug is on, baby!", Boolean(window.savedXApi.DEBUG));
         clearInterval(interval);
       }
     }, 100); // Check every 100ms until the value is set
@@ -170,6 +164,10 @@ export const Application = () => {
     window.savedXApi.goFetchTweets();
   }
 
+  function openDebugSession() {
+    window.savedXApi.openDebugSession();
+  };
+
   const handleClose = () => {
     setOpenConfigDialog(false);
   };
@@ -189,7 +187,7 @@ export const Application = () => {
   if (progressState.active) {
     return (
       <>
-        <Progress state={progressState} />
+        <Progress whichState={progressState} />
       </>
     );
   }
@@ -237,6 +235,18 @@ export const Application = () => {
             Go fetch tweets
           </button>
         </div>
+
+        {state.isDebug && (
+          <div className="text-center my-4">
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              onClick={openDebugSession}
+            >
+              Debug
+            </button>
+          </div>
+        )}
+
       </div>
     </section>
   );

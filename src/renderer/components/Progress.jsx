@@ -15,7 +15,8 @@ const removeClass = (classList, className) => {
     .join(" ");
 };
 
-export const Progress = ({ state }) => {
+export const Progress = ({ whichState }) => {
+
   let logginClass = "flex items-center text-gray-400 py-4";
   let loginText = "Log into X.";
 
@@ -25,31 +26,31 @@ export const Progress = ({ state }) => {
   let logoutClass = "flex items-center text-gray-400 py-4";
   let logoutText = "Log out of X.";
 
-  if (state.logingIn) {
+  if (whichState.logingIn) {
     logginClass = removeClass(logginClass, "text-gray-400");
     logginClass = addClass(logginClass, "text-blue-500");
     loginText = "Logging into X...";
-  } else if (state.loggedIn) {
+  } else if (whichState.loggedIn) {
     logginClass = removeClass(logginClass, "text-gray-400");
     logginClass = addClass(logginClass, "text-blue-500");
     loginText = "Logged into X ✅";
   }
 
-  if (state.scraping) {
+  if (whichState.scraping) {
     scrapingClass = removeClass(scrapingClass, "text-gray-400");
     scrapingClass = addClass(scrapingClass, "text-blue-500");
     scrapingText = "Scraping bookmarks ⏳";
-  } else if (state.scraped) {
+  } else if (whichState.scraped) {
     scrapingClass = removeClass(scrapingClass, "text-gray-400");
     scrapingClass = addClass(scrapingClass, "text-blue-500");
     scrapingText = "Scraped bookmarks ✅";
   }
 
-  if (state.loggingOut) {
+  if (whichState.loggingOut) {
     logoutClass = removeClass(logoutClass, "text-gray-400");
     logoutClass = addClass(logoutClass, "text-blue-500");
     logoutText = "Logging out of X...";
-  } else if (state.loggedOut) {
+  } else if (whichState.loggedOut) {
     logoutClass = removeClass(logoutClass, "text-gray-400");
     logoutClass = addClass(logoutClass, "text-blue-500");
     logoutText = "Logged out of X ✅";
@@ -67,15 +68,15 @@ export const Progress = ({ state }) => {
         <div className="flex flex-col items-center py-8">
           <div id="login" className={logginClass}>
             {loginText}
-            {state.logingIn && <ProgressIcon />}
+            {whichState.logingIn && <ProgressIcon />}
           </div>
           <div id="scraping" className={scrapingClass}>
             {scrapingText}
-            {state.scraping && <ProgressIcon />}
+            {whichState.scraping && <ProgressIcon />}
           </div>
           <div id="logout" className={logoutClass}>
             {logoutText}
-            {state.loggingOut && <ProgressIcon />}
+            {whichState.loggingOut && <ProgressIcon />}
           </div>
         </div>
         <div>
@@ -84,9 +85,7 @@ export const Progress = ({ state }) => {
           <Button autoFocus onClick={stopScraping}>
             Stop the scrape 🛑
           </Button>
-          {window.env.DEBUG == true && (
-            <Button onClick={null}>Debug x-bot 🛑</Button>
-          )}
+
         </div>
       </div>
     </>

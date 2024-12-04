@@ -169,6 +169,24 @@ ipcMain.on("update-config-data", async (event, formData) => {
     sendMessageToMainWindow("ALERT", `Trouble updating config data: ${error}`);
   }
 });
+ipcMain.on("open-debug-session", async (event) => {
+  try {
+    console.log("open-debug-session!");
+
+    if (true) {
+      sendMessageToMainWindow("NOTIFICATION", `success--open-debug-session!`);
+    } else {
+      sendMessageToMainWindow(
+        "ALERT",
+        `Trouble updating config data mai fren:  ${JSON.stringify(
+          updateConfigDataResponse.errorMessage
+        )}`
+      );
+    }
+  } catch (error) {
+    sendMessageToMainWindow("ALERT", `Trouble updating config data: ${error}`);
+  }
+});
 
 console.log("DEBUG in main process:", process.env.DEBUG);
 

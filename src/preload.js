@@ -22,7 +22,8 @@ const api = {
   removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
   getConfigData: () => ipcRenderer.send("fetch-config-data"),
   updateConfigData: (formData) => ipcRenderer.send("update-config-data", formData),
-  DEBUG: process.env.DEBUG  // Pass DEBUG directly
+  DEBUG: process.env.DEBUG,
+  openDebugSession: () => ipcRenderer.send("open-debug-session"),
 };
 
 let debugValueSet = false;
