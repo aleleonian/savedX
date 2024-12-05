@@ -10,6 +10,7 @@ import { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
 import { Cancel } from "@mui/icons-material";
 import { IconButton, TextField, Autocomplete, Chip } from "@mui/material";
+import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
 
 import { AlertDialog } from "./AlertDialog";
 
@@ -65,11 +66,11 @@ export function TweetDetailDialog({
   const [tweetTags, setTweetTags] = useState([]);
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
 
   useEffect(() => {
     // Make sure tweetData and tweetData.tags are available
     if (tweetData && tweetData.tags) {
-        
       setTweetTags(tweetData.tags.split(","));
     } else setTweetTags([]);
   }, [tweetData]); // Dependency array to rerun when tweetData changes
@@ -139,6 +140,20 @@ export function TweetDetailDialog({
     );
   };
 
+  const onDelete = () => {
+    setConfirmationDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setConfirmationDialogOpen(false);
+  };
+
+  const handleConfirmAction = () => {
+    // Add your confirmation logic here (e.g., delete item)
+    console.log("Confirmed!");
+    setConfirmationDialogOpen(false);
+  };
+
   return (
     <React.Fragment>
       <Dialog
@@ -172,6 +187,15 @@ export function TweetDetailDialog({
                 openFlag={true}
               />
             )}
+
+            <ConfirmationDialog
+              open={confirmationDialogOpen}
+              handleClose={handleCloseDialog}
+              handleConfirm={handleConfirmAction}
+              title="Confirm Deletion"
+              message="Are you sure you want to delete this saved tweet?"
+            />
+
             {/* Tweet content */}
             <div className="flex-1">
               {/* User details row */}
@@ -179,7 +203,6 @@ export function TweetDetailDialog({
                 <b>{tweetData.userName}</b>
                 <span className="text-gray-600">{tweetData.twitterHandle}</span>
                 <span className="text-gray-400">· {tweetData.tweetDate}</span>
-                <span className="text-gray-400">tags: {tweetData.tags}</span>
               </div>
 
               {/* Tweet text */}
@@ -220,7 +243,6 @@ export function TweetDetailDialog({
         <DialogActions
           sx={{ display: "flex", justifyContent: "space-between" }}
         >
-          {/* Tag Input */}
           <Autocomplete
             fullWidth
             multiple
@@ -229,7 +251,6 @@ export function TweetDetailDialog({
             value={tweetTags}
             onChange={(event, newValue) => handleTagsUpdate(newValue)}
             renderTags={(value, getTagProps) => {
-              
               return value.map((option, index) => (
                 <Chip
                   key={index}
@@ -246,7 +267,12 @@ export function TweetDetailDialog({
             renderOption={renderOption} // Custom option renderer with a remove button
             sx={{ marginTop: 1 }}
           />
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onDelete}>
+            <span style={{ fontSize: "24px" }}>❌</span>
+          </Button>
+          <Button onClick={onClose}>
+            <span style={{ fontSize: "24px" }}>👍🏻</span>
+          </Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>
