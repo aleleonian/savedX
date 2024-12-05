@@ -1,5 +1,5 @@
 import * as constants from "../util/constants";
-import { sendMessageToMainWindow, encode } from "../util/messaging";
+import { encode } from "../util/messaging";
 
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
@@ -23,11 +23,9 @@ let pupConfig = {
     ignoreDefaultArgs: ["--enable-automation"],
     args: ["--start-maximized", "--no-sandbox", "--disable-setuid-sandbox"],
 };
-
 if (process.env.EXECUTABLE_PATH) {
     pupConfig.executablePath = process.env.EXECUTABLE_PATH;
 }
-
 export class XBot {
     constructor() {
         this.browser;
@@ -44,7 +42,6 @@ export class XBot {
         this.botPassword;
         this.botEmail;
     }
-
     getId(divHtmlContent) {
         const $ = cheerio.load(divHtmlContent);
 
@@ -63,7 +60,6 @@ export class XBot {
         }
         return translateYValue ? translateYValue : this.createHash(divHtmlContent);
     }
-
     createHash(inputString) {
         const hash = crypto.createHash("md5");
         hash.update(inputString);
@@ -76,7 +72,6 @@ export class XBot {
     getTweet(userId) {
         return this.tweets[userId];
     }
-
     async init() {
         const browser = await puppeteer.launch(pupConfig);
         let responseObject = {};
@@ -205,7 +200,6 @@ export class XBot {
 
         return this.getCurrentBotUrl();
     }
-
     async tweet(userId, text) {
         // if the xBot is busy then the userId and tweetText will be kept in an object in
         // the queue array
@@ -270,7 +264,6 @@ export class XBot {
             return this.respond(false, "xBot is busy");
         }
     }
-
     async twitterSuspects() {
         try {
             const TwitterSuspects = await this.page.waitForSelector(
@@ -314,19 +307,9 @@ export class XBot {
     }
     async unusualLoginDetected() {
         try {
+
             return await this.findTextInPage(process.env.TWITTER_UNUSUAL_LOGIN_TEXT);
 
-            const TwitterSuspects = await this.page.waitForSelector(
-                `//*[contains(text(), '${process.env.TWITTER_UNUSUAL_LOGIN_TEXT}')]`,
-                { timeout: 10000 }
-            );
-            if (TwitterSuspects) {
-                console.log("Found TWITTER_UNUSUAL_LOGIN_TEXT!");
-                return true;
-            } else {
-                console.log("Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!");
-                return false;
-            }
         } catch (error) {
             console.log(
                 "unusualLoginDetected() exception! -> Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!"
@@ -335,7 +318,6 @@ export class XBot {
             return false;
         }
     }
-
     async arkoseChallengeDetected() {
         const arkoseFrame = await this.page.$("#arkoseFrame");
 
@@ -356,7 +338,6 @@ export class XBot {
             if (TwitterWantsToVerify) {
                 console.log("Alert: found VERIFICATION_TEXT!!");
                 const pageContent = await this.page.content();
-                // console.log(pageContent);
                 let response = {};
                 response.success = true;
                 response.pageContent = pageContent;
@@ -374,11 +355,9 @@ export class XBot {
             return false;
         }
     }
-
     async closeBrowser() {
         return await this.browser.close();
     }
-
     async lookForWrongLoginInfoDialog(textToLookFor) {
         try {
             const timeout = 5000;
@@ -656,7 +635,6 @@ export class XBot {
             return this.respond(false, "xBot is already logged in!");
         }
     }
-
     async inputEmail() {
         let foundAndClicked = await this.findAndClick(
             process.env.TWITTER_EMAIL_INPUT
@@ -741,7 +719,6 @@ export class XBot {
     wait(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
-
     storeBookmarks = async () => {
         const bookmarkDivs = await this.page.$$('[data-testid="cellInnerDiv"]');
 
@@ -822,14 +799,6 @@ export class XBot {
         }
 
         return this.bookmarks;
-    };
-
-    //TODO deprecated
-    delimiterBookmarkFound = (searchString) => {
-        const matchingObjects = this.bookmarks.filter((obj) =>
-            obj.html.includes(searchString)
-        );
-        return matchingObjects.length > 0;
     };
 
     isScrolledToBottom = async () => {
