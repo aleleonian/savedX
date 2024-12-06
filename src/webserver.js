@@ -5,8 +5,6 @@ let xBotPointer;
 
 // Function to Start the Express Server
 export const startExpressServer = (xBot) => {
-  console.log("xBot->", xBot);
-
   xBotPointer = xBot;
   const server = express();
 

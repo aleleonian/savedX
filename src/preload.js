@@ -24,6 +24,7 @@ const api = {
   updateConfigData: (formData) => ipcRenderer.send("update-config-data", formData),
   DEBUG: process.env.DEBUG,
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
+  deleteSavedTweet: (tweetId) => ipcRenderer.invoke("delete-saved-tweet", tweetId),
 };
 
 let debugValueSet = false;

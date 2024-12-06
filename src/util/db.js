@@ -171,7 +171,6 @@ export const openDb = (filePath) => {
 export const storeTweets = async (tweetArray) => {
   await Promise.all(
     tweetArray.map(async (tweet) => {
-
       const $ = cheerio.load(tweet.htmlContent);
       const userNameData = $('[data-testid="User-Name"]').text().split("@");
       tweet.userName = userNameData[0];
@@ -233,19 +232,16 @@ export const closeDb = () => {
   }
 };
 
-// TODO deprecated
-export const getXCredentials = async () => {
-  console.log("getXCredentials()");
-  const query = "SELECT * FROM users";
+export async function deleteTweetById(tweetId) {
   try {
-    const getQueryResponse = await getQuery(query);
-    if (!getQueryResponse.data) return false;
-    return returnSuccess(getQueryResponse.data);
+    await runQuery("DELETE FROM tweets_tags WHERE tweetId = ?", [tweetId]);
+    await runQuery("DELETE FROM tweets WHERE id = ?", [tweetId]);
+    return true;
   } catch (error) {
-    console.error("Error executing query:", error);
+    console.error("Error deleting tweet:", error);
     return false;
   }
-};
+}
 
 export const updateTags = async (tweetId, newTags) => {
   try {

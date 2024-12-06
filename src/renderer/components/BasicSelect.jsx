@@ -1,18 +1,18 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 export function BasicSelect({ tags, handleSelectChange }) {
-  const [tag, setTag] = React.useState('');
-  
+  const [tag, setTag] = React.useState("");
+
   const handleChange = (event) => {
     let tagFilter = event.target.value;
 
-    if (tagFilter == 'clean-the-filter-123') {
-      tagFilter = '';
+    if (tagFilter == "clean-the-filter-123") {
+      tagFilter = "";
     }
     setTag(tagFilter);
     handleSelectChange(tagFilter);
@@ -36,10 +36,9 @@ export function BasicSelect({ tags, handleSelectChange }) {
           ))}
           {/* Manual MenuItem */}
           <MenuItem value="clean-the-filter-123" key="clean-tag-filter">
-            Clean tag filter
+            <span style={{ fontSize: "34px" }}>🧹</span>
           </MenuItem>
         </Select>
-
       </FormControl>
     </Box>
   );

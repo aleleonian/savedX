@@ -148,10 +148,22 @@ export function TweetDetailDialog({
     setConfirmationDialogOpen(false);
   };
 
-  const handleConfirmAction = () => {
+  const handleConfirmAction = async () => {
     // Add your confirmation logic here (e.g., delete item)
-    console.log("Confirmed!");
     setConfirmationDialogOpen(false);
+    const tweetDeleteResult = await window.savedXApi.deleteSavedTweet(
+      tweetData.id
+    );
+    // Gotta update the array of tweets and re-render
+    if (tweetDeleteResult) {
+      const newSavedTweets = [...state.savedTweets];
+      updateState(
+        "savedTweets",
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
+      );
+      setNotificationMessage(null);
+      onClose();
+    }
   };
 
   return (
@@ -182,9 +194,10 @@ export function TweetDetailDialog({
 
             {notificationMessage && (
               <AlertDialog
-                title="Woops!"
+                title="⚠️"
                 message={notificationMessage}
                 openFlag={true}
+                cleanUp={() => setNotificationMessage(null)}
               />
             )}
 
@@ -257,7 +270,6 @@ export function TweetDetailDialog({
                   label={option}
                   {...getTagProps({ index })}
                   variant="outlined"
-                  // onDelete={() => handleRemoveTag(option)}
                 />
               ));
             }}

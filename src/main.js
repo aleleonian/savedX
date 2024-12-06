@@ -44,8 +44,7 @@ const createWindow = () => {
     mainWindow = null;
   });
 
-  mainWindow.webContents.on('did-finish-load', () => {
-
+  mainWindow.webContents.on("did-finish-load", () => {
     const debugEnvVar = (() => {
       try {
         const value = JSON.parse(process.env.DEBUG);
@@ -56,7 +55,7 @@ const createWindow = () => {
       }
     })();
 
-    sendMessageToMainWindow('env-debug', debugEnvVar || false);
+    sendMessageToMainWindow("env-debug", debugEnvVar || false);
   });
 
   // and load the index.html of the app.
@@ -166,6 +165,25 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
 ipcMain.on("fetch-config-data", async () => {
   const checkUserAndPassResponse = await checkUserAndPass();
   sendMessageToMainWindow("CONFIG_DATA", checkUserAndPassResponse);
+});
+
+ipcMain.handle("delete-saved-tweet", async (event, tweetId) => {
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      const deleteTweetResult = await dbTools.deleteTweetById(tweetId);
+      if (deleteTweetResult) {
+        resolve(true);
+        sendMessageToMainWindow("NOTIFICATION", "success--Tweet was deleted!");
+      } else {
+        resolve(false);
+        sendMessageToMainWindow("NOTIFICATION", "error--Tweet was not deleted");
+      }
+    } catch (error) {
+      resolve(false);
+      sendMessageToMainWindow("NOTIFICATION", "error--Tweet was not deleted: " + error);
+    }
+  });
 });
 
 ipcMain.on("update-config-data", async (event, formData) => {
