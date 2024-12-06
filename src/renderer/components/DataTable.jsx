@@ -1,24 +1,24 @@
 import * as React from "react";
 
 import {
-    Table,
-    Header,
-    HeaderRow,
-    Body,
-    Row,
-    HeaderCell,
-    Cell,
+  Table,
+  Header,
+  HeaderRow,
+  Body,
+  Row,
+  HeaderCell,
+  Cell,
 } from "@table-library/react-table-library/table";
 import { useTheme } from "@table-library/react-table-library/theme";
 
 const stripedTheme = {
-    BaseRow: `
+  BaseRow: `
         font-size: 14px;
       `,
-    HeaderRow: `
+  HeaderRow: `
         background-color: #eaf5fd;
       `,
-    Row: `
+  Row: `
         &:nth-of-type(odd) {
           background-color: #d2e9fb;
         }
@@ -30,17 +30,17 @@ const stripedTheme = {
 };
 
 const marginTheme = {
-    BaseCell: `
+  BaseCell: `
         margin: 9px;
         padding: 11px;
       `,
 };
 
 const colorTheme = {
-    BaseRow: `
+  BaseRow: `
         color: #141414;
       `,
-    Row: `
+  Row: `
         &:hover {
           color: orange;
         }
@@ -51,34 +51,38 @@ const colorTheme = {
 
 const theme = useTheme([colorTheme, stripedTheme, marginTheme]);
 
-export const DataTable = ({ nodes, clickHandler }) => {
-    const data = nodes;
+export const DataTable = ({ dataForTable, clickHandler, pagination }) => {
+  const beginning = pagination.page * pagination.size;
+  const end = beginning + pagination.size;
 
-    return (
-        <Table data={data} theme={theme}>
-            {(tableList) => (
-                <>
-                    <Header>
-                        <HeaderRow>
-                            <HeaderCell>Tweet Text</HeaderCell>
-                        </HeaderRow>
-                    </Header>
+  dataForTable.nodes = dataForTable.nodes.slice(beginning, end);
 
-                    <Body>
-                        {tableList.map((item) => {
-                            return (
-                                <Row
-                                    key={item.id}
-                                    item={item}
-                                    onClick={() => clickHandler(item)}
-                                >
-                                    <Cell>{item.tweetText}</Cell>
-                                </Row>
-                            )
-                        })}
-                    </Body>
-                </>
-            )}
-        </Table>
-    );
+  const data = dataForTable;
+  return (
+    <Table data={data} theme={theme}>
+      {(tableList) => (
+        <>
+          <Header>
+            <HeaderRow>
+              <HeaderCell>Tweet Text</HeaderCell>
+            </HeaderRow>
+          </Header>
+
+          <Body>
+            {tableList.map((item) => {
+              return (
+                <Row
+                  key={item.id}
+                  item={item}
+                  onClick={() => clickHandler(item)}
+                >
+                  <Cell>{item.tweetText}</Cell>
+                </Row>
+              );
+            })}
+          </Body>
+        </>
+      )}
+    </Table>
+  );
 };
