@@ -22,7 +22,7 @@ export const menuTemplate = [
             sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
             sendMessageToMainWindow(
               "ALERT",
-              `Bro, there's no user and pass 😫`
+              { title: 'Bro...', message: `There's no user and pass 😫` }
             );
           }
         },
@@ -53,6 +53,14 @@ export const menuTemplate = [
         },
       },
       { type: "separator" },
+      {
+        label: "Delete all saved tweets",
+        click: async () => {
+          sendMessageToMainWindow(
+            "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG"
+          );
+        },
+      },
     ],
   },
 ];

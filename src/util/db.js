@@ -207,18 +207,18 @@ export const storeTweets = async (tweetArray) => {
     })
   );
 };
-export const deleteTweets = async (tweetArray) => {
-  const query = `DELETE FROM TWEETS`;
+export const deleteAllTweets = async (tweetArray) => {
   try {
-    await runQuery(query);
+    await runQuery("DELETE FROM tweets_tags");
+    await runQuery("DELETE FROM tweets");
     return {
       success: true,
     };
   } catch (error) {
-    console.error("deleteTweets: Error executing query:", error);
+    console.error("deleteAllTweets: Error executing query:", error);
     return {
       success: false,
-      errorMessage: `Could not delete tweets: ${error}`,
+      errorMessage: `Could not delete all tweets: ${error}`,
     };
   }
 };

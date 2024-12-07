@@ -7,11 +7,12 @@ import { Title } from "./Title";
 import * as constants from "../../util/constants";
 import { Progress } from "./Progress";
 import { AppContext } from "../../context/AppContext";
-import Button from "@mui/material/Button";
+import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
+  const [alertTitle, setAlertTitle] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [notificationClass, setNotificationClass] = useState(null);
   const [progressState, setProgressState] = useState({
@@ -26,6 +27,7 @@ export const Application = () => {
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
   const [configData, setConfigData] = useState(null);
   const { state, updateState } = useContext(AppContext);
+  const [deleteAllSavedTweetsConfirmationDialogOpen, setDeleteAllSavedTweetsConfirmationDialogOpen] = useState(false);
 
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
@@ -63,8 +65,10 @@ export const Application = () => {
 
     const alertEventListener = (event) => {
       if (event.detail) {
-        const data = event.detail;
-        setAlertMessage(data);
+        const alertMessage = event.detail.message;
+        const alertTitle = event.detail.title;
+        setAlertTitle(alertTitle);
+        setAlertMessage(alertMessage);
       }
     };
 
@@ -126,6 +130,10 @@ export const Application = () => {
       setOpenConfigDialog(true);
     };
 
+    const showDeleteSavedTweetsEventListener = () => {
+      setDeleteAllSavedTweetsConfirmationDialogOpen(true);
+    }
+
     const contentEventListener = (event) => {
       if (event.detail.tweets) setTweetsData(event.detail.tweets);
       if (event.detail.tags) setTags(event.detail.tags);
@@ -143,6 +151,11 @@ export const Application = () => {
       showConfigDialogEventListener
     );
 
+    window.addEventListener(
+      "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
+      showDeleteSavedTweetsEventListener
+    );
+
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
@@ -157,8 +170,33 @@ export const Application = () => {
         "SHOW_CONFIG_DIALOG",
         showConfigDialogEventListener
       );
+      window.removeEventListener(
+        "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
+        showDeleteSavedTweetsEventListener
+      );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
+
+  const handleCloseConfirmDeleteSavedTweetsDialog = () => {
+    setDeleteAllSavedTweetsConfirmationDialogOpen(false);
+  }
+
+  const handleConfirmDeleteSavedTweetsAction = async () => {
+    const tweetsDeleteResult = await window.savedXApi.deleteAllSavedTweets();
+    handleCloseConfirmDeleteSavedTweetsDialog();
+    if (tweetsDeleteResult) {
+      updateState(
+        "savedTweets",
+        []
+      );
+      setAlertTitle('All good!');
+      setAlertMessage('All saved tweets deleted!');
+    }
+    else {
+      setAlertTitle('Something happened...');
+      setAlertMessage('Tweets were not deleted :(');
+    }
+  }
 
   function goFetchTweets() {
     window.savedXApi.goFetchTweets();
@@ -197,10 +235,14 @@ export const Application = () => {
 
       {alertMessage && (
         <AlertDialog
-          title={"Ouch!"}
+          title={alertTitle}
           message={alertMessage}
           openFlag={true}
-          cleanUp={() => setAlertMessage(null)}
+          cleanUp={() => {
+            setAlertTitle(null)
+            setAlertMessage(null)
+          }
+          }
         />
       )}
 
@@ -217,6 +259,16 @@ export const Application = () => {
           open={openConfigDialog}
           onClose={handleClose}
           configData={configData}
+        />
+      )}
+
+      {deleteAllSavedTweetsConfirmationDialogOpen && (
+        <ConfirmationDialog
+          open={deleteAllSavedTweetsConfirmationDialogOpen}
+          handleClose={handleCloseConfirmDeleteSavedTweetsDialog}
+          handleConfirm={handleConfirmDeleteSavedTweetsAction}
+          title="Confirm Deletion of ALL saved tweets"
+          message="Are you sure you want to delete all the saved tweets?"
         />
       )}
 

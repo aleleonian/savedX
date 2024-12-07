@@ -25,6 +25,7 @@ const api = {
   DEBUG: process.env.DEBUG,
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
   deleteSavedTweet: (tweetId) => ipcRenderer.invoke("delete-saved-tweet", tweetId),
+  deleteAllSavedTweets: () => ipcRenderer.invoke("delete-all-saved-tweets"),
 };
 
 let debugValueSet = false;
@@ -82,6 +83,10 @@ ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
       dispatchNotification("SHOW_CONFIG_DIALOG", configData);
     }, 1500);
   }
+});
+ipcRenderer.on("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG", (event) => {
+  console.log("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG preload");
+  dispatchNotification("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG");
 });
 
 ipcRenderer.on("CONFIG_DATA", (event, message) => {
