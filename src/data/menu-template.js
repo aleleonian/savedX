@@ -39,7 +39,7 @@ export const menuTemplate = [
     label: "Config",
     submenu: [
       {
-        label: "X account login",
+        label: "Settings",
         click: async () => {
           // Show a dialog when the "Open Dialog" menu item is clicked
           const getAllConfigDataResponse = await getAllConfigData();

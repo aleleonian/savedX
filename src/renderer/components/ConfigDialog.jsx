@@ -65,13 +65,10 @@ export function ConfigDialog({ open, onClose, configData }) {
     downloadMedia: configData?.DOWNLOAD_MEDIA ?? false,
   });
 
-  debugger;
-  
   const handleChange = (e) => {
     let { name, value } = e.target;
     if (name == "downloadMedia") {
-      if (value == "on") value = true;
-      else value = false;
+      value = e.target.checked;
     }
     setFormData({ ...formData, [name]: value });
   };

@@ -32,7 +32,7 @@ export const getAllConfigData = () => {
       );
       const data = getQueryResponse.data;
       if (data.DOWNLOAD_MEDIA == 1) data.DOWNLOAD_MEDIA = true;
-      else data.DOWNLOAD_MEDIA = true;
+      else data.DOWNLOAD_MEDIA = false;
 
       // if (
       // ) {
@@ -53,7 +53,7 @@ export const updateConfigData = (formData) => {
       let getQueryResponse = await dbTools.runQuery(`DELETE FROM config`);
 
       if (formData.downloadMedia == true) formData.downloadMedia = 1;
-      else data.DOWNLOAD_MEDIA = 0;
+      else formData.DOWNLOAD_MEDIA = 0;
 
       getQueryResponse = await dbTools.runQuery(
         `INSERT INTO config (TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL, DOWNLOAD_MEDIA) VALUES (?, ?, ?, ?);`,
