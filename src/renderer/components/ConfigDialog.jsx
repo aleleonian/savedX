@@ -3,6 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import Checkbox from "@mui/material/Checkbox";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
 import { useState, useContext, useEffect } from "react";
@@ -31,38 +32,47 @@ export function ConfigDialog({ open, onClose, configData }) {
         setNotificationMessage(data[1]);
       }
     };
-
-    const configDataDialogEventListener = (event) => {
-      if (event.detail) {
-        if (event.detail.success) {
-        }
-      }
-    };
+    // TODO: esto está al pedo?
+    // const configDataDialogEventListener = (event) => {
+    //   if (event.detail) {
+    //     if (event.detail.success) {
+    //       debugger;
+    //     }
+    //   }
+    // };
 
     window.addEventListener("NOTIFICATION", notificationEventListener);
-    window.addEventListener("CONFIG_DATA", configDataDialogEventListener);
+    // window.addEventListener("CONFIG_DATA", configDataDialogEventListener);
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
-      window.removeEventListener("CONFIG_DATA", configDataDialogEventListener);
+      // window.removeEventListener("CONFIG_DATA", configDataDialogEventListener);
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
 
-  useEffect(() => {
-    window.savedXApi.getConfigData();
-  }, []);
+  // TODO: al pedo?
+  // useEffect(() => {
+  //   window.savedXApi.getConfigData();
+  // }, []);
 
   const [formData, setFormData] = useState({
     username: configData?.TWITTER_BOT_USERNAME ?? "",
     password: configData?.TWITTER_BOT_PASSWORD ?? "",
     email: configData?.TWITTER_BOT_EMAIL ?? "",
+    downloadMedia: configData?.DOWNLOAD_MEDIA ?? false,
   });
 
+  debugger;
+  
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name == "downloadMedia") {
+      if (value == "on") value = true;
+      else value = false;
+    }
     setFormData({ ...formData, [name]: value });
   };
 
@@ -110,12 +120,13 @@ export function ConfigDialog({ open, onClose, configData }) {
                 marginTop: 2,
               }}
             >
-              <Typography variant="h5">Configure your account</Typography>
               <Box
                 component="form"
                 onSubmit={handleSubmit}
                 sx={{ mt: 3, width: "100%" }}
               >
+                <Typography variant="h5">Configure your account:</Typography>
+
                 <TextField
                   fullWidth
                   label="Username"
@@ -148,6 +159,15 @@ export function ConfigDialog({ open, onClose, configData }) {
                   onChange={handleChange}
                   required
                 />
+                <br />
+                <Typography variant="h5">Download tweets media ?</Typography>
+                <Checkbox
+                  checked={formData.downloadMedia}
+                  onChange={handleChange}
+                  color="primary"
+                  name="downloadMedia"
+                />
+                <br />
                 <Button
                   type="Save"
                   variant="contained"

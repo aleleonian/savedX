@@ -3,7 +3,11 @@ const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const path = require("node:path");
 import { startExpressServer } from "./webserver";
 import * as dbTools from "./util/db";
-import { checkUserAndPass, updateConfigData } from "./util/account";
+import {
+  checkUserAndPass,
+  updateConfigData,
+  getAllConfigData,
+} from "./util/account";
 import { menuTemplate } from "./data/menu-template";
 import { XBot } from "./classes/XBot";
 
@@ -130,7 +134,10 @@ ipcMain.on("go-fetch-tweets", async (event, data) => {
     );
   } else {
     sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
-    sendMessageToMainWindow("ALERT", { title: 'Bro...', message: `There's no user and pass 😫` });
+    sendMessageToMainWindow("ALERT", {
+      title: "Bro...",
+      message: `There's no user and pass 😫`,
+    });
   }
 });
 
@@ -163,12 +170,11 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
 });
 
 ipcMain.on("fetch-config-data", async () => {
-  const checkUserAndPassResponse = await checkUserAndPass();
-  sendMessageToMainWindow("CONFIG_DATA", checkUserAndPassResponse);
+  const getAllConfigDataResponse = await getAllConfigData();
+  sendMessageToMainWindow("CONFIG_DATA", getAllConfigDataResponse);
 });
 
 ipcMain.handle("delete-saved-tweet", async (event, tweetId) => {
-
   return new Promise(async (resolve, reject) => {
     try {
       const deleteTweetResult = await dbTools.deleteTweetById(tweetId);
@@ -181,12 +187,14 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetId) => {
       }
     } catch (error) {
       resolve(false);
-      sendMessageToMainWindow("NOTIFICATION", "error--Tweet was not deleted: " + error);
+      sendMessageToMainWindow(
+        "NOTIFICATION",
+        "error--Tweet was not deleted: " + error
+      );
     }
   });
 });
 ipcMain.handle("delete-all-saved-tweets", async (event, tweetId) => {
-
   return new Promise(async (resolve, reject) => {
     try {
       const deleteAllTweestResult = await dbTools.deleteAllTweets();
@@ -199,7 +207,10 @@ ipcMain.handle("delete-all-saved-tweets", async (event, tweetId) => {
       }
     } catch (error) {
       resolve(false);
-      sendMessageToMainWindow("NOTIFICATION", "error--Tweet was not deleted: " + error);
+      sendMessageToMainWindow(
+        "NOTIFICATION",
+        "error--Tweet was not deleted: " + error
+      );
     }
   });
 });
@@ -218,7 +229,10 @@ ipcMain.on("update-config-data", async (event, formData) => {
       );
     }
   } catch (error) {
-    sendMessageToMainWindow("ALERT", { title: 'Something happened...', message: `Trouble updating config data: ${error}` });
+    sendMessageToMainWindow("ALERT", {
+      title: "Something happened...",
+      message: `Trouble updating config data: ${error}`,
+    });
   }
 });
 ipcMain.on("open-debug-session", async (event) => {
@@ -236,7 +250,10 @@ ipcMain.on("open-debug-session", async (event) => {
       );
     }
   } catch (error) {
-    sendMessageToMainWindow("ALERT", { title: 'Ouch...', message: `Trouble updating config data: ${error}` });
+    sendMessageToMainWindow("ALERT", {
+      title: "Ouch...",
+      message: `Trouble updating config data: ${error}`,
+    });
   }
 });
 

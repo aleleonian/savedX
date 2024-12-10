@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require("electron");
 import { sendMessageToMainWindow } from "../util/messaging";
-import { checkUserAndPass } from "../util/account";
+import { checkUserAndPass, getAllConfigData } from "../util/account";
 import { goFetchTweets } from "../goFetchTweets";
 
 export const menuTemplate = [
@@ -42,12 +42,12 @@ export const menuTemplate = [
         label: "X account login",
         click: async () => {
           // Show a dialog when the "Open Dialog" menu item is clicked
-          const checkUserAndPassResponse = await checkUserAndPass();
+          const getAllConfigDataResponse = await getAllConfigData();
           const focusedWindow = BrowserWindow.getFocusedWindow();
           if (focusedWindow) {
             sendMessageToMainWindow(
               "SHOW_CONFIG_DIALOG",
-              checkUserAndPassResponse.data
+              getAllConfigDataResponse.data
             );
           }
         },
