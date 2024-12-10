@@ -1,36 +1,47 @@
-import { XBot } from "./classes/XBot";
 import * as constants from "./util/constants";
 import * as dbTools from "./util/db";
 import * as common from "./util/common";
 import { sendMessageToMainWindow, encode } from "./util/messaging";
 
+let localBot;
+
+function setLocalBot(bot) {
+  localBot = bot;
+}
+
+function getLocalBot(bot) {
+  return localBot;
+}
+
 export async function goFetchTweets(xBot, botUsername, botPassword, botEmail) {
   showProgress(encode(constants.progress.INIT_PROGRESS));
-  xBot.botUsername = botUsername;
-  xBot.botPassword = botPassword;
-  xBot.botEmail = botEmail;
+  setLocalBot(xBot);
 
-  console.log("xBot.botUsername->", xBot.botUsername);
-  console.log("xBot.botPassword->", xBot.botPassword);
-  console.log("xBot.botEmail->", xBot.botEmail);
+  localBot.botUsername = botUsername;
+  localBot.botPassword = botPassword;
+  localBot.botEmail = botEmail;
 
-  let result = await xBot.init();
+  console.log("localBot.botUsername->", localBot.botUsername);
+  console.log("localBot.botPassword->", localBot.botPassword);
+  console.log("localBot.botEmail->", localBot.botEmail);
+
+  let result = await localBot.init();
   if (result.success) {
     showProgress(
       encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN)
     );
     //TODO something's wrong with the passwords
-    result = await xBot.loginToX(
-      xBot.botUsername,
-      xBot.botPassword,
-      xBot.botEmail
+    result = await localBot.loginToX(
+      localBot.botUsername,
+      localBot.botPassword,
+      localBot.botEmail
     );
     if (result.success) {
       showProgress(
         encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN)
       );
-      await xBot.wait(3000);
-      await xBot.goto("https://twitter.com/i/bookmarks");
+      await localBot.wait(3000);
+      await localBot.goto("https://twitter.com/i/bookmarks");
       showProgress(
         encode(
           constants.progress.INIT_PROGRESS,
@@ -38,8 +49,8 @@ export async function goFetchTweets(xBot, botUsername, botPassword, botEmail) {
           constants.progress.SCRAPING
         )
       );
-      await xBot.wait(5000);
-      const bookmarks = await xBot.scrapeBookmarks(showProgress);
+      await localBot.wait(5000);
+      const bookmarks = await localBot.scrapeBookmarks(showProgress);
       showProgress(
         encode(
           constants.progress.INIT_PROGRESS,
@@ -48,8 +59,8 @@ export async function goFetchTweets(xBot, botUsername, botPassword, botEmail) {
         )
       );
       await dbTools.storeTweets(bookmarks);
-      await xBot.wait(3000);
-      await xBot.logOut();
+      await localBot.wait(3000);
+      await localBot.logOut();
       showProgress(
         encode(
           constants.progress.INIT_PROGRESS,
@@ -58,7 +69,7 @@ export async function goFetchTweets(xBot, botUsername, botPassword, botEmail) {
           constants.progress.LOGGED_OUT
         )
       );
-      await xBot.wait(3000);
+      await localBot.wait(3000);
       hideProgress();
     } else {
       hideProgress();
@@ -66,10 +77,10 @@ export async function goFetchTweets(xBot, botUsername, botPassword, botEmail) {
         "NOTIFICATION",
         `error--Could not log into X 😫 : ${result.message}`
       );
-      await xBot.closeBrowser();
+      await localBot.closeBrowser();
       return;
     }
-    await xBot.closeBrowser();
+    await localBot.closeBrowser();
     const tweets = await dbTools.readAllTweets();
     console.log("tweets->", tweets);
     hideProgress();
@@ -126,8 +137,8 @@ export async function goFetchTweetsFake() {
   hideProgress();
 }
 export function stopScraping() {
-  console.log("xBot.goAheadScrape = false.");
-  xBot.goAheadScrape = false;
+  console.log("localBot.goAheadScrape = false.");
+  localBot.goAheadScrape = false;
 }
 
 const showProgress = (encodedStages) => {
