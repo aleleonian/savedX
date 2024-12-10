@@ -3,3 +3,5 @@
 + que se baje la configuración de los selectors desde latigo.com.ar/savedX
 + capacity to delete saved tweets <-- done
 + que haya un dialog para managear los tags
++ handle the captcha case in a more tidy way, letting the user do the captcha and then we resume doing our thing
+    + as opposed to setting a timer and letting the user do their thing before it ends
