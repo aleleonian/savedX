@@ -120,18 +120,11 @@ app.on("before-quit", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ipcMain.on("go-fetch-tweets", async (event, data) => {
-  // const credentials = await dbTools.getXCredentials();
-  // await goFetchTweetsFake();
+ipcMain.on("go-fetch-tweets", async (event) => {
   const checkUserAndPassResponse = await checkUserAndPass();
   if (checkUserAndPassResponse.success) {
-    const data = checkUserAndPassResponse.data;
-    await goFetchTweets(
-      xBot,
-      data.TWITTER_BOT_USERNAME,
-      data.TWITTER_BOT_PASSWORD,
-      data.TWITTER_BOT_EMAIL
-    );
+    const allConfigDataResponse = await getAllConfigData();
+    await goFetchTweets(xBot, allConfigDataResponse.data);
   } else {
     sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
     sendMessageToMainWindow("ALERT", {

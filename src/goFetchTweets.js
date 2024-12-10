@@ -13,17 +13,19 @@ function getLocalBot(bot) {
   return localBot;
 }
 
-export async function goFetchTweets(xBot, botUsername, botPassword, botEmail) {
+export async function goFetchTweets(xBot, configData) {
   showProgress(encode(constants.progress.INIT_PROGRESS));
   setLocalBot(xBot);
 
-  localBot.botUsername = botUsername;
-  localBot.botPassword = botPassword;
-  localBot.botEmail = botEmail;
+  localBot.botUsername = configData.TWITTER_BOT_USERNAME;
+  localBot.botPassword = configData.TWITTER_BOT_PASSWORD;
+  localBot.botEmail = configData.TWITTER_BOT_EMAIL;
+  localBot.downloadMedia = configData.DOWNLOAD_MEDIA;
 
   console.log("localBot.botUsername->", localBot.botUsername);
   console.log("localBot.botPassword->", localBot.botPassword);
   console.log("localBot.botEmail->", localBot.botEmail);
+  console.log("localBot.downloadMedia->", localBot.downloadMedia);
 
   let result = await localBot.init();
   if (result.success) {

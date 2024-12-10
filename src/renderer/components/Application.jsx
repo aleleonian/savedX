@@ -27,7 +27,10 @@ export const Application = () => {
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
   const [configData, setConfigData] = useState(null);
   const { state, updateState } = useContext(AppContext);
-  const [deleteAllSavedTweetsConfirmationDialogOpen, setDeleteAllSavedTweetsConfirmationDialogOpen] = useState(false);
+  const [
+    deleteAllSavedTweetsConfirmationDialogOpen,
+    setDeleteAllSavedTweetsConfirmationDialogOpen,
+  ] = useState(false);
 
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
@@ -38,7 +41,7 @@ export const Application = () => {
 
   const setIsDebug = (isDebug) => {
     updateState("isDebug", isDebug);
-  }
+  };
 
   useEffect(() => {
     // Wait for savedXApi.DEBUG to be set
@@ -132,7 +135,7 @@ export const Application = () => {
 
     const showDeleteSavedTweetsEventListener = () => {
       setDeleteAllSavedTweetsConfirmationDialogOpen(true);
-    }
+    };
 
     const contentEventListener = (event) => {
       if (event.detail.tweets) setTweetsData(event.detail.tweets);
@@ -179,24 +182,20 @@ export const Application = () => {
 
   const handleCloseConfirmDeleteSavedTweetsDialog = () => {
     setDeleteAllSavedTweetsConfirmationDialogOpen(false);
-  }
+  };
 
   const handleConfirmDeleteSavedTweetsAction = async () => {
     const tweetsDeleteResult = await window.savedXApi.deleteAllSavedTweets();
     handleCloseConfirmDeleteSavedTweetsDialog();
     if (tweetsDeleteResult) {
-      updateState(
-        "savedTweets",
-        []
-      );
-      setAlertTitle('All good!');
-      setAlertMessage('All saved tweets deleted!');
+      updateState("savedTweets", []);
+      setAlertTitle("All good!");
+      setAlertMessage("All saved tweets deleted!");
+    } else {
+      setAlertTitle("Something happened...");
+      setAlertMessage("Tweets were not deleted :(");
     }
-    else {
-      setAlertTitle('Something happened...');
-      setAlertMessage('Tweets were not deleted :(');
-    }
-  }
+  };
 
   function goFetchTweets() {
     window.savedXApi.goFetchTweets();
@@ -204,7 +203,7 @@ export const Application = () => {
 
   function openDebugSession() {
     window.savedXApi.openDebugSession();
-  };
+  }
 
   const handleClose = () => {
     setOpenConfigDialog(false);
@@ -239,10 +238,9 @@ export const Application = () => {
           message={alertMessage}
           openFlag={true}
           cleanUp={() => {
-            setAlertTitle(null)
-            setAlertMessage(null)
-          }
-          }
+            setAlertTitle(null);
+            setAlertMessage(null);
+          }}
         />
       )}
 
@@ -274,8 +272,8 @@ export const Application = () => {
 
       <div className="text-center">
         {!progressState.active &&
-          state.savedTweets &&
-          state.savedTweets.length > 0
+        state.savedTweets &&
+        state.savedTweets.length > 0
           ? displayTweetsData(state.savedTweets, state.tags)
           : "There's nothing to show, bro 😣"}
         <div className="text-center my-4">
@@ -298,7 +296,6 @@ export const Application = () => {
             </button>
           </div>
         )}
-
       </div>
     </section>
   );

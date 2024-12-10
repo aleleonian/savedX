@@ -41,6 +41,7 @@ export class XBot {
         this.botUsername;
         this.botPassword;
         this.botEmail;
+        this.downloadMedia;
     }
     getId(divHtmlContent) {
         const $ = cheerio.load(divHtmlContent);
