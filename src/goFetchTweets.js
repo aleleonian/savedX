@@ -9,10 +9,6 @@ function setLocalBot(bot) {
   localBot = bot;
 }
 
-function getLocalBot(bot) {
-  return localBot;
-}
-
 export async function goFetchTweets(xBot, configData) {
   showProgress(encode(constants.progress.INIT_PROGRESS));
   setLocalBot(xBot);

@@ -145,7 +145,8 @@ const createIfNotExist = async (filePath) => {
 };
 
 export const openDb = (filePath) => {
-  return new Promise(async (resolve, reject) => {
+  // eslint-disable-next-line no-async-promise-executor
+  return new Promise(async (resolve) => {
     try {
       const openOrCreateResult = await createIfNotExist(filePath);
       if (!openOrCreateResult.success) {
@@ -207,7 +208,7 @@ export const storeTweets = async (tweetArray) => {
     })
   );
 };
-export const deleteAllTweets = async (tweetArray) => {
+export const deleteAllTweets = async () => {
   try {
     await runQuery("DELETE FROM tweets_tags");
     await runQuery("DELETE FROM tweets");

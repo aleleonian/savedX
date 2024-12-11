@@ -63,11 +63,14 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+      path.join(
+        __dirname,
+        `../renderer/${process.env.MAIN_WINDOW_VITE_NAME}/index.html`
+      )
     );
   }
 
@@ -120,7 +123,7 @@ app.on("before-quit", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ipcMain.on("go-fetch-tweets", async (event) => {
+ipcMain.on("go-fetch-tweets", async () => {
   const checkUserAndPassResponse = await checkUserAndPass();
   if (checkUserAndPassResponse.success) {
     const allConfigDataResponse = await getAllConfigData();
@@ -134,7 +137,7 @@ ipcMain.on("go-fetch-tweets", async (event) => {
   }
 });
 
-ipcMain.on("stop-scraping", async (event, data) => {
+ipcMain.on("stop-scraping", async () => {
   // const credentials = await dbTools.getXCredentials();
   // await goFetchTweetsFake();
   console.log("we gonna stop scraping then.");
@@ -168,43 +171,53 @@ ipcMain.on("fetch-config-data", async () => {
 });
 
 ipcMain.handle("delete-saved-tweet", async (event, tweetId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const deleteTweetResult = await dbTools.deleteTweetById(tweetId);
-      if (deleteTweetResult) {
-        resolve(true);
-        sendMessageToMainWindow("NOTIFICATION", "success--Tweet was deleted!");
-      } else {
+  return new Promise((resolve) => {
+    (async () => {
+      try {
+        const deleteTweetResult = await dbTools.deleteTweetById(tweetId);
+        if (deleteTweetResult) {
+          resolve(true);
+          sendMessageToMainWindow(
+            "NOTIFICATION",
+            "success--Tweet was deleted!"
+          );
+        } else {
+          resolve(false);
+          sendMessageToMainWindow(
+            "NOTIFICATION",
+            "error--Tweet was not deleted"
+          );
+        }
+      } catch (error) {
         resolve(false);
-        sendMessageToMainWindow("NOTIFICATION", "error--Tweet was not deleted");
+        sendMessageToMainWindow(
+          "NOTIFICATION",
+          "error--Tweet was not deleted: " + error
+        );
       }
-    } catch (error) {
-      resolve(false);
-      sendMessageToMainWindow(
-        "NOTIFICATION",
-        "error--Tweet was not deleted: " + error
-      );
-    }
+    })();
   });
 });
-ipcMain.handle("delete-all-saved-tweets", async (event, tweetId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const deleteAllTweestResult = await dbTools.deleteAllTweets();
-      if (deleteAllTweestResult) {
-        resolve(true);
-        // sendMessageToMainWindow("NOTIFICATION", "success--Tweets were deleted!");
-      } else {
+ipcMain.handle("delete-all-saved-tweets", async () => {
+  return new Promise((resolve) => {
+    (async () => {
+      try {
+        const deleteAllTweestResult = await dbTools.deleteAllTweets();
+        if (deleteAllTweestResult) {
+          resolve(true);
+          // sendMessageToMainWindow("NOTIFICATION", "success--Tweets were deleted!");
+        } else {
+          resolve(false);
+          // sendMessageToMainWindow("NOTIFICATION", "error--Tweets were NOT deleted");
+        }
+      } catch (error) {
         resolve(false);
-        // sendMessageToMainWindow("NOTIFICATION", "error--Tweets were NOT deleted");
+        sendMessageToMainWindow(
+          "NOTIFICATION",
+          "error--Tweet was not deleted: " + error
+        );
       }
-    } catch (error) {
-      resolve(false);
-      sendMessageToMainWindow(
-        "NOTIFICATION",
-        "error--Tweet was not deleted: " + error
-      );
-    }
+    })();
   });
 });
 
@@ -228,20 +241,21 @@ ipcMain.on("update-config-data", async (event, formData) => {
     });
   }
 });
-ipcMain.on("open-debug-session", async (event) => {
+ipcMain.on("open-debug-session", async () => {
   try {
     console.log("open-debug-session!");
 
     if (true) {
       sendMessageToMainWindow("NOTIFICATION", `success--open-debug-session!`);
-    } else {
-      sendMessageToMainWindow(
-        "ALERT",
-        `Trouble updating config data mai fren:  ${JSON.stringify(
-          updateConfigDataResponse.errorMessage
-        )}`
-      );
     }
+    // else {
+    //   sendMessageToMainWindow(
+    //     "ALERT",
+    //     `Trouble updating config data mai fren:  ${JSON.stringify(
+    //       updateConfigDataResponse.errorMessage
+    //     )}`
+    //   );
+    // }
   } catch (error) {
     sendMessageToMainWindow("ALERT", {
       title: "Ouch...",
