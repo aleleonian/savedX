@@ -1,11 +1,11 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Alert from '@mui/material/Alert';
-import IconButton from '@mui/material/IconButton';
-import Collapse from '@mui/material/Collapse';
-import CloseIcon from '@mui/icons-material/Close';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
+import IconButton from "@mui/material/IconButton";
+import Collapse from "@mui/material/Collapse";
+import CloseIcon from "@mui/icons-material/Close";
 
-export function TransitionAlerts({severity, message, handleAlertClose}) {
+export function TransitionAlerts({ severity, message, handleAlertClose }) {
   const [open, setOpen] = React.useState(true);
   const formattedText = message.split("\n").map((line, index) => (
     <React.Fragment key={index}>
@@ -15,7 +15,7 @@ export function TransitionAlerts({severity, message, handleAlertClose}) {
   ));
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: "100%" }}>
       <Collapse in={open}>
         <Alert
           action={

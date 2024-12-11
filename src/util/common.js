@@ -17,6 +17,6 @@ export const returnSuccess = (data) => {
 };
 
 export const generateHash = (data) => {
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(data).digest('hex');
+  const crypto = require("crypto");
+  return crypto.createHash("sha256").update(data).digest("hex");
 };

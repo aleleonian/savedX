@@ -1,23 +1,20 @@
-import React from 'react';
-import { CompactTable } from '@table-library/react-table-library/compact';
+import React from "react";
+import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 
-const columns = [
-    { label: 'Tweet', renderCell: (item) => item.tweetText },
-];
+const columns = [{ label: "Tweet", renderCell: (item) => item.tweetText }];
 
 export const TweetTable = ({ nodes }) => {
+  let data = { nodes };
 
-    let data = { nodes };
-
-    const stripedTheme = {
-        BaseRow: `
+  const stripedTheme = {
+    BaseRow: `
             font-size: 14px;
           `,
-        HeaderRow: `
+    HeaderRow: `
             background-color: #eaf5fd;
           `,
-        Row: `
+    Row: `
             &:nth-of-type(odd) {
               background-color: #d2e9fb;
             }
@@ -26,54 +23,58 @@ export const TweetTable = ({ nodes }) => {
               background-color: #eaf5fd;
             }
           `,
-    };
+  };
 
-    const marginTheme = {
-        BaseCell: `
+  const marginTheme = {
+    BaseCell: `
             margin: 9px;
             padding: 11px;
           `,
-    };
+  };
 
-    const colorTheme = {
-        BaseRow: `
+  const colorTheme = {
+    BaseRow: `
             color: #141414;
           `,
-        Row: `
+    Row: `
             &:hover {
               color: orange;
             }
     
             cursor: pointer;
           `,
-    };
+  };
 
-    const theme = useTheme([colorTheme, stripedTheme, marginTheme]);
+  const theme = useTheme([colorTheme, stripedTheme, marginTheme]);
 
-    const [search, setSearch] = React.useState("");
+  const [search, setSearch] = React.useState("");
 
-    const handleSearch = (event) => {
-        setSearch(event.target.value);
-    };
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
 
-    data = {
-        nodes: data.nodes.filter((item) =>
-            item.tweetText.toLowerCase().includes(search.toLowerCase())
-        ),
-    };
+  data = {
+    nodes: data.nodes.filter((item) =>
+      item.tweetText.toLowerCase().includes(search.toLowerCase()),
+    ),
+  };
 
-    return (
-        <>
-            <div className="search-box p-[11px] text-left flex justify-between">
-                <div>
-                    Search by Tweet Text:
-                </div>
-                <div className='bg-red'>
-                    <input id="search" type="text" value={search} onChange={handleSearch} className='border' />
-                </div>
-            </div>
+  return (
+    <>
+      <div className="search-box p-[11px] text-left flex justify-between">
+        <div>Search by Tweet Text:</div>
+        <div className="bg-red">
+          <input
+            id="search"
+            type="text"
+            value={search}
+            onChange={handleSearch}
+            className="border"
+          />
+        </div>
+      </div>
 
-            <CompactTable columns={columns} data={data} theme={theme} />
-        </>
-    )
-}
+      <CompactTable columns={columns} data={data} theme={theme} />
+    </>
+  );
+};

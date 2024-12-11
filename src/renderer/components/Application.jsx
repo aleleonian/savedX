@@ -147,16 +147,16 @@ export const Application = () => {
     window.addEventListener("SHOW_PROGRESS", progressEventListener);
     window.addEventListener(
       "DISABLE_GO_FETCH_BUTTON",
-      disableGoFetchButtonEventListener
+      disableGoFetchButtonEventListener,
     );
     window.addEventListener(
       "SHOW_CONFIG_DIALOG",
-      showConfigDialogEventListener
+      showConfigDialogEventListener,
     );
 
     window.addEventListener(
       "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-      showDeleteSavedTweetsEventListener
+      showDeleteSavedTweetsEventListener,
     );
 
     // Clean up event listener on component unmount
@@ -167,15 +167,15 @@ export const Application = () => {
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
       window.removeEventListener(
         "DISABLE_GO_FETCH_BUTTON",
-        disableGoFetchButtonEventListener
+        disableGoFetchButtonEventListener,
       );
       window.removeEventListener(
         "SHOW_CONFIG_DIALOG",
-        showConfigDialogEventListener
+        showConfigDialogEventListener,
       );
       window.removeEventListener(
         "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-        showDeleteSavedTweetsEventListener
+        showDeleteSavedTweetsEventListener,
       );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount

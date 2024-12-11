@@ -52,7 +52,7 @@ const TweetsTable = () => {
     const updatedArray = array.map((item) =>
       item.id === id
         ? { ...item, ...newProperty } // Create a new object with updated properties
-        : item
+        : item,
     );
 
     return updatedArray;

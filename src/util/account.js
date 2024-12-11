@@ -6,7 +6,7 @@ export const checkUserAndPass = () => {
     (async () => {
       try {
         const getQueryResponse = await dbTools.getQuery(
-          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL from config"
+          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL from config",
         );
         const data = getQueryResponse.data;
         if (
@@ -21,7 +21,7 @@ export const checkUserAndPass = () => {
       } catch (error) {
         console.log("checkUserAndPassPromise error->", error);
         resolve(
-          error.errorMessage ? error.errorMessage : JSON.stringify(error)
+          error.errorMessage ? error.errorMessage : JSON.stringify(error),
         );
       }
     })();
@@ -33,7 +33,7 @@ export const getAllConfigData = () => {
     (async function () {
       try {
         const getQueryResponse = await dbTools.getQuery(
-          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL, DOWNLOAD_MEDIA from config"
+          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL, DOWNLOAD_MEDIA from config",
         );
         const data = getQueryResponse.data;
         if (data.DOWNLOAD_MEDIA == 1) data.DOWNLOAD_MEDIA = true;
@@ -42,7 +42,7 @@ export const getAllConfigData = () => {
       } catch (error) {
         console.log("getAllConfigDataPromise error->", error);
         resolve(
-          error.errorMessage ? error.errorMessage : JSON.stringify(error)
+          error.errorMessage ? error.errorMessage : JSON.stringify(error),
         );
       }
     })();
@@ -65,7 +65,7 @@ export const updateConfigData = (formData) => {
             formData.password,
             formData.email,
             formData.downloadMedia,
-          ]
+          ],
         );
 
         if (getQueryResponse.success) {

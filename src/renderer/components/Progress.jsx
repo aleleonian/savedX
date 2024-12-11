@@ -16,7 +16,6 @@ const removeClass = (classList, className) => {
 };
 
 export const Progress = ({ whichState }) => {
-
   let logginClass = "flex items-center text-gray-400 py-4";
   let loginText = "Log into X.";
 
@@ -85,7 +84,6 @@ export const Progress = ({ whichState }) => {
           <Button autoFocus onClick={stopScraping}>
             Stop the scrape 🛑
           </Button>
-
         </div>
       </div>
     </>

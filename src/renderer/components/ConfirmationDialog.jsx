@@ -1,7 +1,20 @@
-import React from 'react';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import React from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 
-export const ConfirmationDialog = ({ open, handleClose, handleConfirm, title, message }) => {
+export const ConfirmationDialog = ({
+  open,
+  handleClose,
+  handleConfirm,
+  title,
+  message,
+}) => {
   return (
     <Dialog
       open={open}

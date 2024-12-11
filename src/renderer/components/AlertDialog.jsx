@@ -1,39 +1,37 @@
-import * as React from 'react';
-import { useState } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import * as React from "react";
+import { useState } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 export const AlertDialog = ({ openFlag, title, message, cleanUp }) => {
-    const [open, setOpen] = useState(openFlag);
+  const [open, setOpen] = useState(openFlag);
 
-    const handleClose = () => {
-        setOpen(false);
-        cleanUp();
-    };
+  const handleClose = () => {
+    setOpen(false);
+    cleanUp();
+  };
 
-    return (
-        <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-            sx={{ zIndex: 1500 }}
-        >
-            <DialogTitle id="alert-dialog-title">
-                {title}
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    {message}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose}>Ok 🤷🏻‍♂️</Button>
-            </DialogActions>
-        </Dialog>
-    )
-}
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      sx={{ zIndex: 1500 }}
+    >
+      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          {message}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>Ok 🤷🏻‍♂️</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};

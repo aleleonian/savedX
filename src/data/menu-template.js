@@ -16,14 +16,14 @@ export const menuTemplate = [
             await goFetchTweets(
               data.TWITTER_BOT_USERNAME,
               data.TWITTER_BOT_PASSWORD,
-              data.TWITTER_BOT_EMAIL
+              data.TWITTER_BOT_EMAIL,
             );
           } else {
             sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
-            sendMessageToMainWindow(
-              "ALERT",
-              { title: 'Bro...', message: `There's no user and pass 😫` }
-            );
+            sendMessageToMainWindow("ALERT", {
+              title: "Bro...",
+              message: `There's no user and pass 😫`,
+            });
           }
         },
       },
@@ -47,7 +47,7 @@ export const menuTemplate = [
           if (focusedWindow) {
             sendMessageToMainWindow(
               "SHOW_CONFIG_DIALOG",
-              getAllConfigDataResponse.data
+              getAllConfigDataResponse.data,
             );
           }
         },
@@ -56,9 +56,7 @@ export const menuTemplate = [
       {
         label: "Delete all saved tweets",
         click: async () => {
-          sendMessageToMainWindow(
-            "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG"
-          );
+          sendMessageToMainWindow("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG");
         },
       },
     ],
