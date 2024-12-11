@@ -1,5 +1,6 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
+const { Foundation } = require("@mui/icons-material");
 const { ipcRenderer, contextBridge, shell } = require("electron");
 
 let domContentLoaded = false;
@@ -30,6 +31,8 @@ const api = {
   deleteSavedTweet: (tweetId) =>
     ipcRenderer.invoke("delete-saved-tweet", tweetId),
   deleteAllSavedTweets: () => ipcRenderer.invoke("delete-all-saved-tweets"),
+  reportFoundTweet: (reportObj) =>
+    ipcRenderer.send("report-found-tweet", reportObj),
 };
 
 let debugValueSet = false;
@@ -100,4 +103,8 @@ ipcRenderer.on("CONFIG_DATA", (event, message) => {
       dispatchNotification("CONFIG_DATA", message);
     }, 1500);
   }
+});
+
+ipcRenderer.on("CHECK_SAVED_TWEET_EXISTS", (event, tweetUrl) => {
+  dispatchNotification("CHECK_SAVED_TWEET_EXISTS", tweetUrl);
 });
