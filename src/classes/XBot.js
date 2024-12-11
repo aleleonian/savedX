@@ -190,12 +190,12 @@ export class XBot {
   }
   async getLastTweetUrl() {
     let hasVisited = await this.goto(
-      "https://www.x.com" + "/" + this.botUsername
+      "https://www.x.com" + "/" + this.botUsername,
     );
     if (!hasVisited) return false;
 
     let foundAndClicked = await this.findAndClick(
-      process.env.TWITTER_LAST_POST_IN_PROFILE
+      process.env.TWITTER_LAST_POST_IN_PROFILE,
     );
     if (!foundAndClicked) return false;
 
@@ -223,7 +223,7 @@ export class XBot {
       // TODO: if the TWITTER_NEW_TWEET_INPUT is not found it's because Twitter
       // suspects i'm a bot and wants my email
       let foundAndClicked = await this.findAndClick(
-        process.env.TWITTER_NEW_TWEET_INPUT
+        process.env.TWITTER_NEW_TWEET_INPUT,
       );
       if (!foundAndClicked)
         return this.respond(false, "Could not find TWITTER_NEW_TWEET_INPUT");
@@ -231,22 +231,22 @@ export class XBot {
 
       let foundAndTyped = await this.findAndType(
         process.env.TWITTER_NEW_TWEET_INPUT,
-        text
+        text,
       );
       if (!foundAndTyped)
         return this.respond(
           false,
-          "Could not find and type TWITTER_NEW_TWEET_INPUT"
+          "Could not find and type TWITTER_NEW_TWEET_INPUT",
         );
       console.log("tweet() found and typed TWITTER_NEW_TWEET_INPUT");
 
       foundAndClicked = await this.findAndClick(
-        process.env.TWITTER_POST_BUTTON
+        process.env.TWITTER_POST_BUTTON,
       );
       if (!foundAndClicked)
         return this.respond(
           false,
-          "Could not find and click TWITTER_POST_BUTTON"
+          "Could not find and click TWITTER_POST_BUTTON",
         );
       console.log("tweet() found and clicked TWITTER_POST_BUTTON");
 
@@ -269,7 +269,7 @@ export class XBot {
     try {
       const TwitterSuspects = await this.page.waitForSelector(
         `//*[contains(text(), '${process.env.SUSPICION_TEXT}')]`,
-        { timeout: 10000 }
+        { timeout: 10000 },
       );
       if (TwitterSuspects) {
         console.log("Found SUSPICION_TEXT!");
@@ -281,7 +281,7 @@ export class XBot {
     } catch (error) {
       console.log(
         "twitterSuspects() exception! -> Did NOT find SUSPICION_TEXT! : ",
-        error
+        error,
       );
       return false;
     }
@@ -290,7 +290,7 @@ export class XBot {
     try {
       const TwitterSuspects = await this.page.waitForSelector(
         `//*[contains(text(), '${process.env.TWITTER_AUTHENTICATE_TEXT}')]`,
-        { timeout: 5000 }
+        { timeout: 5000 },
       );
 
       if (TwitterSuspects) {
@@ -303,7 +303,7 @@ export class XBot {
     } catch (error) {
       console.log(
         "twitterRequiresCaptcha() exception! -> Did NOT find TWITTER_AUTHENTICATE_TEXT! ",
-        error
+        error,
       );
       return false;
     }
@@ -313,7 +313,7 @@ export class XBot {
       return await this.findTextInPage(process.env.TWITTER_UNUSUAL_LOGIN_TEXT);
     } catch (error) {
       console.log(
-        "unusualLoginDetected() exception! -> Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!"
+        "unusualLoginDetected() exception! -> Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!",
       );
       console.log(error);
       return false;
@@ -334,7 +334,7 @@ export class XBot {
     try {
       const TwitterWantsToVerify = await this.page.waitForSelector(
         `//*[contains(text(), '${process.env.VERIFICATION_TEXT}')]`,
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
       if (TwitterWantsToVerify) {
         console.log("Alert: found VERIFICATION_TEXT!!");
@@ -352,7 +352,7 @@ export class XBot {
     } catch (error) {
       console.log(
         "twitterSuspects() exception! -> Did NOT find VERIFICATION_TEXT!",
-        error
+        error,
       );
       return false;
     }
@@ -397,7 +397,7 @@ export class XBot {
   async logOut() {
     await this.goto("https://x.com/logout");
     let foundAndClicked = await this.findAndClick(
-      process.env.TWITTER_LOGOUT_BUTTON
+      process.env.TWITTER_LOGOUT_BUTTON,
     );
     if (!foundAndClicked) {
       console.log("Cant't find TWITTER_LOGOUT_BUTTON");
@@ -420,7 +420,7 @@ export class XBot {
       console.log("We're at https://www.x.com");
 
       let foundAndClicked = await this.findAndClick(
-        process.env.TWITTER_USERNAME_INPUT
+        process.env.TWITTER_USERNAME_INPUT,
       );
       if (!foundAndClicked) {
         console.log("Can't find TWITTER_USERNAME_INPUT");
@@ -431,27 +431,27 @@ export class XBot {
 
       let foundAndTyped = await this.findAndType(
         process.env.TWITTER_USERNAME_INPUT,
-        botUsername
+        botUsername,
       );
       if (!foundAndTyped) {
         console.log("Can't find and type TWITTER_USERNAME_INPUT");
         this.isBusy = false;
         return this.respond(
           false,
-          "Can't find and type TWITTER_USERNAME_INPUT"
+          "Can't find and type TWITTER_USERNAME_INPUT",
         );
       }
       console.log("Found and typed TWITTER_USERNAME_INPUT");
 
       foundAndClicked = await this.findAndClick(
-        process.env.TWITTER_USERNAME_SUBMIT_BUTTON
+        process.env.TWITTER_USERNAME_SUBMIT_BUTTON,
       );
       if (!foundAndClicked) {
         console.log("Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON");
         this.isBusy = false;
         return this.respond(
           false,
-          "Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON"
+          "Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON",
         );
       }
       console.log("Found and clicked TWITTER_USERNAME_SUBMIT_BUTTON");
@@ -463,7 +463,7 @@ export class XBot {
       }
 
       foundAndClicked = await this.findAndClick(
-        process.env.TWITTER_PASSWORD_INPUT
+        process.env.TWITTER_PASSWORD_INPUT,
       );
 
       if (!foundAndClicked) {
@@ -474,17 +474,17 @@ export class XBot {
           console.log("Bro, you need to solve the puzzle!");
         } else if (await this.unusualLoginDetected()) {
           console.log(
-            "Bro, X detected an unusual login attempt! Will try to calm the bitch down."
+            "Bro, X detected an unusual login attempt! Will try to calm the bitch down.",
           );
           // await this.wait(15000);
           try {
             await this.findAndType(
               process.env.TWITTER_UNUSUAL_LOGIN_EMAIL_INPUT,
-              botEmail
+              botEmail,
             );
             //TODO what if findAndTypeResult is false?
             await this.findAndClick(
-              process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON
+              process.env.TWITTER_UNUSUAL_LOGIN_SUBMIT_BUTTON,
             );
             //TODO this is not being found despite apparently having to be the case
             //when my login data is bullshit
@@ -498,7 +498,7 @@ export class XBot {
             this.isBusy = false;
             return this.respond(
               false,
-              "Could not go past unusual login attempt!"
+              "Could not go past unusual login attempt!",
             );
           }
 
@@ -515,7 +515,7 @@ export class XBot {
           // that external condition would be changed by the clicking of that button
 
           console.log(
-            "Bro we need you to do something about this situation, will give you 20 seconds."
+            "Bro we need you to do something about this situation, will give you 20 seconds.",
           );
           await this.wait(20000);
         } else {
@@ -523,21 +523,21 @@ export class XBot {
           this.isBusy = false;
           return this.respond(
             false,
-            "Can't find and click TWITTER_PASSWORD_INPUT"
+            "Can't find and click TWITTER_PASSWORD_INPUT",
           );
         }
       } else console.log("Found and clicked TWITTER_PASSWORD_INPUT");
 
       foundAndTyped = await this.findAndType(
         process.env.TWITTER_PASSWORD_INPUT,
-        botPassword
+        botPassword,
       );
       if (!foundAndTyped) {
         console.log("Can't find and type TWITTER_PASSWORD_INPUT");
         this.isBusy = false;
         return this.respond(
           false,
-          "Can't find and type TWITTER_PASSWORD_INPUT"
+          "Can't find and type TWITTER_PASSWORD_INPUT",
         );
       }
       console.log("Found and typed TWITTER_PASSWORD_INPUT");
@@ -555,12 +555,12 @@ export class XBot {
       // }
 
       const blockedAttempt = await this.findTextInPage(
-        "We blocked an attempt to access your account because"
+        "We blocked an attempt to access your account because",
       );
       if (blockedAttempt) {
         return this.respond(
           false,
-          "We're temporarily blocked for some reason."
+          "We're temporarily blocked for some reason.",
         );
       }
 
@@ -629,7 +629,7 @@ export class XBot {
   }
   async inputEmail() {
     let foundAndClicked = await this.findAndClick(
-      process.env.TWITTER_EMAIL_INPUT
+      process.env.TWITTER_EMAIL_INPUT,
     );
     if (!foundAndClicked) {
       console.log("Cant't find TWITTER_EMAIL_INPUT");
@@ -639,7 +639,7 @@ export class XBot {
 
     let foundAndTyped = await this.findAndType(
       process.env.TWITTER_EMAIL_INPUT,
-      this.botEmail
+      this.botEmail,
     );
     if (!foundAndTyped) {
       console.log("Can't find and type TWITTER_EMAIL_INPUT");
@@ -653,7 +653,7 @@ export class XBot {
   }
   async inputVerificationCode(code) {
     let foundAndClicked = await this.findAndClick(
-      process.env.TWITTER_VERIFICATION_CODE_INPUT
+      process.env.TWITTER_VERIFICATION_CODE_INPUT,
     );
     if (!foundAndClicked) {
       console.log("Cant't find TWITTER_VERIFICATION_CODE_INPUT");
@@ -663,7 +663,7 @@ export class XBot {
 
     let foundAndTyped = await this.findAndType(
       process.env.TWITTER_VERIFICATION_CODE_INPUT,
-      code
+      code,
     );
     if (!foundAndTyped) {
       console.log("Can't find and type TWITTER_VERIFICATION_CODE_INPUT");
@@ -694,7 +694,7 @@ export class XBot {
     if (!xBotClassContext.isBusy) {
       console.log("xBotClassContext.isBusy->" + xBotClassContext.isBusy);
       console.log(
-        "xBot is not busy, so processQueue will start completing pending tasks"
+        "xBot is not busy, so processQueue will start completing pending tasks",
       );
       while (xBotClassContext.queue.length > 0) {
         const nextItem = xBotClassContext.queue.pop();
@@ -742,7 +742,7 @@ export class XBot {
 
     for (const newBookmark of processedBookmarks) {
       const idExists = this.bookmarks.some(
-        (bookmark) => bookmark.indexId === newBookmark.indexId
+        (bookmark) => bookmark.indexId === newBookmark.indexId,
       );
       if (!idExists) {
         this.bookmarks.push(newBookmark);
@@ -764,8 +764,8 @@ export class XBot {
         encode(
           constants.progress.INIT_PROGRESS,
           constants.progress.LOGGED_IN,
-          constants.progress.SCRAPING
-        )
+          constants.progress.SCRAPING,
+        ),
       );
 
       // Wait for a while after each scroll to give time for content loading
