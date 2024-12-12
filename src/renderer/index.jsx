@@ -34,5 +34,5 @@ document.addEventListener("keydown", (event) => {
 root.render(
   <AppProvider>
     <Application />
-  </AppProvider>,
+  </AppProvider>
 );

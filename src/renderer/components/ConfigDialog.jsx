@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -6,7 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Checkbox from "@mui/material/Checkbox";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 
 import { Notification } from "./Notification";

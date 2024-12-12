@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -93,7 +93,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g",
+      "g"
     );
     return originalString.replace(regex, "").trim();
   }
@@ -115,7 +115,8 @@ export function TweetDetailDialog({
     removeTagFromDB(tagToRemove);
   };
 
-  const renderOption = (props, option, { selected }) => {
+  // const renderOption = (props, option, { selected }) => {
+  const renderOption = (props, option) => {
     return (
       <li
         {...props}
@@ -152,14 +153,14 @@ export function TweetDetailDialog({
     // Add your confirmation logic here (e.g., delete item)
     setConfirmationDialogOpen(false);
     const tweetDeleteResult = await window.savedXApi.deleteSavedTweet(
-      tweetData.id,
+      tweetData.id
     );
     // Gotta update the array of tweets and re-render
     if (tweetDeleteResult) {
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
       );
       setNotificationMessage(null);
       onClose();

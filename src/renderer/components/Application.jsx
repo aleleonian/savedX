@@ -121,7 +121,7 @@ export const Application = () => {
       });
     };
 
-    const disableGoFetchButtonEventListener = (event) => {
+    const disableGoFetchButtonEventListener = () => {
       setIsDisabled(true);
     };
 
@@ -153,21 +153,21 @@ export const Application = () => {
     window.addEventListener("SHOW_PROGRESS", progressEventListener);
     window.addEventListener(
       "DISABLE_GO_FETCH_BUTTON",
-      disableGoFetchButtonEventListener,
+      disableGoFetchButtonEventListener
     );
     window.addEventListener(
       "SHOW_CONFIG_DIALOG",
-      showConfigDialogEventListener,
+      showConfigDialogEventListener
     );
 
     window.addEventListener(
       "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-      showDeleteSavedTweetsEventListener,
+      showDeleteSavedTweetsEventListener
     );
 
     window.addEventListener(
       "CHECK_SAVED_TWEET_EXISTS",
-      checkSavedTweetEventListener,
+      checkSavedTweetEventListener
     );
 
     // Clean up event listener on component unmount
@@ -178,19 +178,19 @@ export const Application = () => {
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
       window.removeEventListener(
         "DISABLE_GO_FETCH_BUTTON",
-        disableGoFetchButtonEventListener,
+        disableGoFetchButtonEventListener
       );
       window.removeEventListener(
         "SHOW_CONFIG_DIALOG",
-        showConfigDialogEventListener,
+        showConfigDialogEventListener
       );
       window.removeEventListener(
         "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-        showDeleteSavedTweetsEventListener,
+        showDeleteSavedTweetsEventListener
       );
       window.removeEventListener(
         "CHECK_SAVED_TWEET_EXISTS",
-        checkSavedTweetEventListener,
+        checkSavedTweetEventListener
       );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
@@ -228,7 +228,7 @@ export const Application = () => {
     setNotificationMessage(null);
   };
 
-  const displayTweetsData = (tweetsArray, tags) => {
+  const displayTweetsData = () => {
     return (
       <div>
         <TweetsTable />
@@ -289,7 +289,7 @@ export const Application = () => {
         {!progressState.active &&
         state.savedTweets &&
         state.savedTweets.length > 0
-          ? displayTweetsData(state.savedTweets, state.tags)
+          ? displayTweetsData()
           : "There's nothing to show, bro 😣"}
         <div className="text-center my-4">
           <button
