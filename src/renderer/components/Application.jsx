@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Notification } from "./Notification";
 import { AlertDialog } from "./AlertDialog";
 import { ConfigDialog } from "./ConfigDialog";
@@ -32,6 +32,8 @@ export const Application = () => {
     setDeleteAllSavedTweetsConfirmationDialogOpen,
   ] = useState(false);
 
+  const stateRef = useRef(state);
+
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
   };
@@ -55,6 +57,10 @@ export const Application = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     // Listen for messages from the preload script
@@ -127,8 +133,16 @@ export const Application = () => {
 
     const checkSavedTweetEventListener = (event) => {
       const tweetUrl = event.detail;
-      debugger;
-      setIsDisabled(true);
+
+      const found = stateRef.current.savedTweets.find(
+        (savedTweet) => savedTweet.tweetUrl === tweetUrl
+      );
+      const reportResponse = {
+        success: found ? true : false,
+        tweetUrl,
+      };
+      console.log("reportResponse->", reportResponse);
+      window.savedXApi.reportFoundTweet(reportResponse);
     };
 
     const showConfigDialogEventListener = (event) => {
@@ -147,6 +161,7 @@ export const Application = () => {
       if (event.detail.tweets) setTweetsData(event.detail.tweets);
       if (event.detail.tags) setTags(event.detail.tags);
     };
+
     window.addEventListener("NOTIFICATION", notificationEventListener);
     window.addEventListener("ALERT", alertEventListener);
     window.addEventListener("CONTENT", contentEventListener);

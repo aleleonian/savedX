@@ -30,8 +30,10 @@ const api = {
   deleteSavedTweet: (tweetId) =>
     ipcRenderer.invoke("delete-saved-tweet", tweetId),
   deleteAllSavedTweets: () => ipcRenderer.invoke("delete-all-saved-tweets"),
-  reportFoundTweet: (reportObj) =>
-    ipcRenderer.send("report-found-tweet", reportObj),
+  reportFoundTweet: (reportObj) => {
+    console.log("reportFoundTweet() reportObj:", reportObj);
+    ipcRenderer.send("report-found-tweet", reportObj);
+  },
 };
 
 let debugValueSet = false;

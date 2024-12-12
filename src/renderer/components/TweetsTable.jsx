@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useContext } from "react";
 import { DataTable } from "./DataTable";
 import { usePagination } from "@table-library/react-table-library/pagination";

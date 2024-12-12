@@ -26,17 +26,17 @@ export async function goFetchTweets(xBot, configData) {
   let result = await localBot.init();
   if (result.success) {
     showProgress(
-      encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN),
+      encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN)
     );
     //TODO something's wrong with the passwords
     result = await localBot.loginToX(
       localBot.botUsername,
       localBot.botPassword,
-      localBot.botEmail,
+      localBot.botEmail
     );
     if (result.success) {
       showProgress(
-        encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN),
+        encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN)
       );
       await localBot.wait(3000);
       await localBot.goto("https://twitter.com/i/bookmarks");
@@ -44,8 +44,8 @@ export async function goFetchTweets(xBot, configData) {
         encode(
           constants.progress.INIT_PROGRESS,
           constants.progress.LOGGED_IN,
-          constants.progress.SCRAPING,
-        ),
+          constants.progress.SCRAPING
+        )
       );
       await localBot.wait(5000);
       const bookmarks = await localBot.scrapeBookmarks(showProgress);
@@ -53,8 +53,8 @@ export async function goFetchTweets(xBot, configData) {
         encode(
           constants.progress.INIT_PROGRESS,
           constants.progress.LOGGED_IN,
-          constants.progress.SCRAPED,
-        ),
+          constants.progress.SCRAPED
+        )
       );
       await dbTools.storeTweets(bookmarks);
       await localBot.wait(3000);
@@ -64,8 +64,8 @@ export async function goFetchTweets(xBot, configData) {
           constants.progress.INIT_PROGRESS,
           constants.progress.LOGGED_IN,
           constants.progress.SCRAPED,
-          constants.progress.LOGGED_OUT,
-        ),
+          constants.progress.LOGGED_OUT
+        )
       );
       await localBot.wait(3000);
       hideProgress();
@@ -73,14 +73,13 @@ export async function goFetchTweets(xBot, configData) {
       hideProgress();
       sendMessageToMainWindow(
         "NOTIFICATION",
-        `error--Could not log into X 😫 : ${result.message}`,
+        `error--Could not log into X 😫 : ${result.message}`
       );
       await localBot.closeBrowser();
       return;
     }
     await localBot.closeBrowser();
     const tweets = await dbTools.readAllTweets();
-    console.log("tweets->", tweets);
     hideProgress();
     sendMessageToMainWindow("CONTENT", { tweets: tweets.rows });
   } else {
@@ -91,19 +90,27 @@ export async function goFetchTweets(xBot, configData) {
 export async function goFetchTweetsFake() {
   showProgress(encode(constants.progress.INIT_PROGRESS));
   showProgress(
-    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN),
+    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN)
   );
   await common.wait(3000);
   showProgress(
-    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN),
+    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN)
   );
   await common.wait(3000);
   showProgress(
     encode(
       constants.progress.INIT_PROGRESS,
       constants.progress.LOGGED_IN,
-      constants.progress.SCRAPING,
-    ),
+      constants.progress.SCRAPING
+    )
+  );
+  await common.wait(3000);
+  showProgress(
+    encode(
+      constants.progress.INIT_PROGRESS,
+      constants.progress.LOGGED_IN,
+      constants.progress.SCRAPED
+    )
   );
   await common.wait(3000);
   showProgress(
@@ -111,16 +118,8 @@ export async function goFetchTweetsFake() {
       constants.progress.INIT_PROGRESS,
       constants.progress.LOGGED_IN,
       constants.progress.SCRAPED,
-    ),
-  );
-  await common.wait(3000);
-  showProgress(
-    encode(
-      constants.progress.INIT_PROGRESS,
-      constants.progress.LOGGED_IN,
-      constants.progress.SCRAPED,
-      constants.progress.LOGGING_OUT,
-    ),
+      constants.progress.LOGGING_OUT
+    )
   );
   await common.wait(2000);
   showProgress(
@@ -128,8 +127,8 @@ export async function goFetchTweetsFake() {
       constants.progress.INIT_PROGRESS,
       constants.progress.LOGGED_IN,
       constants.progress.SCRAPED,
-      constants.progress.LOGGED_OUT,
-    ),
+      constants.progress.LOGGED_OUT
+    )
   );
   await common.wait(2000);
   hideProgress();

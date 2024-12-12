@@ -1,5 +1,7 @@
 import * as constants from "../util/constants";
 import { encode } from "../util/messaging";
+import { waitForNewReport } from "../util/event-emitter";
+import { sendMessageToMainWindow } from "../util/messaging";
 
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
@@ -708,18 +710,6 @@ export class XBot {
   wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  //VOY POR ACA: la idea es no guardar los bookmarks cuyo url ya existe en el array de tweets guardados en el contexto de la app
-  // para eso habría que  sendMessageToMainWindow("CHECK_SAVED_TWEET_EXISTS", tweetUrl
-  // tweetArray.map(async (tweet) => {
-  //   const $ = cheerio.load(tweet.htmlContent);
-  //   const userNameData = $('[data-testid="User-Name"]').text().split("@");
-  //   tweet.userName = userNameData[0];
-  //   tweet.twitterHandle = "@" + userNameData[1].split("·")[0];
-  //   tweet.tweetDate = userNameData[1].split("·")[1];
-  //   tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
-  //   tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr("href");
-  //   tweet.profilePicUrl = $("img").first().attr("src");
-  // }),
 
   storeBookmarks = async () => {
     const bookmarkDivs = await this.page.$$('[data-testid="cellInnerDiv"]');
@@ -740,7 +730,6 @@ export class XBot {
         const isLastBookmark =
           divWithTestId.children(".css-175oi2r.r-4d76ec").length > 0;
         if (isLastBookmark) {
-          // console.log("tweet index: ", index);
           return null;
         }
 
@@ -752,6 +741,42 @@ export class XBot {
       .filter((item) => item !== null);
 
     for (const newBookmark of processedBookmarks) {
+      //VOY POR ACA: la idea es no guardar los bookmarks cuyo url ya existe en el array de tweets guardados en el contexto de la app
+      // para eso habría que  sendMessageToMainWindow("CHECK_SAVED_TWEET_EXISTS", tweetUrl
+      // tweetArray.map(async (tweet) => {
+      //   const $ = cheerio.load(tweet.htmlContent);
+      //   const userNameData = $('[data-testid="User-Name"]').text().split("@");
+      //   tweet.userName = userNameData[0];
+      //   tweet.twitterHandle = "@" + userNameData[1].split("·")[0];
+      //   tweet.tweetDate = userNameData[1].split("·")[1];
+      //   tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
+      //   tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr("href");
+      //   tweet.profilePicUrl = $("img").first().attr("src");
+      // }),
+
+      const $ = cheerio.load(newBookmark.htmlContent);
+
+      const newBookmarkTweetUrl = $('[data-testid="User-Name"] a')
+        .eq(2)
+        .attr("href");
+
+      sendMessageToMainWindow("CHECK_SAVED_TWEET_EXISTS", newBookmarkTweetUrl);
+
+      console.log("gonna wait for waitForNewReport()");
+
+      const waitForNewReportResponse = await waitForNewReport();
+
+      console.log("waitForNewReportResponse->", waitForNewReportResponse);
+
+      if (waitForNewReportResponse.success) {
+        console.log(
+          waitForNewReportResponse.tweetUrl + " already exists, skipping!"
+        );
+        continue;
+      }
+
+      // now enter a while loop that breaks only when the front end responds
+
       const idExists = this.bookmarks.some(
         (bookmark) => bookmark.indexId === newBookmark.indexId
       );
