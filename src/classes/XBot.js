@@ -2,6 +2,7 @@ import * as constants from "../util/constants";
 import { encode } from "../util/messaging";
 import { waitForNewReport } from "../util/event-emitter";
 import { sendMessageToMainWindow } from "../util/messaging";
+import * as common from "../util/common";
 
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
@@ -102,7 +103,7 @@ export class XBot {
       });
       return true;
     } catch (error) {
-      console.log("goto: Error! ", error);
+      common.debugLog("goto: Error! ", error);
       return false;
     }
   }
@@ -114,7 +115,7 @@ export class XBot {
       await this.page.screenshot({ path: filePath });
       return true;
     } catch (error) {
-      console.log("takePic() error->", error);
+      common.debugLog("takePic() error->", error);
       return false;
     }
   }
@@ -126,7 +127,7 @@ export class XBot {
 
       return true;
     } catch (error) {
-      console.log("findAndType: Error! ", error);
+      common.debugLog("findAndType: Error! ", error);
       return false;
     }
   }
@@ -138,7 +139,7 @@ export class XBot {
 
       return true;
     } catch (error) {
-      console.log("findAndClick: Error! ", error);
+      common.debugLog("findAndClick: Error! ", error);
       return false;
     }
   }
@@ -148,7 +149,7 @@ export class XBot {
 
       return true;
     } catch (error) {
-      console.log("findElement: Error! ", error);
+      common.debugLog("findElement: Error! ", error);
       return false;
     }
   }
@@ -164,7 +165,7 @@ export class XBot {
 
       return responseObject;
     } catch (error) {
-      console.log("findAndGetText: Error! ", error);
+      common.debugLog("findAndGetText: Error! ", error);
       return false;
     }
   }
@@ -178,7 +179,7 @@ export class XBot {
         .toLowerCase()
         .includes(targetText.toLowerCase());
     }, targetText);
-    console.log(targetText + " was found: " + found);
+    common.debugLog(targetText + " was found: " + found);
     return found;
   }
   async findTextInFrame(iFrame, targetText) {
@@ -186,7 +187,7 @@ export class XBot {
       return document.body.innerText.includes("your desired text");
     }, targetText);
 
-    console.log(targetText + " was found: " + found);
+    common.debugLog(targetText + " was found: " + found);
 
     return found;
   }
@@ -212,16 +213,16 @@ export class XBot {
     // when it finds the xBot to not be busy, then it pops the next item from the queue
     // and tweets it
     // if the queue is empty, then the queue monitor turns itself off
-    console.log("userId->", userId);
-    console.log("text->", text);
+    common.debugLog("userId->", userId);
+    common.debugLog("text->", text);
 
     if (!this.isBusy) {
-      console.log("this.isBusy->", this.isBusy);
+      common.debugLog("this.isBusy->", this.isBusy);
 
       this.isBusy = true;
       let hasVisited = await this.goto("https://www.x.com");
       if (!hasVisited) return this.respond(false, "Could not visit x.com");
-      console.log("tweet() visited x.com");
+      common.debugLog("tweet() visited x.com");
       // TODO: if the TWITTER_NEW_TWEET_INPUT is not found it's because Twitter
       // suspects i'm a bot and wants my email
       let foundAndClicked = await this.findAndClick(
@@ -229,7 +230,7 @@ export class XBot {
       );
       if (!foundAndClicked)
         return this.respond(false, "Could not find TWITTER_NEW_TWEET_INPUT");
-      console.log("tweet() found and clicked TWITTER_NEW_TWEET_INPUT");
+      common.debugLog("tweet() found and clicked TWITTER_NEW_TWEET_INPUT");
 
       let foundAndTyped = await this.findAndType(
         process.env.TWITTER_NEW_TWEET_INPUT,
@@ -240,7 +241,7 @@ export class XBot {
           false,
           "Could not find and type TWITTER_NEW_TWEET_INPUT"
         );
-      console.log("tweet() found and typed TWITTER_NEW_TWEET_INPUT");
+      common.debugLog("tweet() found and typed TWITTER_NEW_TWEET_INPUT");
 
       foundAndClicked = await this.findAndClick(
         process.env.TWITTER_POST_BUTTON
@@ -250,7 +251,7 @@ export class XBot {
           false,
           "Could not find and click TWITTER_POST_BUTTON"
         );
-      console.log("tweet() found and clicked TWITTER_POST_BUTTON");
+      common.debugLog("tweet() found and clicked TWITTER_POST_BUTTON");
 
       //TODO: scan the page for "Whoops! you posted that already"
 
@@ -258,10 +259,10 @@ export class XBot {
       this.tweets[userId] = text;
       return this.respond(true, "xBot tweeted!");
     } else {
-      console.log("xBot is busy, queuing task.");
+      common.debugLog("xBot is busy, queuing task.");
       this.queue.push({ userId, text });
       if (this.queue.length == 1) {
-        console.log("starting queue monitor");
+        common.debugLog("starting queue monitor");
         this.startQueueMonitor();
       }
       return this.respond(false, "xBot is busy");
@@ -274,14 +275,14 @@ export class XBot {
         { timeout: 10000 }
       );
       if (TwitterSuspects) {
-        console.log("Found SUSPICION_TEXT!");
+        common.debugLog("Found SUSPICION_TEXT!");
         return true;
       } else {
-        console.log("Did NOT find SUSPICION_TEXT!");
+        common.debugLog("Did NOT find SUSPICION_TEXT!");
         return false;
       }
     } catch (error) {
-      console.log(
+      common.debugLog(
         "twitterSuspects() exception! -> Did NOT find SUSPICION_TEXT! : ",
         error
       );
@@ -296,14 +297,14 @@ export class XBot {
       );
 
       if (TwitterSuspects) {
-        console.log("Found TWITTER_AUTHENTICATE_TEXT!");
+        common.debugLog("Found TWITTER_AUTHENTICATE_TEXT!");
         return true;
       } else {
-        console.log("Did NOT find TWITTER_AUTHENTICATE_TEXT!");
+        common.debugLog("Did NOT find TWITTER_AUTHENTICATE_TEXT!");
         return false;
       }
     } catch (error) {
-      console.log(
+      common.debugLog(
         "twitterRequiresCaptcha() exception! -> Did NOT find TWITTER_AUTHENTICATE_TEXT! ",
         error
       );
@@ -314,10 +315,10 @@ export class XBot {
     try {
       return await this.findTextInPage(process.env.TWITTER_UNUSUAL_LOGIN_TEXT);
     } catch (error) {
-      console.log(
+      common.debugLog(
         "unusualLoginDetected() exception! -> Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!"
       );
-      console.log(error);
+      common.debugLog(error);
       return false;
     }
   }
@@ -325,11 +326,11 @@ export class XBot {
     const arkoseFrame = await this.page.$("#arkoseFrame");
 
     if (arkoseFrame) {
-      console.log("arkoseFrame exists! we need you to do stuff");
+      common.debugLog("arkoseFrame exists! we need you to do stuff");
       return true;
       // return await this.findTextInFrame(arkoseFrame, process.env.TWITTER_AUTHENTICATE_TEXT);
     } else {
-      console.log("Bro the arkoseFrame div DOES NOT exists bro!");
+      common.debugLog("Bro the arkoseFrame div DOES NOT exists bro!");
     }
   }
   async twitterWantsVerification() {
@@ -339,20 +340,20 @@ export class XBot {
         { timeout: 3000 }
       );
       if (TwitterWantsToVerify) {
-        console.log("Alert: found VERIFICATION_TEXT!!");
+        common.debugLog("Alert: found VERIFICATION_TEXT!!");
         const pageContent = await this.page.content();
         let response = {};
         response.success = true;
         response.pageContent = pageContent;
         return response;
       } else {
-        console.log("Did NOT find VERIFICATION_TEXT!");
+        common.debugLog("Did NOT find VERIFICATION_TEXT!");
         let response = {};
         response.success = false;
         return response;
       }
     } catch (error) {
-      console.log(
+      common.debugLog(
         "twitterSuspects() exception! -> Did NOT find VERIFICATION_TEXT!",
         error
       );
@@ -385,10 +386,10 @@ export class XBot {
       });
 
       if (dialogAppeared) {
-        console.log("Error dialog detected.");
+        common.debugLog("Error dialog detected.");
         return true;
       } else {
-        console.log("Error dialog did not appear within the timeout.");
+        common.debugLog("Error dialog did not appear within the timeout.");
         return false;
       }
     } catch (error) {
@@ -402,10 +403,10 @@ export class XBot {
       process.env.TWITTER_LOGOUT_BUTTON
     );
     if (!foundAndClicked) {
-      console.log("Cant't find TWITTER_LOGOUT_BUTTON");
+      common.debugLog("Cant't find TWITTER_LOGOUT_BUTTON");
       return false;
     }
-    console.log("Found TWITTER_LOGOUT_BUTTON");
+    common.debugLog("Found TWITTER_LOGOUT_BUTTON");
     this.isLoggedIn = false;
     return true;
   }
@@ -415,48 +416,48 @@ export class XBot {
     if (!this.isLoggedIn) {
       let hasVisited = await this.goto("https://www.x.com/login");
       if (!hasVisited) {
-        console.log("Can't visit https://www.x.com");
+        common.debugLog("Can't visit https://www.x.com");
         this.isBusy = false;
         return this.respond(false, "Could not visit x.com");
       }
-      console.log("We're at https://www.x.com");
+      common.debugLog("We're at https://www.x.com");
 
       let foundAndClicked = await this.findAndClick(
         process.env.TWITTER_USERNAME_INPUT
       );
       if (!foundAndClicked) {
-        console.log("Can't find TWITTER_USERNAME_INPUT");
+        common.debugLog("Can't find TWITTER_USERNAME_INPUT");
         this.isBusy = false;
         return this.respond(false, "Can't find TWITTER_USERNAME_INPUT");
       }
-      console.log("Found and clicked TWITTER_USERNAME_INPUT");
+      common.debugLog("Found and clicked TWITTER_USERNAME_INPUT");
 
       let foundAndTyped = await this.findAndType(
         process.env.TWITTER_USERNAME_INPUT,
         botUsername
       );
       if (!foundAndTyped) {
-        console.log("Can't find and type TWITTER_USERNAME_INPUT");
+        common.debugLog("Can't find and type TWITTER_USERNAME_INPUT");
         this.isBusy = false;
         return this.respond(
           false,
           "Can't find and type TWITTER_USERNAME_INPUT"
         );
       }
-      console.log("Found and typed TWITTER_USERNAME_INPUT");
+      common.debugLog("Found and typed TWITTER_USERNAME_INPUT");
 
       foundAndClicked = await this.findAndClick(
         process.env.TWITTER_USERNAME_SUBMIT_BUTTON
       );
       if (!foundAndClicked) {
-        console.log("Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON");
+        common.debugLog("Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON");
         this.isBusy = false;
         return this.respond(
           false,
           "Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON"
         );
       }
-      console.log("Found and clicked TWITTER_USERNAME_SUBMIT_BUTTON");
+      common.debugLog("Found and clicked TWITTER_USERNAME_SUBMIT_BUTTON");
 
       if (
         await this.lookForWrongLoginInfoDialog("we could not find your account")
@@ -469,13 +470,13 @@ export class XBot {
       );
 
       if (!foundAndClicked) {
-        console.log("Can't find and click TWITTER_PASSWORD_INPUT");
+        common.debugLog("Can't find and click TWITTER_PASSWORD_INPUT");
         // let's look for this text We need to make sure that you’re a real person.
         // await this.wait(300000)
         if (await this.twitterRequiresCaptcha()) {
-          console.log("Bro, you need to solve the puzzle!");
+          common.debugLog("Bro, you need to solve the puzzle!");
         } else if (await this.unusualLoginDetected()) {
-          console.log(
+          common.debugLog(
             "Bro, X detected an unusual login attempt! Will try to calm the bitch down."
           );
           // await this.wait(15000);
@@ -496,7 +497,7 @@ export class XBot {
               return this.respond(false, "Bro, your password is messed up.");
             }
           } catch (error) {
-            console.log(error);
+            common.debugLog(error);
             this.isBusy = false;
             return this.respond(
               false,
@@ -516,33 +517,33 @@ export class XBot {
           // when some external condition changes
           // that external condition would be changed by the clicking of that button
 
-          console.log(
+          common.debugLog(
             "Bro we need you to do something about this situation, will give you 20 seconds."
           );
           await this.wait(20000);
         } else {
-          console.log("Bro, we're defeated by Twitter. Dang it.");
+          common.debugLog("Bro, we're defeated by Twitter. Dang it.");
           this.isBusy = false;
           return this.respond(
             false,
             "Can't find and click TWITTER_PASSWORD_INPUT"
           );
         }
-      } else console.log("Found and clicked TWITTER_PASSWORD_INPUT");
+      } else common.debugLog("Found and clicked TWITTER_PASSWORD_INPUT");
 
       foundAndTyped = await this.findAndType(
         process.env.TWITTER_PASSWORD_INPUT,
         botPassword
       );
       if (!foundAndTyped) {
-        console.log("Can't find and type TWITTER_PASSWORD_INPUT");
+        common.debugLog("Can't find and type TWITTER_PASSWORD_INPUT");
         this.isBusy = false;
         return this.respond(
           false,
           "Can't find and type TWITTER_PASSWORD_INPUT"
         );
       }
-      console.log("Found and typed TWITTER_PASSWORD_INPUT");
+      common.debugLog("Found and typed TWITTER_PASSWORD_INPUT");
       await this.page.keyboard.press("Enter");
       await this.wait(3000);
 
@@ -551,7 +552,7 @@ export class XBot {
       }
 
       // const wrongPassword = await this.findTextInPage("wrong password");
-      // console.log("wrongPassword->", wrongPassword);
+      // common.debugLog("wrongPassword->", wrongPassword);
       // if (wrongPassword) {
       //     return this.respond(false, "Your password is bad.");
       // }
@@ -578,36 +579,36 @@ export class XBot {
       // check for Suspicious login prevented
       // const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT, 5000);
       // if (found) {
-      //     console.log("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
+      //     common.debugLog("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
       //     this.isBusy = false;
       //     return this.respond(false, "Wrong login information.");
       // }
 
       //HERE I GOTTA MAKE SURE Twitter is not suspicious and temporarily blocked me
 
-      // console.log("Twitter Bot has logged in, we now will try to detect suspicion.");
+      // common.debugLog("Twitter Bot has logged in, we now will try to detect suspicion.");
 
       // let confirmedSuspicion = await this.twitterSuspects();
 
       // if (confirmedSuspicion) {
-      //     console.log("Twitter suspects, will try to convince them.");
+      //     common.debugLog("Twitter suspects, will try to convince them.");
       //     let emailWasInput = await this.inputEmail();
       //     if (emailWasInput) {
-      //         console.log("We succeeded convincing twitter. We're in.");
+      //         common.debugLog("We succeeded convincing twitter. We're in.");
       //         this.isBusy = false;
       //         return this.respond(true, "xBot is logged in, we convinced Elon!");
       //     }
       //     else {
-      //         console.log("We did not convince Elon :(");
+      //         common.debugLog("We did not convince Elon :(");
       //         this.isBusy = false;
       //         return this.respond(false, "xBot is not logged in :(");
       //     }
       // }
       // else {
-      //     console.log("We will now try to see if Twitter wants verification from us.")
+      //     common.debugLog("We will now try to see if Twitter wants verification from us.")
       //     let confirmedVerification = await this.twitterWantsVerification();
       //     if (confirmedVerification.success) {
-      //         console.log("Twitter wants verification from us!")
+      //         common.debugLog("Twitter wants verification from us!")
       //         // now we must check the code that was sent to us
       //         // (or read the email automatically)
       //         // and send it to the browser.
@@ -617,14 +618,14 @@ export class XBot {
       //         // res.download(filePath);
       //     }
       //     else {
-      //         console.log("Apparently Twitter does not suspect, so we're logged in!");
+      //         common.debugLog("Apparently Twitter does not suspect, so we're logged in!");
       //         this.isLoggedIn = true;
       //         this.isBusy = false;
       //         return this.respond(true, "xBot is logged in!")
       //     }
       // }
     } else {
-      console.log("xBot is already logged in!");
+      common.debugLog("xBot is already logged in!");
       this.isBusy = false;
       return this.respond(false, "xBot is already logged in!");
     }
@@ -634,20 +635,20 @@ export class XBot {
       process.env.TWITTER_EMAIL_INPUT
     );
     if (!foundAndClicked) {
-      console.log("Cant't find TWITTER_EMAIL_INPUT");
+      common.debugLog("Cant't find TWITTER_EMAIL_INPUT");
       return false;
     }
-    console.log("Found TWITTER_EMAIL_INPUT");
+    common.debugLog("Found TWITTER_EMAIL_INPUT");
 
     let foundAndTyped = await this.findAndType(
       process.env.TWITTER_EMAIL_INPUT,
       this.botEmail
     );
     if (!foundAndTyped) {
-      console.log("Can't find and type TWITTER_EMAIL_INPUT");
+      common.debugLog("Can't find and type TWITTER_EMAIL_INPUT");
       return false;
     }
-    console.log("Found and typed TWITTER_EMAIL_INPUT");
+    common.debugLog("Found and typed TWITTER_EMAIL_INPUT");
 
     await this.page.keyboard.press("Enter");
 
@@ -658,20 +659,20 @@ export class XBot {
       process.env.TWITTER_VERIFICATION_CODE_INPUT
     );
     if (!foundAndClicked) {
-      console.log("Cant't find TWITTER_VERIFICATION_CODE_INPUT");
+      common.debugLog("Cant't find TWITTER_VERIFICATION_CODE_INPUT");
       return false;
     }
-    console.log("Found TWITTER_VERIFICATION_CODE_INPUT");
+    common.debugLog("Found TWITTER_VERIFICATION_CODE_INPUT");
 
     let foundAndTyped = await this.findAndType(
       process.env.TWITTER_VERIFICATION_CODE_INPUT,
       code
     );
     if (!foundAndTyped) {
-      console.log("Can't find and type TWITTER_VERIFICATION_CODE_INPUT");
+      common.debugLog("Can't find and type TWITTER_VERIFICATION_CODE_INPUT");
       return false;
     }
-    console.log("Found and typed TWITTER_VERIFICATION_CODE_INPUT");
+    common.debugLog("Found and typed TWITTER_VERIFICATION_CODE_INPUT");
 
     await this.page.keyboard.press("Enter");
 
@@ -694,13 +695,13 @@ export class XBot {
   }
   async processQueue(xBotClassContext) {
     if (!xBotClassContext.isBusy) {
-      console.log("xBotClassContext.isBusy->" + xBotClassContext.isBusy);
-      console.log(
+      common.debugLog("xBotClassContext.isBusy->" + xBotClassContext.isBusy);
+      common.debugLog(
         "xBot is not busy, so processQueue will start completing pending tasks"
       );
       while (xBotClassContext.queue.length > 0) {
         const nextItem = xBotClassContext.queue.pop();
-        console.log("nextItem->", JSON.stringify(nextItem));
+        common.debugLog("nextItem->", JSON.stringify(nextItem));
         await xBotClassContext.tweet(nextItem.userId, nextItem.text);
         //wait some time
       }
@@ -762,14 +763,14 @@ export class XBot {
 
       sendMessageToMainWindow("CHECK_SAVED_TWEET_EXISTS", newBookmarkTweetUrl);
 
-      console.log("gonna wait for waitForNewReport()");
+      common.debugLog("gonna wait for waitForNewReport()");
 
       const waitForNewReportResponse = await waitForNewReport();
 
-      console.log("waitForNewReportResponse->", waitForNewReportResponse);
+      common.debugLog("waitForNewReportResponse->", waitForNewReportResponse);
 
       if (waitForNewReportResponse.success) {
-        console.log(
+        common.debugLog(
           waitForNewReportResponse.tweetUrl + " already exists, skipping!"
         );
         continue;
@@ -792,7 +793,7 @@ export class XBot {
     let scrollPosition = 0;
 
     while (this.goAheadScrape) {
-      console.log("Gonna scroll...");
+      common.debugLog("Gonna scroll...");
       await this.page.evaluate(() => {
         window.scrollBy(0, window.innerHeight);
       });
@@ -809,7 +810,7 @@ export class XBot {
 
       await this.storeBookmarks();
 
-      console.log("bookmarks stored.");
+      common.debugLog("bookmarks stored.");
 
       // Get the scroll position
       const newScrollPosition = await this.page.evaluate(() => {
@@ -817,10 +818,10 @@ export class XBot {
       });
 
       if (newScrollPosition > scrollPosition) {
-        console.log("looping again.");
+        common.debugLog("looping again.");
         scrollPosition = newScrollPosition;
       } else if (newScrollPosition <= scrollPosition) {
-        console.log("End of page reached. Aborting.");
+        common.debugLog("End of page reached. Aborting.");
         break;
       }
     }

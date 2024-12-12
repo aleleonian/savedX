@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const path = require("node:path");
 import { startExpressServer } from "./webserver";
 import * as dbTools from "./util/db";
+import * as common from "./util/common";
 import {
   checkUserAndPass,
   updateConfigData,
@@ -143,7 +144,7 @@ ipcMain.on("go-fetch-tweets", async () => {
 ipcMain.on("stop-scraping", async () => {
   // const credentials = await dbTools.getXCredentials();
   // await goFetchTweetsFake();
-  console.log("we gonna stop scraping then.");
+  common.debugLog("we gonna stop scraping then.");
   await stopScraping();
 });
 
@@ -152,7 +153,7 @@ ipcMain.on("update-tags-for-tweet", async (event, tweetId, newTags) => {
 
   //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
   //O MAL EL UPDATE
-  console.log("updateTagsResult->", updateTagsResult);
+  common.debugLog("updateTagsResult->", updateTagsResult);
 });
 
 ipcMain.on("remove-tag-from-db", async (event, tag) => {
@@ -165,7 +166,7 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
       `error--${removeTagFromDBResult.errorMessage} 😫`
     );
   }
-  console.log("removeTagFromDBResult->", removeTagFromDBResult);
+  common.debugLog("removeTagFromDBResult->", removeTagFromDBResult);
 });
 
 ipcMain.on("fetch-config-data", async () => {
@@ -225,7 +226,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
 });
 
 ipcMain.on("report-found-tweet", async (event, reportObj) => {
-  console.log("report-found-tweet reportObj->", reportObj);
+  common.debugLog("report-found-tweet reportObj->", reportObj);
   mainEmitter.emit("report-found-tweet", reportObj);
 });
 
@@ -251,7 +252,7 @@ ipcMain.on("update-config-data", async (event, formData) => {
 });
 ipcMain.on("open-debug-session", async () => {
   try {
-    console.log("open-debug-session!");
+    common.debugLog("open-debug-session!");
 
     if (true) {
       sendMessageToMainWindow("NOTIFICATION", `success--open-debug-session!`);
@@ -272,17 +273,17 @@ ipcMain.on("open-debug-session", async () => {
   }
 });
 
-console.log("DEBUG in main process:", JSON.parse(process.env.DEBUG));
+common.debugLog("DEBUG in main process:", JSON.parse(process.env.DEBUG));
 
 const init = async () => {
   let dbPath;
-  console.log("process.env.NODE_ENV->", process.env.NODE_ENV);
+  common.debugLog("process.env.NODE_ENV->", process.env.NODE_ENV);
   dbPath =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "debug"
       ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
       : "./savedx.db";
 
-  console.log("dbPath>", dbPath);
+  common.debugLog("dbPath>", dbPath);
 
   const openDbResult = await dbTools.openDb(dbPath);
 

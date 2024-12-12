@@ -8,6 +8,7 @@ import * as constants from "../../util/constants";
 import { Progress } from "./Progress";
 import { AppContext } from "../../context/AppContext";
 import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
+import * as common from "../../util/common";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);

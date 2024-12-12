@@ -18,10 +18,10 @@ export async function goFetchTweets(xBot, configData) {
   localBot.botEmail = configData.TWITTER_BOT_EMAIL;
   localBot.downloadMedia = configData.DOWNLOAD_MEDIA;
 
-  console.log("localBot.botUsername->", localBot.botUsername);
-  console.log("localBot.botPassword->", localBot.botPassword);
-  console.log("localBot.botEmail->", localBot.botEmail);
-  console.log("localBot.downloadMedia->", localBot.downloadMedia);
+  common.debugLog("localBot.botUsername->", localBot.botUsername);
+  common.debugLog("localBot.botPassword->", localBot.botPassword);
+  common.debugLog("localBot.botEmail->", localBot.botEmail);
+  common.debugLog("localBot.downloadMedia->", localBot.downloadMedia);
 
   let result = await localBot.init();
   if (result.success) {
@@ -134,7 +134,7 @@ export async function goFetchTweetsFake() {
   hideProgress();
 }
 export function stopScraping() {
-  console.log("localBot.goAheadScrape = false.");
+  debugLog("localBot.goAheadScrape = false.");
   localBot.goAheadScrape = false;
 }
 

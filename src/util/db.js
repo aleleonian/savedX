@@ -1,5 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
 import { returnError, returnSuccess } from "./common";
+import * as common from "./common";
 import cheerio from "cheerio";
 const fs = require("fs");
 
@@ -15,7 +16,7 @@ function createDatabase(filePath) {
           errorMessage: err.message,
         });
       } else {
-        console.log("New database created.");
+        common.debugLog("New database created.");
         resolve({
           success: true,
           db, // Return the database object for further operations
@@ -75,7 +76,7 @@ export const getAllQuery = (query, params = []) => {
 
 const createIfNotExist = async (filePath) => {
   if (!fs.existsSync(filePath)) {
-    console.log("Database file not found. Creating a new one...");
+    common.debugLog("Database file not found. Creating a new one...");
 
     try {
       const createDatabaseResult = await createDatabase(filePath);
@@ -122,7 +123,7 @@ const createIfNotExist = async (filePath) => {
       "DOWNLOAD_MEDIA"	NUMERIC NOT NULL DEFAULT 0 )
      `);
 
-      console.log("Database schema initialized.");
+      common.debugLog("Database schema initialized.");
 
       await dbClose();
 
@@ -130,14 +131,14 @@ const createIfNotExist = async (filePath) => {
         success: true,
       };
     } catch (error) {
-      console.log("Error creating DB file! ", error);
+      common.debugLog("Error creating DB file! ", error);
       return {
         success: false,
       };
     }
   }
 
-  console.log("DB file exists.");
+  common.debugLog("DB file exists.");
 
   return {
     success: true,
@@ -183,11 +184,11 @@ export const storeTweets = async (tweetArray) => {
 
       if ($('[data-testid="videoPlayer"]').length > 0) {
         tweet.tweetImageOrPoster = $('[data-testid="videoPlayer"] video').attr(
-          "poster",
+          "poster"
         );
       } else {
         tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr(
-          "src",
+          "src"
         );
       }
       await db.run(
@@ -203,9 +204,9 @@ export const storeTweets = async (tweetArray) => {
           tweet.tweetText,
           tweet.tweetUrl,
           tweet.profilePicUrl,
-        ],
+        ]
       );
-    }),
+    })
   );
 };
 export const deleteAllTweets = async () => {
@@ -254,7 +255,7 @@ export const updateTags = async (tweetId, newTags) => {
       // Check if the tag exists in the tags table
       const getQueryResponse = await getQuery(
         "SELECT id FROM tags WHERE name = ?",
-        [tag],
+        [tag]
       );
 
       if (getQueryResponse.data) {
@@ -262,14 +263,14 @@ export const updateTags = async (tweetId, newTags) => {
         // TODO error check this runQuery call
         await runQuery(
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
-          [tweetId, getQueryResponse.data.id],
+          [tweetId, getQueryResponse.data.id]
         );
-        console.log(`Added tag "${tag}" for tweetId: ${tweetId}`);
+        common.debugLog(`Added tag "${tag}" for tweetId: ${tweetId}`);
       } else {
         // If the tag doesn't exist, insert it into the tags table
         const runQueryResponse = await runQuery(
           "INSERT INTO tags (name) VALUES (?)",
-          [tag],
+          [tag]
         );
 
         // Get the new tag id (from last inserted row)
@@ -279,9 +280,9 @@ export const updateTags = async (tweetId, newTags) => {
         // TODO error check this runQuery call
         await runQuery(
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
-          [tweetId, newTagId],
+          [tweetId, newTagId]
         );
-        console.log(`Added new tag "${tag}" for tweetId: ${tweetId}`);
+        common.debugLog(`Added new tag "${tag}" for tweetId: ${tweetId}`);
       }
     }
     return true;
@@ -309,7 +310,7 @@ export const readAllTags = async () => {
       };
     }
   } catch (error) {
-    console.log("readAllTags() error: ", error);
+    common.debugLog("readAllTags() error: ", error);
     return returnError(error.errorMessage);
   }
 };
@@ -363,7 +364,7 @@ export const removeTagFromDB = async (tagName) => {
     // Now delete the tag itself from the tags table
     await runQuery(deleteTagQuery, [tagName]);
 
-    console.log(`Successfully removed tag '${tagName}' from the system.`);
+    common.debugLog(`Successfully removed tag '${tagName}' from the system.`);
     return returnSuccess();
   } catch (error) {
     console.error("Error removing tag from system:", error);

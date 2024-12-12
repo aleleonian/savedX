@@ -1,3 +1,4 @@
+import * as common from "./util/common";
 const express = require("express");
 
 let xBotPointer;
@@ -13,8 +14,8 @@ export const startExpressServer = (xBot) => {
   // Example route to fetch data
   server.get("/debug-xbot", async (req, res) => {
     try {
-      console.log("/debug-xbot GET");
-      console.log("xBotPointer->", xBotPointer);
+      common.debugLog("/debug-xbot GET");
+      common.debugLog("xBotPointer->", xBotPointer);
       // const data = await getQuery("SELECT * FROM config"); // Assume this is your DB helper function
       // res.json(data);
       await xBotPointer.goto("https://www.latigo.com.ar");
@@ -26,7 +27,7 @@ export const startExpressServer = (xBot) => {
 
   server.post("/debug-xbot", async (req, res) => {
     try {
-      console.log("/debug-xbot POST");
+      common.debugLog("/debug-xbot POST");
       // const data = await getQuery("SELECT * FROM config"); // Assume this is your DB helper function
       // res.json(data);
       res.send("/xbot-debug");
@@ -37,6 +38,6 @@ export const startExpressServer = (xBot) => {
 
   const port = 3000;
   server.listen(port, () => {
-    console.log(`Express server running at http://localhost:${port}`);
+    common.debugLog(`Express server running at http://localhost:${port}`);
   });
 };

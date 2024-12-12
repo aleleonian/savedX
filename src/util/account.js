@@ -1,12 +1,13 @@
 import { returnError, returnSuccess } from "./common";
 import * as dbTools from "./db";
+import * as common from "../util/common";
 
 export const checkUserAndPass = () => {
   return new Promise(function checkUserAndPassPromise(resolve) {
     (async () => {
       try {
         const getQueryResponse = await dbTools.getQuery(
-          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL from config",
+          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL from config"
         );
         const data = getQueryResponse.data;
         if (
@@ -19,9 +20,9 @@ export const checkUserAndPass = () => {
           resolve(returnError("Missing config data 🙈"));
         }
       } catch (error) {
-        console.log("checkUserAndPassPromise error->", error);
+        common.debugLog("checkUserAndPassPromise error->", error);
         resolve(
-          error.errorMessage ? error.errorMessage : JSON.stringify(error),
+          error.errorMessage ? error.errorMessage : JSON.stringify(error)
         );
       }
     })();
@@ -33,16 +34,16 @@ export const getAllConfigData = () => {
     (async function () {
       try {
         const getQueryResponse = await dbTools.getQuery(
-          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL, DOWNLOAD_MEDIA from config",
+          "SELECT TWITTER_BOT_USERNAME, TWITTER_BOT_PASSWORD, TWITTER_BOT_EMAIL, DOWNLOAD_MEDIA from config"
         );
         const data = getQueryResponse.data;
         if (data.DOWNLOAD_MEDIA == 1) data.DOWNLOAD_MEDIA = true;
         else data.DOWNLOAD_MEDIA = false;
         resolve(returnSuccess(data));
       } catch (error) {
-        console.log("getAllConfigDataPromise error->", error);
+        common.debugLog("getAllConfigDataPromise error->", error);
         resolve(
-          error.errorMessage ? error.errorMessage : JSON.stringify(error),
+          error.errorMessage ? error.errorMessage : JSON.stringify(error)
         );
       }
     })();
@@ -65,7 +66,7 @@ export const updateConfigData = (formData) => {
             formData.password,
             formData.email,
             formData.downloadMedia,
-          ],
+          ]
         );
 
         if (getQueryResponse.success) {
