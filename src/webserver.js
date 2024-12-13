@@ -14,8 +14,8 @@ export const startExpressServer = (xBot) => {
   // Example route to fetch data
   server.get("/debug-xbot", async (req, res) => {
     try {
-      common.debugLog("/debug-xbot GET");
-      common.debugLog("xBotPointer->", xBotPointer);
+      common.debugLog(process.env.DEBUG, "/debug-xbot GET");
+      common.debugLog(process.env.DEBUG, "xBotPointer->", xBotPointer);
       // const data = await getQuery("SELECT * FROM config"); // Assume this is your DB helper function
       // res.json(data);
       await xBotPointer.goto("https://www.latigo.com.ar");
@@ -27,7 +27,7 @@ export const startExpressServer = (xBot) => {
 
   server.post("/debug-xbot", async (req, res) => {
     try {
-      common.debugLog("/debug-xbot POST");
+      common.debugLog(process.env.DEBUG, "/debug-xbot POST");
       // const data = await getQuery("SELECT * FROM config"); // Assume this is your DB helper function
       // res.json(data);
       res.send("/xbot-debug");
@@ -38,6 +38,9 @@ export const startExpressServer = (xBot) => {
 
   const port = 3000;
   server.listen(port, () => {
-    common.debugLog(`Express server running at http://localhost:${port}`);
+    common.debugLog(
+      process.env.DEBUG,
+      `Express server running at http://localhost:${port}`
+    );
   });
 };

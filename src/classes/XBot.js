@@ -103,7 +103,7 @@ export class XBot {
       });
       return true;
     } catch (error) {
-      common.debugLog("goto: Error! ", error);
+      common.debugLog(process.env.DEBUG, "goto: Error! ", error);
       return false;
     }
   }
@@ -115,7 +115,7 @@ export class XBot {
       await this.page.screenshot({ path: filePath });
       return true;
     } catch (error) {
-      common.debugLog("takePic() error->", error);
+      common.debugLog(process.env.DEBUG, "takePic() error->", error);
       return false;
     }
   }
@@ -127,7 +127,7 @@ export class XBot {
 
       return true;
     } catch (error) {
-      common.debugLog("findAndType: Error! ", error);
+      common.debugLog(process.env.DEBUG, "findAndType: Error! ", error);
       return false;
     }
   }
@@ -139,7 +139,7 @@ export class XBot {
 
       return true;
     } catch (error) {
-      common.debugLog("findAndClick: Error! ", error);
+      common.debugLog(process.env.DEBUG, "findAndClick: Error! ", error);
       return false;
     }
   }
@@ -149,7 +149,7 @@ export class XBot {
 
       return true;
     } catch (error) {
-      common.debugLog("findElement: Error! ", error);
+      common.debugLog(process.env.DEBUG, "findElement: Error! ", error);
       return false;
     }
   }
@@ -165,7 +165,7 @@ export class XBot {
 
       return responseObject;
     } catch (error) {
-      common.debugLog("findAndGetText: Error! ", error);
+      common.debugLog(process.env.DEBUG, "findAndGetText: Error! ", error);
       return false;
     }
   }
@@ -179,7 +179,7 @@ export class XBot {
         .toLowerCase()
         .includes(targetText.toLowerCase());
     }, targetText);
-    common.debugLog(targetText + " was found: " + found);
+    common.debugLog(process.env.DEBUG, targetText + " was found: " + found);
     return found;
   }
   async findTextInFrame(iFrame, targetText) {
@@ -187,7 +187,7 @@ export class XBot {
       return document.body.innerText.includes("your desired text");
     }, targetText);
 
-    common.debugLog(targetText + " was found: " + found);
+    common.debugLog(process.env.DEBUG, targetText + " was found: " + found);
 
     return found;
   }
@@ -213,16 +213,16 @@ export class XBot {
     // when it finds the xBot to not be busy, then it pops the next item from the queue
     // and tweets it
     // if the queue is empty, then the queue monitor turns itself off
-    common.debugLog("userId->", userId);
-    common.debugLog("text->", text);
+    common.debugLog(process.env.DEBUG, "userId->", userId);
+    common.debugLog(process.env.DEBUG, "text->", text);
 
     if (!this.isBusy) {
-      common.debugLog("this.isBusy->", this.isBusy);
+      common.debugLog(process.env.DEBUG, "this.isBusy->", this.isBusy);
 
       this.isBusy = true;
       let hasVisited = await this.goto("https://www.x.com");
       if (!hasVisited) return this.respond(false, "Could not visit x.com");
-      common.debugLog("tweet() visited x.com");
+      common.debugLog(process.env.DEBUG, "tweet() visited x.com");
       // TODO: if the TWITTER_NEW_TWEET_INPUT is not found it's because Twitter
       // suspects i'm a bot and wants my email
       let foundAndClicked = await this.findAndClick(
@@ -230,7 +230,10 @@ export class XBot {
       );
       if (!foundAndClicked)
         return this.respond(false, "Could not find TWITTER_NEW_TWEET_INPUT");
-      common.debugLog("tweet() found and clicked TWITTER_NEW_TWEET_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "tweet() found and clicked TWITTER_NEW_TWEET_INPUT"
+      );
 
       let foundAndTyped = await this.findAndType(
         process.env.TWITTER_NEW_TWEET_INPUT,
@@ -241,7 +244,10 @@ export class XBot {
           false,
           "Could not find and type TWITTER_NEW_TWEET_INPUT"
         );
-      common.debugLog("tweet() found and typed TWITTER_NEW_TWEET_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "tweet() found and typed TWITTER_NEW_TWEET_INPUT"
+      );
 
       foundAndClicked = await this.findAndClick(
         process.env.TWITTER_POST_BUTTON
@@ -251,7 +257,10 @@ export class XBot {
           false,
           "Could not find and click TWITTER_POST_BUTTON"
         );
-      common.debugLog("tweet() found and clicked TWITTER_POST_BUTTON");
+      common.debugLog(
+        process.env.DEBUG,
+        "tweet() found and clicked TWITTER_POST_BUTTON"
+      );
 
       //TODO: scan the page for "Whoops! you posted that already"
 
@@ -259,10 +268,10 @@ export class XBot {
       this.tweets[userId] = text;
       return this.respond(true, "xBot tweeted!");
     } else {
-      common.debugLog("xBot is busy, queuing task.");
+      common.debugLog(process.env.DEBUG, "xBot is busy, queuing task.");
       this.queue.push({ userId, text });
       if (this.queue.length == 1) {
-        common.debugLog("starting queue monitor");
+        common.debugLog(process.env.DEBUG, "starting queue monitor");
         this.startQueueMonitor();
       }
       return this.respond(false, "xBot is busy");
@@ -275,14 +284,15 @@ export class XBot {
         { timeout: 10000 }
       );
       if (TwitterSuspects) {
-        common.debugLog("Found SUSPICION_TEXT!");
+        common.debugLog(process.env.DEBUG, "Found SUSPICION_TEXT!");
         return true;
       } else {
-        common.debugLog("Did NOT find SUSPICION_TEXT!");
+        common.debugLog(process.env.DEBUG, "Did NOT find SUSPICION_TEXT!");
         return false;
       }
     } catch (error) {
       common.debugLog(
+        process.env.DEBUG,
         "twitterSuspects() exception! -> Did NOT find SUSPICION_TEXT! : ",
         error
       );
@@ -297,14 +307,18 @@ export class XBot {
       );
 
       if (TwitterSuspects) {
-        common.debugLog("Found TWITTER_AUTHENTICATE_TEXT!");
+        common.debugLog(process.env.DEBUG, "Found TWITTER_AUTHENTICATE_TEXT!");
         return true;
       } else {
-        common.debugLog("Did NOT find TWITTER_AUTHENTICATE_TEXT!");
+        common.debugLog(
+          process.env.DEBUG,
+          "Did NOT find TWITTER_AUTHENTICATE_TEXT!"
+        );
         return false;
       }
     } catch (error) {
       common.debugLog(
+        process.env.DEBUG,
         "twitterRequiresCaptcha() exception! -> Did NOT find TWITTER_AUTHENTICATE_TEXT! ",
         error
       );
@@ -316,9 +330,10 @@ export class XBot {
       return await this.findTextInPage(process.env.TWITTER_UNUSUAL_LOGIN_TEXT);
     } catch (error) {
       common.debugLog(
+        process.env.DEBUG,
         "unusualLoginDetected() exception! -> Did NOT find TWITTER_UNUSUAL_LOGIN_TEXT!"
       );
-      common.debugLog(error);
+      common.debugLog(process.env.DEBUG, error);
       return false;
     }
   }
@@ -326,11 +341,17 @@ export class XBot {
     const arkoseFrame = await this.page.$("#arkoseFrame");
 
     if (arkoseFrame) {
-      common.debugLog("arkoseFrame exists! we need you to do stuff");
+      common.debugLog(
+        process.env.DEBUG,
+        "arkoseFrame exists! we need you to do stuff"
+      );
       return true;
       // return await this.findTextInFrame(arkoseFrame, process.env.TWITTER_AUTHENTICATE_TEXT);
     } else {
-      common.debugLog("Bro the arkoseFrame div DOES NOT exists bro!");
+      common.debugLog(
+        process.env.DEBUG,
+        "Bro the arkoseFrame div DOES NOT exists bro!"
+      );
     }
   }
   async twitterWantsVerification() {
@@ -340,20 +361,21 @@ export class XBot {
         { timeout: 3000 }
       );
       if (TwitterWantsToVerify) {
-        common.debugLog("Alert: found VERIFICATION_TEXT!!");
+        common.debugLog(process.env.DEBUG, "Alert: found VERIFICATION_TEXT!!");
         const pageContent = await this.page.content();
         let response = {};
         response.success = true;
         response.pageContent = pageContent;
         return response;
       } else {
-        common.debugLog("Did NOT find VERIFICATION_TEXT!");
+        common.debugLog(process.env.DEBUG, "Did NOT find VERIFICATION_TEXT!");
         let response = {};
         response.success = false;
         return response;
       }
     } catch (error) {
       common.debugLog(
+        process.env.DEBUG,
         "twitterSuspects() exception! -> Did NOT find VERIFICATION_TEXT!",
         error
       );
@@ -386,10 +408,13 @@ export class XBot {
       });
 
       if (dialogAppeared) {
-        common.debugLog("Error dialog detected.");
+        common.debugLog(process.env.DEBUG, "Error dialog detected.");
         return true;
       } else {
-        common.debugLog("Error dialog did not appear within the timeout.");
+        common.debugLog(
+          process.env.DEBUG,
+          "Error dialog did not appear within the timeout."
+        );
         return false;
       }
     } catch (error) {
@@ -403,10 +428,10 @@ export class XBot {
       process.env.TWITTER_LOGOUT_BUTTON
     );
     if (!foundAndClicked) {
-      common.debugLog("Cant't find TWITTER_LOGOUT_BUTTON");
+      common.debugLog(process.env.DEBUG, "Cant't find TWITTER_LOGOUT_BUTTON");
       return false;
     }
-    common.debugLog("Found TWITTER_LOGOUT_BUTTON");
+    common.debugLog(process.env.DEBUG, "Found TWITTER_LOGOUT_BUTTON");
     this.isLoggedIn = false;
     return true;
   }
@@ -416,48 +441,63 @@ export class XBot {
     if (!this.isLoggedIn) {
       let hasVisited = await this.goto("https://www.x.com/login");
       if (!hasVisited) {
-        common.debugLog("Can't visit https://www.x.com");
+        common.debugLog(process.env.DEBUG, "Can't visit https://www.x.com");
         this.isBusy = false;
         return this.respond(false, "Could not visit x.com");
       }
-      common.debugLog("We're at https://www.x.com");
+      common.debugLog(process.env.DEBUG, "We're at https://www.x.com");
 
       let foundAndClicked = await this.findAndClick(
         process.env.TWITTER_USERNAME_INPUT
       );
       if (!foundAndClicked) {
-        common.debugLog("Can't find TWITTER_USERNAME_INPUT");
+        common.debugLog(process.env.DEBUG, "Can't find TWITTER_USERNAME_INPUT");
         this.isBusy = false;
         return this.respond(false, "Can't find TWITTER_USERNAME_INPUT");
       }
-      common.debugLog("Found and clicked TWITTER_USERNAME_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "Found and clicked TWITTER_USERNAME_INPUT"
+      );
 
       let foundAndTyped = await this.findAndType(
         process.env.TWITTER_USERNAME_INPUT,
         botUsername
       );
       if (!foundAndTyped) {
-        common.debugLog("Can't find and type TWITTER_USERNAME_INPUT");
+        common.debugLog(
+          process.env.DEBUG,
+          "Can't find and type TWITTER_USERNAME_INPUT"
+        );
         this.isBusy = false;
         return this.respond(
           false,
           "Can't find and type TWITTER_USERNAME_INPUT"
         );
       }
-      common.debugLog("Found and typed TWITTER_USERNAME_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "Found and typed TWITTER_USERNAME_INPUT"
+      );
 
       foundAndClicked = await this.findAndClick(
         process.env.TWITTER_USERNAME_SUBMIT_BUTTON
       );
       if (!foundAndClicked) {
-        common.debugLog("Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON");
+        common.debugLog(
+          process.env.DEBUG,
+          "Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON"
+        );
         this.isBusy = false;
         return this.respond(
           false,
           "Can't find and click TWITTER_USERNAME_SUBMIT_BUTTON"
         );
       }
-      common.debugLog("Found and clicked TWITTER_USERNAME_SUBMIT_BUTTON");
+      common.debugLog(
+        process.env.DEBUG,
+        "Found and clicked TWITTER_USERNAME_SUBMIT_BUTTON"
+      );
 
       if (
         await this.lookForWrongLoginInfoDialog("we could not find your account")
@@ -470,13 +510,20 @@ export class XBot {
       );
 
       if (!foundAndClicked) {
-        common.debugLog("Can't find and click TWITTER_PASSWORD_INPUT");
+        common.debugLog(
+          process.env.DEBUG,
+          "Can't find and click TWITTER_PASSWORD_INPUT"
+        );
         // let's look for this text We need to make sure that you’re a real person.
         // await this.wait(300000)
         if (await this.twitterRequiresCaptcha()) {
-          common.debugLog("Bro, you need to solve the puzzle!");
+          common.debugLog(
+            process.env.DEBUG,
+            "Bro, you need to solve the puzzle!"
+          );
         } else if (await this.unusualLoginDetected()) {
           common.debugLog(
+            process.env.DEBUG,
             "Bro, X detected an unusual login attempt! Will try to calm the bitch down."
           );
           // await this.wait(15000);
@@ -497,7 +544,7 @@ export class XBot {
               return this.respond(false, "Bro, your password is messed up.");
             }
           } catch (error) {
-            common.debugLog(error);
+            common.debugLog(process.env.DEBUG, error);
             this.isBusy = false;
             return this.respond(
               false,
@@ -518,32 +565,46 @@ export class XBot {
           // that external condition would be changed by the clicking of that button
 
           common.debugLog(
+            process.env.DEBUG,
             "Bro we need you to do something about this situation, will give you 20 seconds."
           );
           await this.wait(20000);
         } else {
-          common.debugLog("Bro, we're defeated by Twitter. Dang it.");
+          common.debugLog(
+            process.env.DEBUG,
+            "Bro, we're defeated by Twitter. Dang it."
+          );
           this.isBusy = false;
           return this.respond(
             false,
             "Can't find and click TWITTER_PASSWORD_INPUT"
           );
         }
-      } else common.debugLog("Found and clicked TWITTER_PASSWORD_INPUT");
+      } else
+        common.debugLog(
+          process.env.DEBUG,
+          "Found and clicked TWITTER_PASSWORD_INPUT"
+        );
 
       foundAndTyped = await this.findAndType(
         process.env.TWITTER_PASSWORD_INPUT,
         botPassword
       );
       if (!foundAndTyped) {
-        common.debugLog("Can't find and type TWITTER_PASSWORD_INPUT");
+        common.debugLog(
+          process.env.DEBUG,
+          "Can't find and type TWITTER_PASSWORD_INPUT"
+        );
         this.isBusy = false;
         return this.respond(
           false,
           "Can't find and type TWITTER_PASSWORD_INPUT"
         );
       }
-      common.debugLog("Found and typed TWITTER_PASSWORD_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "Found and typed TWITTER_PASSWORD_INPUT"
+      );
       await this.page.keyboard.press("Enter");
       await this.wait(3000);
 
@@ -552,7 +613,7 @@ export class XBot {
       }
 
       // const wrongPassword = await this.findTextInPage("wrong password");
-      // common.debugLog("wrongPassword->", wrongPassword);
+      // common.debugLog(process.env.DEBUG,"wrongPassword->", wrongPassword);
       // if (wrongPassword) {
       //     return this.respond(false, "Your password is bad.");
       // }
@@ -579,36 +640,36 @@ export class XBot {
       // check for Suspicious login prevented
       // const found = await this.findElement(process.env.TWITTER_PASSWORD_INPUT, 5000);
       // if (found) {
-      //     common.debugLog("Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
+      //     common.debugLog(process.env.DEBUG,"Found TWITTER_PASSWORD_INPUT when i should not, wrong login data assumed.");
       //     this.isBusy = false;
       //     return this.respond(false, "Wrong login information.");
       // }
 
       //HERE I GOTTA MAKE SURE Twitter is not suspicious and temporarily blocked me
 
-      // common.debugLog("Twitter Bot has logged in, we now will try to detect suspicion.");
+      // common.debugLog(process.env.DEBUG,"Twitter Bot has logged in, we now will try to detect suspicion.");
 
       // let confirmedSuspicion = await this.twitterSuspects();
 
       // if (confirmedSuspicion) {
-      //     common.debugLog("Twitter suspects, will try to convince them.");
+      //     common.debugLog(process.env.DEBUG,"Twitter suspects, will try to convince them.");
       //     let emailWasInput = await this.inputEmail();
       //     if (emailWasInput) {
-      //         common.debugLog("We succeeded convincing twitter. We're in.");
+      //         common.debugLog(process.env.DEBUG,"We succeeded convincing twitter. We're in.");
       //         this.isBusy = false;
       //         return this.respond(true, "xBot is logged in, we convinced Elon!");
       //     }
       //     else {
-      //         common.debugLog("We did not convince Elon :(");
+      //         common.debugLog(process.env.DEBUG,"We did not convince Elon :(");
       //         this.isBusy = false;
       //         return this.respond(false, "xBot is not logged in :(");
       //     }
       // }
       // else {
-      //     common.debugLog("We will now try to see if Twitter wants verification from us.")
+      //     common.debugLog(process.env.DEBUG,"We will now try to see if Twitter wants verification from us.")
       //     let confirmedVerification = await this.twitterWantsVerification();
       //     if (confirmedVerification.success) {
-      //         common.debugLog("Twitter wants verification from us!")
+      //         common.debugLog(process.env.DEBUG,"Twitter wants verification from us!")
       //         // now we must check the code that was sent to us
       //         // (or read the email automatically)
       //         // and send it to the browser.
@@ -618,14 +679,14 @@ export class XBot {
       //         // res.download(filePath);
       //     }
       //     else {
-      //         common.debugLog("Apparently Twitter does not suspect, so we're logged in!");
+      //         common.debugLog(process.env.DEBUG,"Apparently Twitter does not suspect, so we're logged in!");
       //         this.isLoggedIn = true;
       //         this.isBusy = false;
       //         return this.respond(true, "xBot is logged in!")
       //     }
       // }
     } else {
-      common.debugLog("xBot is already logged in!");
+      common.debugLog(process.env.DEBUG, "xBot is already logged in!");
       this.isBusy = false;
       return this.respond(false, "xBot is already logged in!");
     }
@@ -635,20 +696,23 @@ export class XBot {
       process.env.TWITTER_EMAIL_INPUT
     );
     if (!foundAndClicked) {
-      common.debugLog("Cant't find TWITTER_EMAIL_INPUT");
+      common.debugLog(process.env.DEBUG, "Cant't find TWITTER_EMAIL_INPUT");
       return false;
     }
-    common.debugLog("Found TWITTER_EMAIL_INPUT");
+    common.debugLog(process.env.DEBUG, "Found TWITTER_EMAIL_INPUT");
 
     let foundAndTyped = await this.findAndType(
       process.env.TWITTER_EMAIL_INPUT,
       this.botEmail
     );
     if (!foundAndTyped) {
-      common.debugLog("Can't find and type TWITTER_EMAIL_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "Can't find and type TWITTER_EMAIL_INPUT"
+      );
       return false;
     }
-    common.debugLog("Found and typed TWITTER_EMAIL_INPUT");
+    common.debugLog(process.env.DEBUG, "Found and typed TWITTER_EMAIL_INPUT");
 
     await this.page.keyboard.press("Enter");
 
@@ -659,20 +723,29 @@ export class XBot {
       process.env.TWITTER_VERIFICATION_CODE_INPUT
     );
     if (!foundAndClicked) {
-      common.debugLog("Cant't find TWITTER_VERIFICATION_CODE_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "Cant't find TWITTER_VERIFICATION_CODE_INPUT"
+      );
       return false;
     }
-    common.debugLog("Found TWITTER_VERIFICATION_CODE_INPUT");
+    common.debugLog(process.env.DEBUG, "Found TWITTER_VERIFICATION_CODE_INPUT");
 
     let foundAndTyped = await this.findAndType(
       process.env.TWITTER_VERIFICATION_CODE_INPUT,
       code
     );
     if (!foundAndTyped) {
-      common.debugLog("Can't find and type TWITTER_VERIFICATION_CODE_INPUT");
+      common.debugLog(
+        process.env.DEBUG,
+        "Can't find and type TWITTER_VERIFICATION_CODE_INPUT"
+      );
       return false;
     }
-    common.debugLog("Found and typed TWITTER_VERIFICATION_CODE_INPUT");
+    common.debugLog(
+      process.env.DEBUG,
+      "Found and typed TWITTER_VERIFICATION_CODE_INPUT"
+    );
 
     await this.page.keyboard.press("Enter");
 
@@ -695,13 +768,21 @@ export class XBot {
   }
   async processQueue(xBotClassContext) {
     if (!xBotClassContext.isBusy) {
-      common.debugLog("xBotClassContext.isBusy->" + xBotClassContext.isBusy);
       common.debugLog(
+        process.env.DEBUG,
+        "xBotClassContext.isBusy->" + xBotClassContext.isBusy
+      );
+      common.debugLog(
+        process.env.DEBUG,
         "xBot is not busy, so processQueue will start completing pending tasks"
       );
       while (xBotClassContext.queue.length > 0) {
         const nextItem = xBotClassContext.queue.pop();
-        common.debugLog("nextItem->", JSON.stringify(nextItem));
+        common.debugLog(
+          process.env.DEBUG,
+          "nextItem->",
+          JSON.stringify(nextItem)
+        );
         await xBotClassContext.tweet(nextItem.userId, nextItem.text);
         //wait some time
       }
@@ -763,14 +844,19 @@ export class XBot {
 
       sendMessageToMainWindow("CHECK_SAVED_TWEET_EXISTS", newBookmarkTweetUrl);
 
-      common.debugLog("gonna wait for waitForNewReport()");
+      common.debugLog(process.env.DEBUG, "gonna wait for waitForNewReport()");
 
       const waitForNewReportResponse = await waitForNewReport();
 
-      common.debugLog("waitForNewReportResponse->", waitForNewReportResponse);
+      common.debugLog(
+        process.env.DEBUG,
+        "waitForNewReportResponse->",
+        waitForNewReportResponse
+      );
 
       if (waitForNewReportResponse.success) {
         common.debugLog(
+          process.env.DEBUG,
           waitForNewReportResponse.tweetUrl + " already exists, skipping!"
         );
         continue;
@@ -793,7 +879,7 @@ export class XBot {
     let scrollPosition = 0;
 
     while (this.goAheadScrape) {
-      common.debugLog("Gonna scroll...");
+      common.debugLog(process.env.DEBUG, "Gonna scroll...");
       await this.page.evaluate(() => {
         window.scrollBy(0, window.innerHeight);
       });
@@ -810,7 +896,7 @@ export class XBot {
 
       await this.storeBookmarks();
 
-      common.debugLog("bookmarks stored.");
+      common.debugLog(process.env.DEBUG, "bookmarks stored.");
 
       // Get the scroll position
       const newScrollPosition = await this.page.evaluate(() => {
@@ -818,10 +904,10 @@ export class XBot {
       });
 
       if (newScrollPosition > scrollPosition) {
-        common.debugLog("looping again.");
+        common.debugLog(process.env.DEBUG, "looping again.");
         scrollPosition = newScrollPosition;
       } else if (newScrollPosition <= scrollPosition) {
-        common.debugLog("End of page reached. Aborting.");
+        common.debugLog(process.env.DEBUG, "End of page reached. Aborting.");
         break;
       }
     }

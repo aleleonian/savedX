@@ -1,5 +1,3 @@
-import * as common from "./common";
-
 export const wait = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -23,12 +21,9 @@ export const generateHash = (data) => {
   return crypto.createHash("sha256").update(data).digest("hex");
 };
 
-export const debugLog = (...strings) => {
-  const string = strings.join(" "); // Join with space
-  if (typeof process !== "undefined" && process?.env?.DEBUG) {
-    // Check for Node.js environment and DEBUG variable
+export const debugLog = (debugValue, ...strings) => {
+  const string = strings.join(" "); // Join with space for readability
+  if (debugValue) {
     console.log(string);
-  } else {
-    console.log(string); // Default behavior if not in Node.js environment
   }
 };

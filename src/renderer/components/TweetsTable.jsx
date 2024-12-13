@@ -5,6 +5,7 @@ import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
 import { AppContext } from "../../context/AppContext";
 import { BasicSelect } from "./BasicSelect";
+import { debugLog } from "../../util/common";
 
 const TweetsTable = () => {
   const { state, updateState } = useContext(AppContext);
@@ -90,7 +91,7 @@ const TweetsTable = () => {
     setPaginationState(state);
   }
   const handleTagsUpdate = (tweetId, newTags) => {
-    console.log("Updated tags:", newTags);
+    debugLog("Updated tags:", newTags);
     window.savedXApi.updateTagsForTweet(tweetId, newTags);
     // Update the database or state with the new tags
   };

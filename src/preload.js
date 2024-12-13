@@ -1,6 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 const { ipcRenderer, contextBridge, shell } = require("electron");
+import * as common from "./util/common";
 
 let domContentLoaded = false;
 
@@ -25,13 +26,13 @@ const api = {
   getConfigData: () => ipcRenderer.send("fetch-config-data"),
   updateConfigData: (formData) =>
     ipcRenderer.send("update-config-data", formData),
-  DEBUG: process.env.DEBUG,
+  // DEBUG: Boolean(process.env.DEBUG),
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
   deleteSavedTweet: (tweetId) =>
     ipcRenderer.invoke("delete-saved-tweet", tweetId),
   deleteAllSavedTweets: () => ipcRenderer.invoke("delete-all-saved-tweets"),
   reportFoundTweet: (reportObj) => {
-    console.log("reportFoundTweet() reportObj:", reportObj);
+    common.debugLog(api.DEBUG, "reportFoundTweet() reportObj:", reportObj);
     ipcRenderer.send("report-found-tweet", reportObj);
   },
 };
@@ -48,7 +49,7 @@ ipcRenderer.on("env-debug", (event, debugValue) => {
 });
 
 ipcRenderer.on("NOTIFICATION", (event, message) => {
-  console.log("message from main:", message);
+  common.debugLog(api.DEBUG, "message from main:", message);
   if (domContentLoaded) dispatchNotification("NOTIFICATION", message);
   else {
     setTimeout(() => {
@@ -67,7 +68,7 @@ ipcRenderer.on("DISABLE_GO_FETCH_BUTTON", () => {
 });
 
 ipcRenderer.on("CONTENT", async (event, message) => {
-  console.log("CONTENT preload: ", message);
+  common.debugLog(api.DEBUG, "CONTENT at preload: ", JSON.stringify(message));
   if (domContentLoaded) dispatchNotification("CONTENT", message);
   while (!domContentLoaded) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -84,7 +85,11 @@ ipcRenderer.on("ALERT", async (event, message) => {
 });
 
 ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
-  console.log("SHOW_CONFIG_DIALOG preload configData:", configData);
+  common.debugLog(
+    api.DEBUG,
+    "SHOW_CONFIG_DIALOG preload configData:",
+    JSON.stringify(configData)
+  );
   if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
   else {
     setTimeout(() => {
@@ -93,7 +98,7 @@ ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
   }
 });
 ipcRenderer.on("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG", () => {
-  console.log("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG preload");
+  common.debugLog(api.DEBUG, "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG preload");
   dispatchNotification("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG");
 });
 

@@ -16,7 +16,7 @@ function createDatabase(filePath) {
           errorMessage: err.message,
         });
       } else {
-        common.debugLog("New database created.");
+        common.debugLog(process.env.DEBUG, "New database created.");
         resolve({
           success: true,
           db, // Return the database object for further operations
@@ -76,7 +76,10 @@ export const getAllQuery = (query, params = []) => {
 
 const createIfNotExist = async (filePath) => {
   if (!fs.existsSync(filePath)) {
-    common.debugLog("Database file not found. Creating a new one...");
+    common.debugLog(
+      process.env.DEBUG,
+      "Database file not found. Creating a new one..."
+    );
 
     try {
       const createDatabaseResult = await createDatabase(filePath);
@@ -123,7 +126,7 @@ const createIfNotExist = async (filePath) => {
       "DOWNLOAD_MEDIA"	NUMERIC NOT NULL DEFAULT 0 )
      `);
 
-      common.debugLog("Database schema initialized.");
+      common.debugLog(process.env.DEBUG, "Database schema initialized.");
 
       await dbClose();
 
@@ -131,14 +134,14 @@ const createIfNotExist = async (filePath) => {
         success: true,
       };
     } catch (error) {
-      common.debugLog("Error creating DB file! ", error);
+      common.debugLog(process.env.DEBUG, "Error creating DB file! ", error);
       return {
         success: false,
       };
     }
   }
 
-  common.debugLog("DB file exists.");
+  common.debugLog(process.env.DEBUG, "DB file exists.");
 
   return {
     success: true,
@@ -265,7 +268,10 @@ export const updateTags = async (tweetId, newTags) => {
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
           [tweetId, getQueryResponse.data.id]
         );
-        common.debugLog(`Added tag "${tag}" for tweetId: ${tweetId}`);
+        common.debugLog(
+          process.env.DEBUG,
+          `Added tag "${tag}" for tweetId: ${tweetId}`
+        );
       } else {
         // If the tag doesn't exist, insert it into the tags table
         const runQueryResponse = await runQuery(
@@ -282,7 +288,10 @@ export const updateTags = async (tweetId, newTags) => {
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
           [tweetId, newTagId]
         );
-        common.debugLog(`Added new tag "${tag}" for tweetId: ${tweetId}`);
+        common.debugLog(
+          process.env.DEBUG,
+          `Added new tag "${tag}" for tweetId: ${tweetId}`
+        );
       }
     }
     return true;
@@ -310,7 +319,7 @@ export const readAllTags = async () => {
       };
     }
   } catch (error) {
-    common.debugLog("readAllTags() error: ", error);
+    common.debugLog(process.env.DEBUG, "readAllTags() error: ", error);
     return returnError(error.errorMessage);
   }
 };
@@ -364,7 +373,10 @@ export const removeTagFromDB = async (tagName) => {
     // Now delete the tag itself from the tags table
     await runQuery(deleteTagQuery, [tagName]);
 
-    common.debugLog(`Successfully removed tag '${tagName}' from the system.`);
+    common.debugLog(
+      process.env.DEBUG,
+      `Successfully removed tag '${tagName}' from the system.`
+    );
     return returnSuccess();
   } catch (error) {
     console.error("Error removing tag from system:", error);

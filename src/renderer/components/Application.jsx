@@ -35,23 +35,16 @@ export const Application = () => {
 
   const stateRef = useRef(state);
 
-  const setTweetsData = (savedTweetsArray) => {
-    updateState("savedTweets", savedTweetsArray);
-  };
-  const setTags = (tagsArray) => {
-    updateState("tags", tagsArray);
-  };
-
-  const setIsDebug = (isDebug) => {
-    updateState("isDebug", isDebug);
-  };
-
   useEffect(() => {
     // Wait for savedXApi.DEBUG to be set
     const interval = setInterval(() => {
       if (window.savedXApi && window.savedXApi.DEBUG !== undefined) {
-        setIsDebug(Boolean(window.savedXApi.DEBUG));
-        console.log("isDebug: ", Boolean(window.savedXApi.DEBUG));
+        updateState("isDebug", window.savedXApi.DEBUG); // Update AppContext state directly
+        common.debugLog(
+          window.savedXApi.DEBUG,
+          "isDebug updated to:",
+          window.savedXApi.DEBUG
+        );
         clearInterval(interval);
       }
     }, 100); // Check every 100ms until the value is set
@@ -142,7 +135,7 @@ export const Application = () => {
         success: found ? true : false,
         tweetUrl,
       };
-      console.log("reportResponse->", reportResponse);
+      common.debugLog(state.isDebug, "reportResponse->", reportResponse);
       window.savedXApi.reportFoundTweet(reportResponse);
     };
 
@@ -159,8 +152,8 @@ export const Application = () => {
     };
 
     const contentEventListener = (event) => {
-      if (event.detail.tweets) setTweetsData(event.detail.tweets);
-      if (event.detail.tags) setTags(event.detail.tags);
+      if (event.detail.tweets) updateState("savedTweets", event.detail.tweets);
+      if (event.detail.tags) updateState("tags", event.detail.tags);
     };
 
     window.addEventListener("NOTIFICATION", notificationEventListener);

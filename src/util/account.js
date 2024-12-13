@@ -20,7 +20,11 @@ export const checkUserAndPass = () => {
           resolve(returnError("Missing config data 🙈"));
         }
       } catch (error) {
-        common.debugLog("checkUserAndPassPromise error->", error);
+        common.debugLog(
+          process.env.DEBUG,
+          "checkUserAndPassPromise error->",
+          error
+        );
         resolve(
           error.errorMessage ? error.errorMessage : JSON.stringify(error)
         );
@@ -41,7 +45,11 @@ export const getAllConfigData = () => {
         else data.DOWNLOAD_MEDIA = false;
         resolve(returnSuccess(data));
       } catch (error) {
-        common.debugLog("getAllConfigDataPromise error->", error);
+        common.debugLog(
+          process.env.DEBUG,
+          "getAllConfigDataPromise error->",
+          error
+        );
         resolve(
           error.errorMessage ? error.errorMessage : JSON.stringify(error)
         );
