@@ -868,8 +868,44 @@ export class XBot {
         (bookmark) => bookmark.indexId === newBookmark.indexId
       );
       if (!idExists) {
+        common.debugLog(process.env.DEBUG, "We do have to store this bookmark");
         this.bookmarks.push(newBookmark);
-      }
+        if (this.downloadMedia) {
+          common.debugLog(process.env.DEBUG, "We do have to download images!");
+          const videoPlayerDiv = $('div[data-testid="videoPlayer"]');
+          const imageDiv = $('div[data-testid="tweetPhoto"]');
+          // Check if it exists
+          if (videoPlayerDiv.length > 0) {
+            const videoBlobSrc = $("video source").attr("src");
+            common.debugLog(
+              process.env.DEBUG,
+              "Gotta download this video: ",
+              videoBlobSrc
+            );
+          } else if (imageDiv.length > 0) {
+            const tweetPhothUrl = $('[data-testid="tweetPhoto"] img').attr(
+              "src"
+            );
+            common.debugLog(
+              process.env.DEBUG,
+              "Gotta download this pic: ",
+              tweetPhothUrl
+            );
+          }
+          // if IS_IMAGE
+          //// fetch and save
+          // else OPEN tweetUrl, intercept video, play video, save video
+        } else
+          common.debugLog(
+            process.env.DEBUG,
+            "We do NOT have to download images!"
+          );
+      } else
+        common.debugLog(
+          process.env.DEBUG,
+          "we do not need to store bookmark with id:",
+          newBookmark.indexId
+        );
     }
     return this.bookmarks;
   };

@@ -68,6 +68,10 @@ export async function goFetchTweets(xBot, configData) {
           constants.progress.SCRAPED
         )
       );
+      // this is the moment to save those images if necessary
+      // if(configData.DOWNLOAD_MEDIA){
+      //   await dbTools.
+      // }
       await dbTools.storeTweets(bookmarks);
       await localBot.wait(3000);
       await localBot.logOut();
