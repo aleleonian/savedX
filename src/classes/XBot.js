@@ -11,6 +11,9 @@ const path = require("path");
 const crypto = require("crypto");
 const cheerio = require("cheerio");
 
+const fs = require("fs");
+const https = require("https");
+
 // const puppeteerClassic = require("puppeteer");
 // const iPhone = KnownDevices["iPhone X"];
 // const KnownDevices = puppeteerClassic.KnownDevices;
@@ -46,6 +49,41 @@ export class XBot {
     this.botEmail;
     this.downloadMedia;
   }
+
+  async fetchAndSaveImage(imageUrl, saveDir, saveFileName) {
+    try {
+      // Ensure the save directory exists
+      if (!fs.existsSync(saveDir)) {
+        fs.mkdirSync(saveDir, { recursive: true });
+      }
+
+      // Path to save the image
+      const savePath = path.join(saveDir, saveFileName);
+
+      // Download and save the image
+      const file = fs.createWriteStream(savePath);
+      https
+        .get(imageUrl, (response) => {
+          if (response.statusCode === 200) {
+            response.pipe(file);
+            file.on("finish", () => {
+              file.close();
+              console.log(`Image saved to ${savePath}`);
+            });
+          } else {
+            console.error(
+              `Failed to fetch image. Status code: ${response.statusCode}`
+            );
+          }
+        })
+        .on("error", (err) => {
+          console.error(`Error fetching the image: ${err.message}`);
+        });
+    } catch (error) {
+      console.error(`Error occurred: ${error.message}`);
+    }
+  }
+
   getId(divHtmlContent) {
     const $ = cheerio.load(divHtmlContent);
 
@@ -890,6 +928,11 @@ export class XBot {
               process.env.DEBUG,
               "Gotta download this pic: ",
               tweetPhothUrl
+            );
+            await this.fetchAndSaveImage(
+              tweetPhothUrl,
+              "media",
+              Date.now().toString()
             );
           }
           // if IS_IMAGE
