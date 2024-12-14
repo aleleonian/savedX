@@ -120,6 +120,7 @@ export function ConfigDialog({ open, onClose, configData }) {
               <Box
                 component="form"
                 onSubmit={handleSubmit}
+                id="config-form"
                 sx={{ mt: 3, width: "100%" }}
               >
                 <Typography variant="h5">Configure your account:</Typography>
@@ -164,22 +165,22 @@ export function ConfigDialog({ open, onClose, configData }) {
                   color="primary"
                   name="downloadMedia"
                 />
-                <br />
-                <Button
-                  type="Save"
-                  variant="contained"
-                  color="primary"
-                  sx={{ mt: 3 }}
-                  fullWidth
-                >
-                  Submit
-                </Button>
               </Box>
             </Box>
           </Container>
         </DialogContent>
 
         <DialogActions sx={{ display: "flex", justifyContent: "right" }}>
+          <Button
+            type="submit" // Correct type to make it submit the form
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3 }}
+            fullWidth
+            form="config-form"
+          >
+            Submit
+          </Button>
           <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Dialog>
