@@ -78,7 +78,7 @@ const createIfNotExist = async (filePath) => {
   if (!fs.existsSync(filePath)) {
     common.debugLog(
       process.env.DEBUG,
-      "Database file not found. Creating a new one..."
+      "Database file not found. Creating a new one...",
     );
 
     try {
@@ -187,11 +187,11 @@ export const storeTweets = async (tweetArray) => {
 
       if ($('[data-testid="videoPlayer"]').length > 0) {
         tweet.tweetImageOrPoster = $('[data-testid="videoPlayer"] video').attr(
-          "poster"
+          "poster",
         );
       } else {
         tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr(
-          "src"
+          "src",
         );
       }
       await db.run(
@@ -207,9 +207,9 @@ export const storeTweets = async (tweetArray) => {
           tweet.tweetText,
           tweet.tweetUrl,
           tweet.profilePicUrl,
-        ]
+        ],
       );
-    })
+    }),
   );
 };
 export const deleteAllTweets = async () => {
@@ -258,7 +258,7 @@ export const updateTags = async (tweetId, newTags) => {
       // Check if the tag exists in the tags table
       const getQueryResponse = await getQuery(
         "SELECT id FROM tags WHERE name = ?",
-        [tag]
+        [tag],
       );
 
       if (getQueryResponse.data) {
@@ -266,17 +266,17 @@ export const updateTags = async (tweetId, newTags) => {
         // TODO error check this runQuery call
         await runQuery(
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
-          [tweetId, getQueryResponse.data.id]
+          [tweetId, getQueryResponse.data.id],
         );
         common.debugLog(
           process.env.DEBUG,
-          `Added tag "${tag}" for tweetId: ${tweetId}`
+          `Added tag "${tag}" for tweetId: ${tweetId}`,
         );
       } else {
         // If the tag doesn't exist, insert it into the tags table
         const runQueryResponse = await runQuery(
           "INSERT INTO tags (name) VALUES (?)",
-          [tag]
+          [tag],
         );
 
         // Get the new tag id (from last inserted row)
@@ -286,11 +286,11 @@ export const updateTags = async (tweetId, newTags) => {
         // TODO error check this runQuery call
         await runQuery(
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
-          [tweetId, newTagId]
+          [tweetId, newTagId],
         );
         common.debugLog(
           process.env.DEBUG,
-          `Added new tag "${tag}" for tweetId: ${tweetId}`
+          `Added new tag "${tag}" for tweetId: ${tweetId}`,
         );
       }
     }
@@ -375,7 +375,7 @@ export const removeTagFromDB = async (tagName) => {
 
     common.debugLog(
       process.env.DEBUG,
-      `Successfully removed tag '${tagName}' from the system.`
+      `Successfully removed tag '${tagName}' from the system.`,
     );
     return returnSuccess();
   } catch (error) {

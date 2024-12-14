@@ -73,8 +73,8 @@ const createWindow = () => {
     mainWindow.loadFile(
       path.join(
         __dirname,
-        `../renderer/${process.env.MAIN_WINDOW_VITE_NAME}/index.html`
-      )
+        `../renderer/${process.env.MAIN_WINDOW_VITE_NAME}/index.html`,
+      ),
     );
   }
 
@@ -93,7 +93,7 @@ app.whenReady().then(async () => {
   if (!initStatus.success) {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${initStatus.errorMessage}`
+      `error--${initStatus.errorMessage}`,
     );
   }
   if (process.env.DEBUG) {
@@ -129,16 +129,25 @@ app.on("before-quit", () => {
 // code. You can also put them in separate files and import them here.
 ipcMain.on("go-fetch-tweets", async () => {
   const checkUserAndPassResponse = await checkUserAndPass();
+  const failedResponseObject = {
+    title: "Bro...",
+    message: "An unknown error occurred 😕",
+  };
+
   if (checkUserAndPassResponse.success) {
     const allConfigDataResponse = await getAllConfigData();
-    await goFetchTweets(xBot, allConfigDataResponse.data);
+    if (allConfigDataResponse.success) {
+      await goFetchTweets(xBot, allConfigDataResponse.data);
+      return;
+    } else {
+      failedResponseObject.message = `There's some error with the db 😫 : ${allConfigDataResponse.errorMessage}`;
+    }
   } else {
-    sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
-    sendMessageToMainWindow("ALERT", {
-      title: "Bro...",
-      message: `There's no user and pass 😫`,
-    });
+    failedResponseObject.message = `There's no user and pass 😫`;
   }
+  sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
+  sendMessageToMainWindow("ALERT", failedResponseObject);
+  return
 });
 
 ipcMain.on("stop-scraping", async () => {
@@ -163,13 +172,13 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
   if (!removeTagFromDBResult.success) {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${removeTagFromDBResult.errorMessage} 😫`
+      `error--${removeTagFromDBResult.errorMessage} 😫`,
     );
   }
   common.debugLog(
     process.env.DEBUG,
     "removeTagFromDBResult->",
-    removeTagFromDBResult
+    removeTagFromDBResult,
   );
 });
 
@@ -187,20 +196,20 @@ ipcMain.handle("delete-saved-tweet", async (tweetId) => {
           resolve(true);
           sendMessageToMainWindow(
             "NOTIFICATION",
-            "success--Tweet was deleted!"
+            "success--Tweet was deleted!",
           );
         } else {
           resolve(false);
           sendMessageToMainWindow(
             "NOTIFICATION",
-            "error--Tweet was not deleted"
+            "error--Tweet was not deleted",
           );
         }
       } catch (error) {
         resolve(false);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          "error--Tweet was not deleted: " + error
+          "error--Tweet was not deleted: " + error,
         );
       }
     })();
@@ -222,7 +231,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
         resolve(false);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          "error--Tweet was not deleted: " + error
+          "error--Tweet was not deleted: " + error,
         );
       }
     })();
@@ -233,7 +242,7 @@ ipcMain.on("report-found-tweet", async (event, reportObj) => {
   common.debugLog(
     process.env.DEBUG,
     "report-found-tweet reportObj->",
-    reportObj
+    reportObj,
   );
   mainEmitter.emit("report-found-tweet", reportObj);
 });
@@ -247,8 +256,8 @@ ipcMain.on("update-config-data", async (event, formData) => {
       sendMessageToMainWindow(
         "ALERT",
         `Trouble updating config data mai fren:  ${JSON.stringify(
-          updateConfigDataResponse.errorMessage
-        )}`
+          updateConfigDataResponse.errorMessage,
+        )}`,
       );
     }
   } catch (error) {
@@ -288,7 +297,7 @@ const init = async () => {
   common.debugLog(
     process.env.DEBUG,
     "process.env.NODE_ENV->",
-    process.env.NODE_ENV
+    process.env.NODE_ENV,
   );
   dbPath =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "debug"
@@ -330,7 +339,7 @@ const init = async () => {
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--There were issues opening / creating the db file 😫`
+      `error--There were issues opening / creating the db file 😫`,
     );
     sendMessageToMainWindow("DISABLE_GO_FETCH_BUTTON");
   }
