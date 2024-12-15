@@ -77,6 +77,8 @@ export function TweetDetailDialog({
 
   if (tweetData == null) return null;
 
+  debugger;
+
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
   };
@@ -232,7 +234,7 @@ export function TweetDetailDialog({
                   }}
                 >
                   <img
-                    src={tweetData.tweetImageOrPoster}
+                    src={tweetData.hasLocalMedia ? `media/${tweetData.tweetUrlHash}.jpg` : tweetData.tweetImageOrPoster}
                     className="mt-2 rounded-lg"
                     width="75%"
                     alt="tweet image"
