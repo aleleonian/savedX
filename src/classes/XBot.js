@@ -8,7 +8,6 @@ const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(pluginStealth());
 const path = require("path");
-const crypto = require("crypto");
 const cheerio = require("cheerio");
 
 const fs = require("fs");
@@ -100,13 +99,9 @@ export class XBot {
     if (match && match.length > 1) {
       translateYValue = match[1];
     }
-    return translateYValue ? translateYValue : this.createHash(divHtmlContent);
+    return translateYValue ? translateYValue : common.createHash(divHtmlContent);
   }
-  createHash(inputString) {
-    const hash = crypto.createHash("md5");
-    hash.update(inputString);
-    return hash.digest("hex");
-  }
+
   setBusy(state) {
     this.isBusy = state;
     return true;
@@ -889,7 +884,7 @@ export class XBot {
       common.debugLog(
         process.env.DEBUG,
         "waitForNewReportResponse->",
-        waitForNewReportResponse,
+        JSON.stringify(waitForNewReportResponse),
       );
 
       if (waitForNewReportResponse.success) {
@@ -907,8 +902,10 @@ export class XBot {
       );
       if (!idExists) {
         common.debugLog(process.env.DEBUG, "We do have to store this bookmark");
+        newBookmark.tweetUrlHash = common.createHash(newBookmarkTweetUrl);
         this.bookmarks.push(newBookmark);
         if (this.downloadMedia) {
+          newBookmark.hasLocalMedia = true;
           common.debugLog(process.env.DEBUG, "We do have to download images!");
           const videoPlayerDiv = $('div[data-testid="videoPlayer"]');
           const imageDiv = $('div[data-testid="tweetPhoto"]');
@@ -932,7 +929,7 @@ export class XBot {
             await this.fetchAndSaveImage(
               tweetPhothUrl,
               "media",
-              Date.now().toString(),
+              newBookmark.tweetUrlHash + ".jpg",
             );
           }
           // if IS_IMAGE

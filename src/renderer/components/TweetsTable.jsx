@@ -5,7 +5,7 @@ import { usePagination } from "@table-library/react-table-library/pagination";
 import { TweetDetailDialog } from "./TweetDetailDialog";
 import { AppContext } from "../../context/AppContext";
 import { BasicSelect } from "./BasicSelect";
-import { debugLog } from "../../util/common";
+import { debugLog } from "../util/common";
 
 const TweetsTable = () => {
   const { state, updateState } = useContext(AppContext);

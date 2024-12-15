@@ -8,7 +8,7 @@ import * as constants from "../../util/constants";
 import { Progress } from "./Progress";
 import { AppContext } from "../../context/AppContext";
 import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
-import * as common from "../../util/common";
+import * as common from "../util/common";
 
 export const Application = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
@@ -127,7 +127,6 @@ export const Application = () => {
 
     const checkSavedTweetEventListener = (event) => {
       const tweetUrl = event.detail;
-
       const found = stateRef.current.savedTweets.find(
         (savedTweet) => savedTweet.tweetUrl === tweetUrl,
       );
@@ -296,8 +295,8 @@ export const Application = () => {
 
       <div className="text-center">
         {!progressState.active &&
-        state.savedTweets &&
-        state.savedTweets.length > 0
+          state.savedTweets &&
+          state.savedTweets.length > 0
           ? displayTweetsData()
           : "There's nothing to show, bro 😣"}
         <div className="text-center my-4">

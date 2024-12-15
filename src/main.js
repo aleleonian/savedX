@@ -36,7 +36,7 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,
     },
@@ -242,7 +242,7 @@ ipcMain.on("report-found-tweet", async (event, reportObj) => {
   common.debugLog(
     process.env.DEBUG,
     "report-found-tweet reportObj->",
-    reportObj,
+    JSON.stringify(reportObj),
   );
   mainEmitter.emit("report-found-tweet", reportObj);
 });
@@ -310,6 +310,7 @@ const init = async () => {
 
   if (openDbResult) {
     const tweets = await dbTools.readAllTweets();
+    common.debugLog(process.env.DEBUG, "tweets->" + JSON.stringify(tweets));
     const readAllTagsResult = await dbTools.readAllTags();
 
     let resultOBj = {};

@@ -150,7 +150,7 @@ export async function goFetchTweetsFake() {
   hideProgress();
 }
 export function stopScraping() {
-  debugLog("localBot.goAheadScrape = false.");
+  common.debugLog("localBot.goAheadScrape = false.");
   localBot.goAheadScrape = false;
 }
 

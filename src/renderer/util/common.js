@@ -1,4 +1,3 @@
-import * as crypto from 'crypto';
 
 export const wait = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -24,9 +23,3 @@ export const debugLog = (debugValue, ...strings) => {
     console.log(string);
   }
 };
-
-export function createHash(inputString) {
-  const hash = crypto.createHash("md5");
-  hash.update(inputString);
-  return hash.digest("hex");
-}

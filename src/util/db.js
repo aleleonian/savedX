@@ -94,19 +94,21 @@ const createIfNotExist = async (filePath) => {
           "indexId" TEXT NOT NULL,
           "htmlContent" TEXT NOT NULL,
           "userName" TEXT,
-          "twitterHandle" INTEGER,
+          "twitterHandle" TEXT,
           "tweetText" TEXT,
           "tweetUrl" TEXT UNIQUE,
+          "tweetUrlHash" TEXT NOT NULL,
           "tweetImageOrPoster" TEXT,
           "tweetDate" TEXT,
-          "profilePicUrl" TEXT NOT NULL
+          "profilePicUrl" TEXT NOT NULL,
+          "hasLocalMedia" INTEGER NOT NULL
         )
       `);
 
       await runQuery(`
       CREATE TABLE "tags" (
         "id"	INTEGER NOT NULL,
-        "name"	INTEGER NOT NULL UNIQUE,
+        "name"	TEXT NOT NULL UNIQUE,
         PRIMARY KEY("id" AUTOINCREMENT)
       )
       `);
@@ -163,6 +165,7 @@ export const openDb = (filePath) => {
           resolve(false);
           return;
         } else {
+          // db.on("trace", (sql) => console.log("Executing SQL:", sql));
           resolve(true);
         }
       });
@@ -194,26 +197,40 @@ export const storeTweets = async (tweetArray) => {
           "src",
         );
       }
-      await db.run(
-        `INSERT OR IGNORE INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, profilePicUrl) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          tweet.indexId,
-          tweet.htmlContent,
-          tweet.userName,
-          tweet.twitterHandle,
-          tweet.tweetDate,
-          tweet.tweetImageOrPoster,
-          tweet.tweetText,
-          tweet.tweetUrl,
-          tweet.profilePicUrl,
-        ],
-      );
+      //TODO voy por aquí
+      // tengo que generar un hash para el tweet en base a su url y guardarlo
+      // also si en la configureta hay que guardar media, tengo que setear esa
+      // columna con true
+      try {
+
+        const result = await db.run(
+          `INSERT OR IGNORE INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, tweetUrlHash, profilePicUrl, hasLocalMedia) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            tweet.indexId,
+            tweet.htmlContent,
+            tweet.userName,
+            tweet.twitterHandle,
+            tweet.tweetDate,
+            tweet.tweetImageOrPoster,
+            tweet.tweetText,
+            tweet.tweetUrl,
+            tweet.tweetUrlHash,
+            tweet.profilePicUrl,
+            tweet.hasLocalMedia ? 1 : 0
+          ],
+        );
+        console.log("Insertion result:", result);
+      }
+      catch (error) {
+        common.debugLog('storeTweets error: ', error);
+      }
     }),
   );
 };
 export const deleteAllTweets = async () => {
   try {
+    //TODO: has to delete all media from media/
     await runQuery("DELETE FROM tweets_tags");
     await runQuery("DELETE FROM tweets");
     return {
@@ -345,6 +362,11 @@ export const readAllTweets = async () => {
     const getQueryResponse = await getAllQuery(query);
 
     if (getQueryResponse.data) {
+      getQueryResponse.data = getQueryResponse.data.map(row => {
+        if (row.hasLocalMedia == 1) row.hasLocalMedia = true;
+        else if (row.hasLocalMedia == 0) row.hasLocalMedia = false;
+        return row;
+      })
       return {
         success: true,
         rows: getQueryResponse.data,
