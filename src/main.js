@@ -188,7 +188,6 @@ ipcMain.on("fetch-config-data", async () => {
 });
 
 ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
-  console.log("tweetData->", tweetData);
   return new Promise((resolve) => {
     (async () => {
       try {
