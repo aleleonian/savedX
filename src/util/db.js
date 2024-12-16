@@ -1,5 +1,5 @@
 const sqlite3 = require("sqlite3").verbose();
-import { returnError, returnSuccess } from "./common";
+import { createErrorResponse, createSuccessResponse } from "./common";
 import * as common from "./common";
 import cheerio from "cheerio";
 const fs = require("fs");
@@ -30,9 +30,10 @@ export const runQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(query, params, function (err) {
       if (err) {
-        reject(returnError(err));
+        common.debugLog("runQuery error: ", err);
+        reject(createErrorResponse(err));
       } else {
-        resolve(returnSuccess(this));
+        resolve(createSuccessResponse(this));
       }
     });
   });
@@ -54,9 +55,9 @@ export const getQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.get(query, params, (err, row) => {
       if (err) {
-        reject(returnError(err));
+        reject(createErrorResponse(err));
       } else {
-        resolve(returnSuccess(row));
+        resolve(createSuccessResponse(row));
       }
     });
   });
@@ -66,9 +67,9 @@ export const getAllQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.all(query, params, (err, rows) => {
       if (err) {
-        reject(returnError(err));
+        reject(createErrorResponse(err));
       } else {
-        resolve(returnSuccess(rows)); // rows is an array of all matched rows
+        resolve(createSuccessResponse(rows)); // rows is an array of all matched rows
       }
     });
   });
@@ -78,7 +79,7 @@ const createIfNotExist = async (filePath) => {
   if (!fs.existsSync(filePath)) {
     common.debugLog(
       process.env.DEBUG,
-      "Database file not found. Creating a new one...",
+      "Database file not found. Creating a new one..."
     );
 
     try {
@@ -101,7 +102,7 @@ const createIfNotExist = async (filePath) => {
           "tweetImageOrPoster" TEXT,
           "tweetDate" TEXT,
           "profilePicUrl" TEXT NOT NULL,
-          "hasLocalMedia" INTEGER NOT NULL
+          "hasLocalMedia" TEXT NOT NULL DEFAULT "no"
         )
       `);
 
@@ -165,7 +166,10 @@ export const openDb = (filePath) => {
           resolve(false);
           return;
         } else {
-          // db.on("trace", (sql) => console.log("Executing SQL:", sql));
+          if (process.env.DEBUG)
+            db.on("trace", (sql) => console.log("Executing SQL:", sql));
+          db.run("PRAGMA foreign_keys = ON;");
+          db.run("PRAGMA strict = ON;");
           resolve(true);
         }
       });
@@ -177,57 +181,77 @@ export const openDb = (filePath) => {
 };
 
 export const storeTweets = async (tweetArray) => {
-  await Promise.all(
-    tweetArray.map(async (tweet) => {
-      const $ = cheerio.load(tweet.htmlContent);
-      const userNameData = $('[data-testid="User-Name"]').text().split("@");
-      tweet.userName = userNameData[0];
-      tweet.twitterHandle = "@" + userNameData[1].split("·")[0];
-      tweet.tweetDate = userNameData[1].split("·")[1];
-      tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
-      tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr("href");
-      tweet.profilePicUrl = $("img").first().attr("src");
+  let errorMessage = "";
+  let allSuccessful = true;
+  try {
+    await Promise.all(
+      tweetArray.map(async (tweet) => {
+        const $ = cheerio.load(tweet.htmlContent);
+        const userNameData = $('[data-testid="User-Name"]').text().split("@");
+        tweet.userName = userNameData[0];
+        tweet.twitterHandle = "@" + userNameData[1].split("·")[0];
+        tweet.tweetDate = userNameData[1].split("·")[1];
+        tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
+        tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr("href");
+        tweet.profilePicUrl = $("img").first().attr("src");
 
-      if ($('[data-testid="videoPlayer"]').length > 0) {
-        tweet.tweetImageOrPoster = $('[data-testid="videoPlayer"] video').attr(
-          "poster",
-        );
-      } else {
-        tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr(
-          "src",
-        );
-      }
-      //TODO voy por aquí
-      // tengo que generar un hash para el tweet en base a su url y guardarlo
-      // also si en la configureta hay que guardar media, tengo que setear esa
-      // columna con true
-      try {
-
-        const result = await db.run(
-          `INSERT OR IGNORE INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, tweetUrlHash, profilePicUrl, hasLocalMedia) 
+        if ($('[data-testid="videoPlayer"]').length > 0) {
+          tweet.tweetImageOrPoster = $(
+            '[data-testid="videoPlayer"] video'
+          ).attr("poster");
+        } else {
+          tweet.tweetImageOrPoster = $('[data-testid="tweetPhoto"] img').attr(
+            "src"
+          );
+        }
+        //TODO voy por aquí
+        // tengo que generar un hash para el tweet en base a su url y guardarlo
+        // also si en la configureta hay que guardar media, tengo que setear esa
+        // columna con true
+        try {
+          const result = await runQuery(
+            `INSERT OR IGNORE INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, tweetUrlHash, profilePicUrl, hasLocalMedia) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            tweet.indexId,
-            tweet.htmlContent,
-            tweet.userName,
-            tweet.twitterHandle,
-            tweet.tweetDate,
-            tweet.tweetImageOrPoster,
-            tweet.tweetText,
-            tweet.tweetUrl,
-            tweet.tweetUrlHash,
-            tweet.profilePicUrl,
-            tweet.hasLocalMedia ? 1 : 0
-          ],
-        );
-        console.log("Insertion result:", result);
-      }
-      catch (error) {
-        common.debugLog('storeTweets error: ', error);
-      }
-    }),
-  );
+            [
+              tweet.indexId,
+              tweet.htmlContent,
+              tweet.userName,
+              tweet.twitterHandle,
+              tweet.tweetDate,
+              tweet.tweetImageOrPoster,
+              tweet.tweetText,
+              tweet.tweetUrl,
+              tweet.tweetUrlHash,
+              tweet.profilePicUrl,
+              tweet.hasLocalMedia ? tweet.hasLocalMedia : "no",
+            ]
+          );
+          common.debugLog(process.env.DEBUG, "Insertion result:", result);
+        } catch (error) {
+          allSuccessful = false;
+          common.debugLog(
+            process.env.DEBUG,
+            "storeTweets error during insertion: " + error.errorMessage
+          );
+          errorMessage =
+            "storeTweets error during insertion: " + error.errorMessage;
+        }
+      })
+    );
+  } catch (error) {
+    allSuccessful = false;
+    common.debugLog(
+      process.env.DEBUG,
+      "storeTweets error during processing: ",
+      error.errorMessage
+    );
+    errorMessage = "storeTweets error during processing: " + error.errorMessage;
+  }
+
+  if (allSuccessful) return createSuccessResponse();
+  else return createErrorResponse(errorMessage);
 };
+
 export const deleteAllTweets = async () => {
   try {
     //TODO: has to delete all media from media/
@@ -275,7 +299,7 @@ export const updateTags = async (tweetId, newTags) => {
       // Check if the tag exists in the tags table
       const getQueryResponse = await getQuery(
         "SELECT id FROM tags WHERE name = ?",
-        [tag],
+        [tag]
       );
 
       if (getQueryResponse.data) {
@@ -283,17 +307,17 @@ export const updateTags = async (tweetId, newTags) => {
         // TODO error check this runQuery call
         await runQuery(
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
-          [tweetId, getQueryResponse.data.id],
+          [tweetId, getQueryResponse.data.id]
         );
         common.debugLog(
           process.env.DEBUG,
-          `Added tag "${tag}" for tweetId: ${tweetId}`,
+          `Added tag "${tag}" for tweetId: ${tweetId}`
         );
       } else {
         // If the tag doesn't exist, insert it into the tags table
         const runQueryResponse = await runQuery(
           "INSERT INTO tags (name) VALUES (?)",
-          [tag],
+          [tag]
         );
 
         // Get the new tag id (from last inserted row)
@@ -303,11 +327,11 @@ export const updateTags = async (tweetId, newTags) => {
         // TODO error check this runQuery call
         await runQuery(
           "INSERT INTO tweets_tags (tweetId, tagId) VALUES (?, ?)",
-          [tweetId, newTagId],
+          [tweetId, newTagId]
         );
         common.debugLog(
           process.env.DEBUG,
-          `Added new tag "${tag}" for tweetId: ${tweetId}`,
+          `Added new tag "${tag}" for tweetId: ${tweetId}`
         );
       }
     }
@@ -337,7 +361,7 @@ export const readAllTags = async () => {
     }
   } catch (error) {
     common.debugLog(process.env.DEBUG, "readAllTags() error: ", error);
-    return returnError(error.errorMessage);
+    return createErrorResponse(error.errorMessage);
   }
 };
 
@@ -362,11 +386,6 @@ export const readAllTweets = async () => {
     const getQueryResponse = await getAllQuery(query);
 
     if (getQueryResponse.data) {
-      getQueryResponse.data = getQueryResponse.data.map(row => {
-        if (row.hasLocalMedia == 1) row.hasLocalMedia = true;
-        else if (row.hasLocalMedia == 0) row.hasLocalMedia = false;
-        return row;
-      })
       return {
         success: true,
         rows: getQueryResponse.data,
@@ -379,7 +398,7 @@ export const readAllTweets = async () => {
     }
   } catch (error) {
     console.error("Error executing query:", error);
-    return returnError(error.errorMessage);
+    return createErrorResponse(error.errorMessage);
   }
 };
 
@@ -397,11 +416,11 @@ export const removeTagFromDB = async (tagName) => {
 
     common.debugLog(
       process.env.DEBUG,
-      `Successfully removed tag '${tagName}' from the system.`,
+      `Successfully removed tag '${tagName}' from the system.`
     );
-    return returnSuccess();
+    return createSuccessResponse();
   } catch (error) {
     console.error("Error removing tag from system:", error);
-    return returnError(error.errorMessage);
+    return createErrorResponse(error.errorMessage);
   }
 };

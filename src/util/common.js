@@ -1,17 +1,17 @@
-import * as crypto from 'crypto';
+import * as crypto from "crypto";
 
 export const wait = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export const returnError = (errorMessage) => {
+export const createErrorResponse = (errorMessage) => {
   let responseObj = {};
   responseObj.success = false;
   responseObj.errorMessage = errorMessage;
   return responseObj;
 };
 
-export const returnSuccess = (data) => {
+export const createSuccessResponse = (data) => {
   let responseObj = {};
   responseObj.success = true;
   if (data) responseObj.data = data;

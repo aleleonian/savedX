@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-
+import { StrictMode } from "react";
 import "./index.css";
 import { Application } from "./components/Application";
 import { AppProvider } from "../context/AppContext";
@@ -33,6 +33,8 @@ document.addEventListener("keydown", (event) => {
 
 root.render(
   <AppProvider>
-    <Application />
-  </AppProvider>,
+    <StrictMode>
+      <Application />
+    </StrictMode>
+  </AppProvider>
 );

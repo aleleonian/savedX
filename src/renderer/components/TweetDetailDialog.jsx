@@ -11,7 +11,7 @@ import { AppContext } from "../../context/AppContext";
 import { Cancel } from "@mui/icons-material";
 import { IconButton, TextField, Autocomplete, Chip } from "@mui/material";
 import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
-
+import { VideoPlayer } from "./VideoPlayer";
 import { AlertDialog } from "./AlertDialog";
 
 function PaperComponent(props) {
@@ -77,8 +77,6 @@ export function TweetDetailDialog({
 
   if (tweetData == null) return null;
 
-  debugger;
-
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
   };
@@ -95,7 +93,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g",
+      "g"
     );
     return originalString.replace(regex, "").trim();
   }
@@ -155,14 +153,14 @@ export function TweetDetailDialog({
     // Add your confirmation logic here (e.g., delete item)
     setConfirmationDialogOpen(false);
     const tweetDeleteResult = await window.savedXApi.deleteSavedTweet(
-      tweetData.id,
+      tweetData.id
     );
     // Gotta update the array of tweets and re-render
     if (tweetDeleteResult) {
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
       );
       setNotificationMessage(null);
       onClose();
@@ -224,33 +222,44 @@ export function TweetDetailDialog({
               {/* Tweet text */}
               <p className="mt-2">{tweetData.tweetText}</p>
 
-              {/* Conditional tweet image display */}
-              {tweetData.tweetImageOrPoster ? (
-                <a
-                  href={tweetData.tweetUrl}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleClick(tweetData.tweetUrl);
-                  }}
-                >
-                  <img
-                    src={tweetData.hasLocalMedia ? `media/${tweetData.tweetUrlHash}.jpg` : tweetData.tweetImageOrPoster}
-                    className="mt-2 rounded-lg"
-                    width="75%"
-                    alt="tweet image"
-                  />
-                </a>
+              {/* Conditional tweet image /video display */}
+              {tweetData.hasLocalMedia == "no" ? (
+                tweetData.tweetImageOrPoster ? (
+                  <a
+                    href={tweetData.tweetUrl}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleClick(tweetData.tweetUrl);
+                    }}
+                  >
+                    <img
+                      src={tweetData.tweetImageOrPoster}
+                      className="mt-2 rounded-lg"
+                      width="75%"
+                      alt="tweet image"
+                    />
+                  </a>
+                ) : (
+                  <a
+                    href={tweetData.tweetUrl}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleClick(tweetData.tweetUrl);
+                    }}
+                    className="text-blue-500"
+                  >
+                    Tweet Url
+                  </a>
+                )
+              ) : tweetData.hasLocalMedia == "image" ? (
+                <img
+                  src={`media/${tweetData.tweetUrlHash}.jpg`}
+                  className="mt-2 rounded-lg"
+                  width="75%"
+                  alt="tweet image"
+                />
               ) : (
-                <a
-                  href={tweetData.tweetUrl}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleClick(tweetData.tweetUrl);
-                  }}
-                  className="text-blue-500"
-                >
-                  Tweet Url
-                </a>
+                <VideoPlayer videoSrc={`media/${tweetData.tweetUrlHash}.mp4`} />
               )}
             </div>
           </div>

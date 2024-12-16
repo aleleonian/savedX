@@ -32,7 +32,11 @@ const api = {
     ipcRenderer.invoke("delete-saved-tweet", tweetId),
   deleteAllSavedTweets: () => ipcRenderer.invoke("delete-all-saved-tweets"),
   reportFoundTweet: (reportObj) => {
-    common.debugLog(api.DEBUG, "reportFoundTweet() reportObj:", reportObj);
+    common.debugLog(
+      api.DEBUG,
+      "reportFoundTweet() reportObj:",
+      JSON.stringify(reportObj)
+    );
     ipcRenderer.send("report-found-tweet", reportObj);
   },
 };
@@ -88,7 +92,7 @@ ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
   common.debugLog(
     api.DEBUG,
     "SHOW_CONFIG_DIALOG preload configData:",
-    JSON.stringify(configData),
+    JSON.stringify(configData)
   );
   if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
   else {
