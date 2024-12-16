@@ -1023,8 +1023,9 @@ export class XBot {
         break;
       }
     }
-
-    return this.bookmarks;
+    const bookmarksCopy = [...this.bookmarks];
+    this.bookmarks = [];
+    return bookmarksCopy;
   };
 
   isScrolledToBottom = async () => {

@@ -1,4 +1,6 @@
 import * as crypto from "crypto";
+const path = require("node:path");
+const fs = require("fs");
 
 export const wait = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,3 +32,42 @@ export function createHash(inputString) {
   hash.update(inputString);
   return hash.digest("hex");
 }
+
+export const deleteFile = async (filePath) => {
+  try {
+    const absolutePath = path.resolve(filePath); // Ensures the path is absolute
+    await fs.promises.unlink(absolutePath); // Deletes the file
+    debugLog(process.env.DEBUG, `File deleted: ${absolutePath}`);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting file: ${error.message}`);
+    return false;
+  }
+};
+
+export const deleteAllFilesInDirectory = async (dirPath) => {
+  try {
+    const absoluteDirPath = path.resolve(dirPath); // Ensures the path is absolute
+    const files = await fs.promises.readdir(absoluteDirPath); // Reads the directory contents
+
+    // Loop through each file and delete it
+    await Promise.all(
+      files.map(async (file) => {
+        const filePath = path.join(absoluteDirPath, file);
+        const stats = await fs.promises.stat(filePath);
+        if (stats.isFile()) {
+          await fs.promises.unlink(filePath); // Deletes the file
+          console.log(`Deleted file: ${filePath}`);
+        }
+      })
+    );
+
+    console.log(
+      `All files in directory "${absoluteDirPath}" have been deleted.`
+    );
+    return true;
+  } catch (error) {
+    console.error(`Error deleting files in directory: ${error.message}`);
+    return false;
+  }
+};

@@ -280,9 +280,23 @@ export const closeDb = () => {
 
 export async function deleteTweetById(tweetId) {
   try {
-    await runQuery("DELETE FROM tweets_tags WHERE tweetId = ?", [tweetId]);
-    await runQuery("DELETE FROM tweets WHERE id = ?", [tweetId]);
-    return true;
+    const runQueryResult1 = await runQuery(
+      "DELETE FROM tweets_tags WHERE tweetId = ?",
+      [tweetId]
+    );
+    if (runQueryResult1.success) {
+      const runQueryResult2 = await runQuery(
+        "DELETE FROM tweets WHERE id = ?",
+        [tweetId]
+      );
+      if (runQueryResult2.success) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   } catch (error) {
     console.error("Error deleting tweet:", error);
     return false;

@@ -152,9 +152,8 @@ export function TweetDetailDialog({
   const handleConfirmAction = async () => {
     // Add your confirmation logic here (e.g., delete item)
     setConfirmationDialogOpen(false);
-    const tweetDeleteResult = await window.savedXApi.deleteSavedTweet(
-      tweetData.id
-    );
+    const tweetDeleteResult =
+      await window.savedXApi.deleteSavedTweet(tweetData);
     // Gotta update the array of tweets and re-render
     if (tweetDeleteResult) {
       const newSavedTweets = [...state.savedTweets];

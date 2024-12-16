@@ -28,8 +28,9 @@ const api = {
     ipcRenderer.send("update-config-data", formData),
   // DEBUG: Boolean(process.env.DEBUG),
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
-  deleteSavedTweet: (tweetId) =>
-    ipcRenderer.invoke("delete-saved-tweet", tweetId),
+  deleteSavedTweet: (tweetData) => {
+    return ipcRenderer.invoke("delete-saved-tweet", tweetData);
+  },
   deleteAllSavedTweets: () => ipcRenderer.invoke("delete-all-saved-tweets"),
   reportFoundTweet: (reportObj) => {
     common.debugLog(

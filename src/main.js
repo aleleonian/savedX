@@ -187,17 +187,36 @@ ipcMain.on("fetch-config-data", async () => {
   sendMessageToMainWindow("CONFIG_DATA", getAllConfigDataResponse);
 });
 
-ipcMain.handle("delete-saved-tweet", async (tweetId) => {
+ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
+  console.log("tweetData->", tweetData);
   return new Promise((resolve) => {
     (async () => {
       try {
-        const deleteTweetResult = await dbTools.deleteTweetById(tweetId);
+        const deleteTweetResult = await dbTools.deleteTweetById(tweetData.id);
         if (deleteTweetResult) {
-          resolve(true);
-          sendMessageToMainWindow(
-            "NOTIFICATION",
-            "success--Tweet was deleted!"
-          );
+          // delete media if necessary
+          if (tweetData.hasLocalMedia !== "no") {
+            let filePath = "media/" + tweetData.tweetUrlHash;
+            if (tweetData.hasLocalMedia === "image") {
+              filePath += ".jpg";
+            } else if (tweetData.hasLocalMedia === "video") {
+              filePath += ".mp4";
+            }
+            const fileDeletionResult = await common.deleteFile(filePath);
+            if (fileDeletionResult) {
+              resolve(true);
+              sendMessageToMainWindow(
+                "NOTIFICATION",
+                "success--Tweet was deleted!"
+              );
+            } else {
+              resolve(false);
+              sendMessageToMainWindow(
+                "NOTIFICATION",
+                "error--Tweet was deleted from db but not the media file!"
+              );
+            }
+          }
         } else {
           resolve(false);
           sendMessageToMainWindow(
@@ -221,7 +240,15 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
       try {
         const deleteAllTweestResult = await dbTools.deleteAllTweets();
         if (deleteAllTweestResult) {
-          resolve(true);
+          if (common.deleteAllFilesInDirectory("./media")) {
+            resolve(true);
+          } else {
+            sendMessageToMainWindow(
+              "NOTIFICATION",
+              "error--Tweets were deleted but not all files in the media folder"
+            );
+            resolve(false);
+          }
           // sendMessageToMainWindow("NOTIFICATION", "success--Tweets were deleted!");
         } else {
           resolve(false);
