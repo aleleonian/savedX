@@ -53,12 +53,11 @@ const theme = useTheme([colorTheme, stripedTheme, marginTheme]);
 export const DataTable = ({ dataForTable, clickHandler, pagination }) => {
   const beginning = pagination.page * pagination.size;
   const end = beginning + pagination.size;
+  const dataCopy = { ...dataForTable };
+  dataCopy.nodes = dataCopy.nodes.slice(beginning, end);
 
-  dataForTable.nodes = dataForTable.nodes.slice(beginning, end);
-
-  const data = dataForTable;
   return (
-    <Table data={data} theme={theme}>
+    <Table data={dataCopy} theme={theme}>
       {(tableList) => (
         <>
           <Header>
