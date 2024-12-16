@@ -211,9 +211,6 @@ export const Application = () => {
     const tweetsDeleteResult = await window.savedXApi.deleteAllSavedTweets();
     handleCloseConfirmDeleteSavedTweetsDialog();
     if (tweetsDeleteResult) {
-      //TODO: something's wrong probably here.
-      debugger;
-      // after deleting all tweets, if i fetch tweets, the media files don't get downloaded
       updateState("savedTweets", []);
       setAlertTitle("All good!");
       setAlertMessage("All saved tweets deleted!");
