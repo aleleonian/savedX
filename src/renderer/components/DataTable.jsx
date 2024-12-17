@@ -55,7 +55,6 @@ export const DataTable = ({ dataForTable, clickHandler, pagination }) => {
   const end = beginning + pagination.size;
   const dataCopy = { ...dataForTable };
   dataCopy.nodes = dataCopy.nodes.slice(beginning, end);
-
   return (
     <Table data={dataCopy} theme={theme}>
       {(tableList) => (

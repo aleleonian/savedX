@@ -1,16 +1,13 @@
++ Fix search text and category filtering
+
 + dar la opción de guardar una copia del multimedia de los tweets
     + maybe also guardar un snapshot del tweet. 
-    + agregar el setting al config dialog
-    + make it so the app not only retrieves user and pass but all the config info.
 
-+ add a layer of if (process.ENV.DEBUG) para debugear.
 + que se baje la configuración de los selectors desde latigo.com.ar/savedX
 
 + que haya un dialog para managear los tags
 + handle the captcha case in a more tidy way, letting the user do the captcha and then we resume doing our thing
     + as opposed to setting a timer and letting the user do their thing before it ends
 
-
-\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ done //////////////////////////////////
-
-+ capacity to delete saved tweets <-- done
++ que se puedan borrar los bookmarks pero de la cuenta de twitter.
+    + o que al menos puedas visitar ese bookmark guardado.
