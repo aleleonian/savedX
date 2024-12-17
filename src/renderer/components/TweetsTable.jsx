@@ -29,7 +29,10 @@ const TweetsTable = () => {
 
       if (tagFilter != "") {
         includeThisItem = item.tags.split(",").includes(tagFilter);
+        // if a tag is set and we don't pass the tag filter, let's not include this item
+        if (!includeThisItem) return false;
       }
+
       if (searchString != "") {
         includeThisItem = item.tweetText
           .toLowerCase()
