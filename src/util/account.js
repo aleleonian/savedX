@@ -105,7 +105,7 @@ export function changeDownloadMediaConfig() {
         common.debugLog(
           process.env.DEBUG,
           "getQueryResponse->",
-          json.stringify(getQueryResponse)
+          JSON.stringify(getQueryResponse)
         );
         if (getQueryResponse.success) {
           resolve(common.createSuccessResponse());

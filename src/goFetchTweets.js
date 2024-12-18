@@ -1,6 +1,7 @@
 import * as constants from "./util/constants";
 import * as dbTools from "./util/db";
 import * as common from "./util/common";
+import { changeDownloadMediaConfig } from "./util/account";
 import { sendMessageToMainWindow, encode } from "./util/messaging";
 
 let localBot;

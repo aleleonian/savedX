@@ -1,13 +1,11 @@
 import * as crypto from "crypto";
-import { errorMonitor } from "events";
-import { comma } from "postcss/lib/list";
 const path = require("node:path");
 const fs = require("fs");
 const { exec } = require("child_process");
 
 // Function to check if a command exists
 const checkCommandExists = (command) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     exec(`${command}`, (error) => {
       if (error) {
         resolve(false); // Command not found

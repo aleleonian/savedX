@@ -8,7 +8,6 @@ import {
   checkUserAndPass,
   updateConfigData,
   getAllConfigData,
-  changeDownloadMediaConfig,
 } from "./util/account";
 import { menuTemplate } from "./data/menu-template";
 import { XBot } from "./classes/XBot";
