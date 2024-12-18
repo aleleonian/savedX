@@ -51,37 +51,44 @@ export class XBot {
   }
 
   async fetchAndSaveImage(imageUrl, saveDir, saveFileName) {
-    try {
-      // Ensure the save directory exists
-      if (!fs.existsSync(saveDir)) {
-        fs.mkdirSync(saveDir, { recursive: true });
+    return new Promise((resolve) => {
+      try {
+        // Ensure the save directory exists
+        if (!fs.existsSync(saveDir)) {
+          fs.mkdirSync(saveDir, { recursive: true });
+        }
+
+        // Path to save the image
+        const savePath = path.join(saveDir, saveFileName);
+
+        // Download and save the image
+        const file = fs.createWriteStream(savePath);
+        https
+          .get(imageUrl, (response) => {
+            if (response.statusCode === 200) {
+              response.pipe(file);
+              file.on("finish", () => {
+                file.close();
+                console.log(`Image saved to ${savePath}`);
+                resolve(common.createSuccessResponse());
+              });
+            } else {
+              const errorMessage = `Failed to fetch image. Status code: ${response.statusCode}`;
+              console.error(errorMessage);
+              resolve(common.createErrorResponse(errorMessage));
+            }
+          })
+          .on("error", (err) => {
+            const errorMessage = `Error fetching the image: ${err.message}`;
+            console.error(errorMessage);
+            resolve(common.createErrorResponse(errorMessage));
+          });
+      } catch (error) {
+        const errorMessage = `Error fetching the image: ${error.message}`;
+        console.error(errorMessage);
+        resolve(common.createErrorResponse(errorMessage));
       }
-
-      // Path to save the image
-      const savePath = path.join(saveDir, saveFileName);
-
-      // Download and save the image
-      const file = fs.createWriteStream(savePath);
-      https
-        .get(imageUrl, (response) => {
-          if (response.statusCode === 200) {
-            response.pipe(file);
-            file.on("finish", () => {
-              file.close();
-              console.log(`Image saved to ${savePath}`);
-            });
-          } else {
-            console.error(
-              `Failed to fetch image. Status code: ${response.statusCode}`
-            );
-          }
-        })
-        .on("error", (err) => {
-          console.error(`Error fetching the image: ${err.message}`);
-        });
-    } catch (error) {
-      console.error(`Error occurred: ${error.message}`);
-    }
+    });
   }
 
   async fetchAndSaveVideo(videoPageurl, saveDir, saveFileName) {
@@ -98,6 +105,7 @@ export class XBot {
           if (error) {
             console.error(`Error executing yt-dlp: ${error.message}`);
             resolve(common.createErrorResponse(error.message));
+            return;
           }
           if (stderr) {
             console.error(`stderr: ${stderr}`);
@@ -109,6 +117,7 @@ export class XBot {
         });
       } catch (error) {
         console.error(`fetchAndSaveVideo: Error occurred: ${error.message}`);
+        resolve(common.createErrorResponse(error.message));
       }
     });
   }
@@ -950,11 +959,15 @@ export class XBot {
               "Gotta download the video at: ",
               videoPageUrl
             );
-            await this.fetchAndSaveVideo(
+            const fetchVideoResult = await this.fetchAndSaveVideo(
               videoPageUrl,
               "media",
               newBookmark.tweetUrlHash + ".mp4"
             );
+
+            if (!fetchVideoResult.success) {
+              newBookmark.hasLocalMedia = "no";
+            }
           } else if (imageDiv.length > 0) {
             newBookmark.hasLocalMedia = "image";
             const tweetPhothUrl = $('[data-testid="tweetPhoto"] img').attr(
@@ -965,11 +978,14 @@ export class XBot {
               "Gotta download this pic: ",
               tweetPhothUrl
             );
-            await this.fetchAndSaveImage(
+            const fecthImageResult = await this.fetchAndSaveImage(
               tweetPhothUrl,
               "media",
               newBookmark.tweetUrlHash + ".jpg"
             );
+            if (!fecthImageResult.success) {
+              newBookmark.hasLocalMedia = "no";
+            }
           }
         } else
           common.debugLog(

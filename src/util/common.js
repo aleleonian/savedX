@@ -1,6 +1,22 @@
 import * as crypto from "crypto";
+import { errorMonitor } from "events";
+import { comma } from "postcss/lib/list";
 const path = require("node:path");
 const fs = require("fs");
+const { exec } = require("child_process");
+
+// Function to check if a command exists
+const checkCommandExists = (command) => {
+  return new Promise((resolve, reject) => {
+    exec(`${command}`, (error) => {
+      if (error) {
+        resolve(false); // Command not found
+      } else {
+        resolve(true); // Command found
+      }
+    });
+  });
+};
 
 export const wait = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -31,6 +47,33 @@ export function createHash(inputString) {
   const hash = crypto.createHash("md5");
   hash.update(inputString);
   return hash.digest("hex");
+}
+
+export async function checkDependencies() {
+  const ytdlpInstalled = await checkCommandExists("yt-dlp --version");
+  const ffmpegInstalled = await checkCommandExists("ffmpeg -version");
+  let errorMessage = "";
+
+  debugLog(process.env.DEBUG, "ytdlpInstalled->", ytdlpInstalled);
+
+  debugLog(process.env.DEBUG, "ffmpegInstalled->", ffmpegInstalled);
+
+  if (!ytdlpInstalled) {
+    errorMessage += "yt-dlp is not installed!";
+  }
+
+  if (!ffmpegInstalled) {
+    errorMessage +=
+      errorMessage == ""
+        ? "ffmpeg is not installed!"
+        : "Also you need to install ffmpeg.";
+  }
+
+  if (errorMessage != "") {
+    return createErrorResponse(errorMessage);
+  } else {
+    return createSuccessResponse();
+  }
 }
 
 export const deleteFile = async (filePath) => {
@@ -68,6 +111,6 @@ export const deleteAllFilesInDirectory = async (dirPath) => {
     return true;
   } catch (error) {
     console.error(`Error deleting files in directory: ${error.message}`);
-    return false;
   }
+  return false;
 };

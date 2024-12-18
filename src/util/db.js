@@ -30,8 +30,8 @@ export const runQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(query, params, function (err) {
       if (err) {
-        common.debugLog("runQuery error: ", err);
-        reject(createErrorResponse(err));
+        common.debugLog(process.env.DEBUG, "runQuery error: ", err.message);
+        reject(createErrorResponse(err.message));
       } else {
         resolve(createSuccessResponse(this));
       }
@@ -123,6 +123,7 @@ const createIfNotExist = async (filePath) => {
       `);
       await runQuery(`
     CREATE TABLE "config" (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "TWITTER_BOT_USERNAME"	TEXT NOT NULL,
       "TWITTER_BOT_PASSWORD"	TEXT NOT NULL,
       "TWITTER_BOT_EMAIL"	INTEGER NOT NULL,

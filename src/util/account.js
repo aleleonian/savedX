@@ -94,3 +94,32 @@ export const updateConfigData = (formData) => {
     })();
   });
 };
+
+export function changeDownloadMediaConfig() {
+  return new Promise((resolve) => {
+    (async function cdmcIIFE() {
+      try {
+        const getQueryResponse = await dbTools.runQuery(
+          "UPDATE config SET DOWNLOAD_MEDIA = 0;"
+        );
+        common.debugLog(
+          process.env.DEBUG,
+          "getQueryResponse->",
+          json.stringify(getQueryResponse)
+        );
+        if (getQueryResponse.success) {
+          resolve(common.createSuccessResponse());
+        } else {
+          resolve(common.createErrorResponse(getQueryResponse.errorMessage));
+        }
+      } catch (error) {
+        common.debugLog(
+          process.env.DEBUG,
+          "changeDownloadMediaConfig() error: ",
+          JSON.stringify(error)
+        );
+        resolve(common.createErrorResponse(error.errorMessage));
+      }
+    })();
+  });
+}

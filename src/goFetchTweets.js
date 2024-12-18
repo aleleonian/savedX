@@ -35,6 +35,33 @@ export async function goFetchTweets(xBot, configData) {
     localBot.downloadMedia
   );
 
+  //TODO here we have to check dependencies
+  //if fail then modify configuration to change downloadMedia
+  //and let the user know
+  if (localBot.downloadMedia) {
+    const checkDependenciesResponse = await common.checkDependencies();
+
+    if (!checkDependenciesResponse.success) {
+      sendMessageToMainWindow(
+        "NOTIFICATION",
+        `error-- ${checkDependenciesResponse.errorMessage} 😫. Gonna reset that configuration for you. Please install the software and change it back. `
+      );
+      changeDownloadMediaConfig().then((response) => {
+        if (!response.success) {
+          common.debugLog(
+            process.env.DEBUG,
+            "response->",
+            JSON.stringify(response)
+          );
+          sendMessageToMainWindow(
+            "NOTIFICATION",
+            `error-- ${checkDependenciesResponse.errorMessage} 😫. Failed trying to changeDownloadMediaConfig(): ${response.errorMessage}`
+          );
+        }
+      });
+    }
+  }
+
   let result = await localBot.init();
   if (result.success) {
     showProgress(
