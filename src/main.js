@@ -241,14 +241,17 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
       try {
         const deleteAllTweestResult = await dbTools.deleteAllTweets();
         if (deleteAllTweestResult) {
-          if (common.deleteAllFilesInDirectory("./media")) {
-            resolve(true);
-          } else {
-            sendMessageToMainWindow(
-              "NOTIFICATION",
-              "error--Tweets were deleted but not all files in the media folder"
-            );
-            resolve(false);
+          // TODO: should check if downloadMedia is true
+          if (xBot.downloadMedia) {
+            if (common.deleteAllFilesInDirectory("./media")) {
+              resolve(true);
+            } else {
+              sendMessageToMainWindow(
+                "NOTIFICATION",
+                "error--Tweets were deleted but not all files in the media folder"
+              );
+              resolve(false);
+            }
           }
           // sendMessageToMainWindow("NOTIFICATION", "success--Tweets were deleted!");
         } else {

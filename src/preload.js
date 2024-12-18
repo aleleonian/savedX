@@ -31,7 +31,8 @@ const api = {
   deleteSavedTweet: (tweetData) => {
     return ipcRenderer.invoke("delete-saved-tweet", tweetData);
   },
-  deleteAllSavedTweets: () => ipcRenderer.invoke("delete-all-saved-tweets"),
+  deleteAllSavedTweets: async () =>
+    await ipcRenderer.invoke("delete-all-saved-tweets"),
   reportFoundTweet: (reportObj) => {
     common.debugLog(
       api.DEBUG,
