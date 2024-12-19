@@ -48,11 +48,10 @@ export function TweetDetailDialog({
         const data = event.detail.split("--");
         setNotificationClass(data[0]);
         setNotificationMessage(data[1]);
-        // setTimeout(() => {
-        //     setNotificationMessage(null);
-        // }, 2000);
       }
     };
+
+    debugger;
 
     window.addEventListener("NOTIFICATION", notificationEventListener);
 
@@ -192,6 +191,11 @@ export function TweetDetailDialog({
               />
             </div>
 
+            {/* VOY POR ACA */}
+            {/* TODO: que no se abra este alert si el dialogo no está visible */}
+            {/* o mejor setear las state variables de alert y notification en el contexto y tener systemas
+            que trigereen un dialog o alert si ese componente está visible.
+            */}
             {notificationMessage && (
               <AlertDialog
                 title="⚠️"

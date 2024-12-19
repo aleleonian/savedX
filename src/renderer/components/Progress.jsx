@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Title } from "./Title";
 import { ProgressIcon } from "./ProgressIcon";
 import Button from "@mui/material/Button";
+import { Notification } from "./Notification";
 
 const addClass = (classList, className) => {
   const classesArray = classList.split(/\s+/);
@@ -15,7 +16,16 @@ const removeClass = (classList, className) => {
     .join(" ");
 };
 
+const handleAlertClose = () => {
+  setNotificationMessage(null);
+};
+
 export const Progress = ({ whichState }) => {
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationClass, setNotificationClass] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [alertTitle, setAlertTitle] = useState(null);
+
   let logginClass = "flex items-center text-gray-400 py-4";
   let loginText = "Log into X.";
 
@@ -58,11 +68,55 @@ export const Progress = ({ whichState }) => {
   function stopScraping() {
     window.savedXApi.stopScraping();
   }
+  useEffect(() => {
+    // Listen for messages from the preload script
+    const notificationEventListener = (event) => {
+      if (event.detail) {
+        const data = event.detail.split("--");
+        setNotificationClass(data[0]);
+        setNotificationMessage(data[1]);
+      }
+    };
+
+    const alertEventListener = (event) => {
+      if (event.detail) {
+        const alertMessage = event.detail.message;
+        const alertTitle = event.detail.title;
+        setAlertTitle(alertTitle);
+        setAlertMessage(alertMessage);
+      }
+    };
+
+    window.addEventListener("NOTIFICATION", notificationEventListener);
+
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener("NOTIFICATION", notificationEventListener);
+    };
+  }, []); // Empty dependency array ensures this effect runs only once after mount
 
   return (
     <>
       <div className="container mx-auto text-center">
         <Title />
+        {alertMessage && (
+          <AlertDialog
+            title={alertTitle}
+            message={alertMessage}
+            openFlag={true}
+            cleanUp={() => {
+              setAlertTitle(null);
+              setAlertMessage(null);
+            }}
+          />
+        )}
+        {notificationMessage && (
+          <Notification
+            notificationClass={notificationClass}
+            notificationMessage={notificationMessage}
+            handleAlertClose={handleAlertClose}
+          />
+        )}
         📝Todo list:
         <div className="flex flex-col items-center py-8">
           <div id="login" className={logginClass}>

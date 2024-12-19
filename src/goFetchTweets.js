@@ -42,11 +42,18 @@ export async function goFetchTweets(xBot, configData) {
   if (localBot.downloadMedia) {
     const checkDependenciesResponse = await common.checkDependencies();
 
+    common.debugLog(
+      process.env.DEBUG,
+      "checkDependenciesResponse->",
+      JSON.stringify(checkDependenciesResponse)
+    );
+
     if (!checkDependenciesResponse.success) {
       sendMessageToMainWindow(
         "NOTIFICATION",
-        `error-- ${checkDependenciesResponse.errorMessage} 😫. Gonna reset that configuration for you. Please install the software and change it back. `
+        `error--${checkDependenciesResponse.errorMessage} 😫. Gonna change the 'download tweets media' configuration for you. Please install the software and change it back. `
       );
+
       changeDownloadMediaConfig().then((response) => {
         if (!response.success) {
           common.debugLog(

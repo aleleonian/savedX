@@ -205,10 +205,6 @@ export const storeTweets = async (tweetArray) => {
             "src"
           );
         }
-        //TODO voy por aquí
-        // tengo que generar un hash para el tweet en base a su url y guardarlo
-        // also si en la configureta hay que guardar media, tengo que setear esa
-        // columna con true
         try {
           const result = await runQuery(
             `INSERT OR IGNORE INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, tweetUrlHash, profilePicUrl, hasLocalMedia) 

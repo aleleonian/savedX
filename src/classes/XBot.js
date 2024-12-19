@@ -897,19 +897,6 @@ export class XBot {
       .filter((item) => item !== null);
 
     for (const newBookmark of processedBookmarks) {
-      //VOY POR ACA: la idea es no guardar los bookmarks cuyo url ya existe en el array de tweets guardados en el contexto de la app
-      // para eso habría que  sendMessageToMainWindow("CHECK_SAVED_TWEET_EXISTS", tweetUrl
-      // tweetArray.map(async (tweet) => {
-      //   const $ = cheerio.load(tweet.htmlContent);
-      //   const userNameData = $('[data-testid="User-Name"]').text().split("@");
-      //   tweet.userName = userNameData[0];
-      //   tweet.twitterHandle = "@" + userNameData[1].split("·")[0];
-      //   tweet.tweetDate = userNameData[1].split("·")[1];
-      //   tweet.tweetText = $('div[data-testid="tweetText"] > span').text();
-      //   tweet.tweetUrl = $('[data-testid="User-Name"] a').eq(2).attr("href");
-      //   tweet.profilePicUrl = $("img").first().attr("src");
-      // }),
-
       const $ = cheerio.load(newBookmark.htmlContent);
 
       const newBookmarkTweetUrl = $('[data-testid="User-Name"] a')
