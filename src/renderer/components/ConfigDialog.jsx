@@ -36,7 +36,6 @@ export function ConfigDialog({ open, onClose, configData }) {
     // const configDataDialogEventListener = (event) => {
     //   if (event.detail) {
     //     if (event.detail.success) {
-    //       debugger;
     //     }
     //   }
     // };

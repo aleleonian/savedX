@@ -1,4 +1,5 @@
 import React from "react";
+import { useRef } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -41,17 +42,21 @@ export function TweetDetailDialog({
   removeTagFromDB,
   updateTweetAndTagsLocally,
 }) {
+  const isOpenRef = useRef(open);
+
+  useEffect(() => {
+    isOpenRef.current = open; // Update the ref whenever `open` changes
+  }, [open]);
+
   useEffect(() => {
     // Listen for messages from the preload script
     const notificationEventListener = (event) => {
-      if (event.detail) {
+      if (event.detail && isOpenRef.current) {
         const data = event.detail.split("--");
         setNotificationClass(data[0]);
         setNotificationMessage(data[1]);
       }
     };
-
-    debugger;
 
     window.addEventListener("NOTIFICATION", notificationEventListener);
 

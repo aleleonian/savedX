@@ -9,6 +9,11 @@ export const AppProvider = ({ children }) => {
     savedTweets: [],
     tags: [],
     isDebug: false,
+    communication: {
+      notificatonMessage: "",
+      alertTitle: "",
+      alertMessage: "",
+    },
   });
 
   const updateState = (key, value) => {
