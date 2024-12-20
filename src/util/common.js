@@ -100,11 +100,11 @@ export const deleteAllFilesInDirectory = async (dirPath) => {
           await fs.promises.unlink(filePath); // Deletes the file
           console.log(`Deleted file: ${filePath}`);
         }
-      })
+      }),
     );
 
     console.log(
-      `All files in directory "${absoluteDirPath}" have been deleted.`
+      `All files in directory "${absoluteDirPath}" have been deleted.`,
     );
     return true;
   } catch (error) {

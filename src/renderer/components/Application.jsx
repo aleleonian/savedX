@@ -43,7 +43,7 @@ export const Application = () => {
         common.debugLog(
           window.savedXApi.DEBUG,
           "isDebug updated to:",
-          window.savedXApi.DEBUG
+          window.savedXApi.DEBUG,
         );
         clearInterval(interval);
       }
@@ -128,7 +128,7 @@ export const Application = () => {
     const checkSavedTweetEventListener = (event) => {
       const tweetUrl = event.detail;
       const found = stateRef.current.savedTweets.find(
-        (savedTweet) => savedTweet.tweetUrl === tweetUrl
+        (savedTweet) => savedTweet.tweetUrl === tweetUrl,
       );
       const reportResponse = {
         success: found ? true : false,
@@ -161,21 +161,21 @@ export const Application = () => {
     window.addEventListener("SHOW_PROGRESS", progressEventListener);
     window.addEventListener(
       "DISABLE_GO_FETCH_BUTTON",
-      disableGoFetchButtonEventListener
+      disableGoFetchButtonEventListener,
     );
     window.addEventListener(
       "SHOW_CONFIG_DIALOG",
-      showConfigDialogEventListener
+      showConfigDialogEventListener,
     );
 
     window.addEventListener(
       "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-      showDeleteSavedTweetsEventListener
+      showDeleteSavedTweetsEventListener,
     );
 
     window.addEventListener(
       "CHECK_SAVED_TWEET_EXISTS",
-      checkSavedTweetEventListener
+      checkSavedTweetEventListener,
     );
 
     // Clean up event listener on component unmount
@@ -186,19 +186,19 @@ export const Application = () => {
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
       window.removeEventListener(
         "DISABLE_GO_FETCH_BUTTON",
-        disableGoFetchButtonEventListener
+        disableGoFetchButtonEventListener,
       );
       window.removeEventListener(
         "SHOW_CONFIG_DIALOG",
-        showConfigDialogEventListener
+        showConfigDialogEventListener,
       );
       window.removeEventListener(
         "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-        showDeleteSavedTweetsEventListener
+        showDeleteSavedTweetsEventListener,
       );
       window.removeEventListener(
         "CHECK_SAVED_TWEET_EXISTS",
-        checkSavedTweetEventListener
+        checkSavedTweetEventListener,
       );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount

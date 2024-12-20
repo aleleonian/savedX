@@ -23,3 +23,27 @@ await page.waitForSelector('[data-testid="removeBookmark"]');
 
 // Click the button
 await page.click('[data-testid="removeBookmark"]');
+
+// find the tweet and click the bookmark button
+// el valor en translateY(1232px) es el indexId de cada tweet
+
+const parentDiv = await page.evaluateHandle(() => {
+    // Find all divs with data-testid="cellInnerDiv"
+    const divs = Array.from(document.querySelectorAll('div[data-testid="cellInnerDiv"]'));
+
+    // Find the one with the desired style
+    return divs.find(div => div.style.transform.includes('translateY(1232px)'));
+});
+
+if (parentDiv) {
+    // Get the fourth child with the specific classes
+    const fourthElement = await parentDiv.$('.css-175oi2r.r-1777fci.r-bt1l66.r-bztko3.r-lrvibr.r-1loqt21.r-1ny4l3l:nth-child(4)');
+    
+    if (fourthElement) {
+        console.log('Fourth element found:', await fourthElement.evaluate(el => el.outerHTML));
+    } else {
+        console.log('Fourth element with the specified classes not found.');
+    }
+} else {
+    console.log('Parent div with the specified style not found.');
+}

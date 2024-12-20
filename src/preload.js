@@ -37,7 +37,7 @@ const api = {
     common.debugLog(
       api.DEBUG,
       "reportFoundTweet() reportObj:",
-      JSON.stringify(reportObj)
+      JSON.stringify(reportObj),
     );
     ipcRenderer.send("report-found-tweet", reportObj);
   },
@@ -94,7 +94,7 @@ ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
   common.debugLog(
     api.DEBUG,
     "SHOW_CONFIG_DIALOG preload configData:",
-    JSON.stringify(configData)
+    JSON.stringify(configData),
   );
   if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
   else {
