@@ -41,6 +41,12 @@ if (parentDiv) {
     
     if (fourthElement) {
         console.log('Fourth element found:', await fourthElement.evaluate(el => el.outerHTML));
+        try {
+            await fourthElement.click();
+        } catch (error) {
+        console.error("Failed to click the fourth element:", error);
+        }
+
     } else {
         console.log('Fourth element with the specified classes not found.');
     }

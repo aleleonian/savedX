@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Title } from "./Title";
+import { AlertDialog } from "./AlertDialog";
 import { ProgressIcon } from "./ProgressIcon";
 import Button from "@mui/material/Button";
 import { Notification } from "./Notification";
@@ -14,10 +15,6 @@ const removeClass = (classList, className) => {
     .split(/\s+/)
     .filter((classItem) => classItem !== className)
     .join(" ");
-};
-
-const handleAlertClose = () => {
-  setNotificationMessage(null);
 };
 
 export const Progress = ({ whichState }) => {
@@ -65,6 +62,10 @@ export const Progress = ({ whichState }) => {
     logoutText = "Logged out of X ✅";
   }
 
+  const handleAlertClose = () => {
+    setNotificationMessage(null);
+  };
+
   function stopScraping() {
     window.savedXApi.stopScraping();
   }
@@ -87,11 +88,13 @@ export const Progress = ({ whichState }) => {
       }
     };
 
+    window.addEventListener("ALERT", alertEventListener);
     window.addEventListener("NOTIFICATION", notificationEventListener);
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
+      window.removeEventListener("ALERT", alertEventListener);
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 

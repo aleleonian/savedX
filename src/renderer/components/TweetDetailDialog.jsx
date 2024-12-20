@@ -97,7 +97,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g",
+      "g"
     );
     return originalString.replace(regex, "").trim();
   }
@@ -163,7 +163,7 @@ export function TweetDetailDialog({
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
       );
       setNotificationMessage(null);
       onClose();
@@ -196,11 +196,6 @@ export function TweetDetailDialog({
               />
             </div>
 
-            {/* VOY POR ACA */}
-            {/* TODO: que no se abra este alert si el dialogo no está visible */}
-            {/* o mejor setear las state variables de alert y notification en el contexto y tener systemas
-            que trigereen un dialog o alert si ese componente está visible.
-            */}
             {notificationMessage && (
               <AlertDialog
                 title="⚠️"
