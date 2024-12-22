@@ -34,7 +34,8 @@ export const createSuccessResponse = (data) => {
   return responseObj;
 };
 
-export const debugLog = (debugValue, ...strings) => {
+export const debugLog = (...strings) => {
+  const debugValue = process.env.DEBUG;
   const string = strings.join(" "); // Join with space for readability
   if (debugValue) {
     console.log(string);
@@ -106,9 +107,10 @@ export const deleteAllFilesInDirectory = async (dirPath) => {
     console.log(
       `All files in directory "${absoluteDirPath}" have been deleted.`,
     );
-    return true;
+    return createSuccessResponse();
   } catch (error) {
-    console.error(`Error deleting files in directory: ${error.message}`);
+    const errorMessage = `Error deleting files in directory: ${error.message}`;
+    console.error(errorMessage);
+    return createErrorResponse(errorMessage);
   }
-  return false;
 };

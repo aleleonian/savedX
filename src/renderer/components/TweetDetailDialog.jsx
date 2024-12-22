@@ -14,6 +14,7 @@ import { IconButton, TextField, Autocomplete, Chip } from "@mui/material";
 import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
 import { VideoPlayer } from "./VideoPlayer";
 import { AlertDialog } from "./AlertDialog";
+import { debugLog } from "../util/common";
 
 function PaperComponent(props) {
   return (
@@ -97,7 +98,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g"
+      "g",
     );
     return originalString.replace(regex, "").trim();
   }
@@ -163,10 +164,12 @@ export function TweetDetailDialog({
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
       );
       setNotificationMessage(null);
       onClose();
+    } else {
+      debugLog(window.savedXApi.DEBUG, "tweetDeleteResult:", tweetDeleteResult);
     }
   };
 

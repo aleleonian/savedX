@@ -97,6 +97,21 @@ app.whenReady().then(async () => {
     );
   }
 
+  const allConfigDataResponse = await getAllConfigData();
+  common.debugLog(
+    process.env.DEBUG,
+    "allConfigDataResponse->",
+    JSON.stringify(allConfigDataResponse),
+  );
+  if (allConfigDataResponse.success) {
+    xBot.downloadMedia = allConfigDataResponse.data.DOWNLOAD_MEDIA;
+  } else {
+    sendMessageToMainWindow(
+      "NOTIFICATION",
+      `error--${allConfigDataResponse.errorMessage}`,
+    );
+  }
+
   if (process.env.DEBUG) {
     startExpressServer(xBot); // Start the Express server here
   }
@@ -154,7 +169,7 @@ ipcMain.on("go-fetch-tweets", async () => {
 ipcMain.on("stop-scraping", async () => {
   // const credentials = await dbTools.getXCredentials();
   // await goFetchTweetsFake();
-  common.debugLog(process.env.DEBUG, "we gonna stop scraping then.");
+  common.debugLog("we gonna stop scraping then.");
   await stopScraping();
 });
 
@@ -163,7 +178,7 @@ ipcMain.on("update-tags-for-tweet", async (event, tweetId, newTags) => {
 
   //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
   //O MAL EL UPDATE
-  common.debugLog(process.env.DEBUG, "updateTagsResult->", updateTagsResult);
+  common.debugLog("updateTagsResult->", updateTagsResult);
 });
 
 ipcMain.on("remove-tag-from-db", async (event, tag) => {
@@ -240,9 +255,11 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
     (async () => {
       try {
         const deleteAllTweestResult = await dbTools.deleteAllTweets();
-        if (deleteAllTweestResult) {
+        if (deleteAllTweestResult.success) {
           if (xBot.downloadMedia) {
-            if (common.deleteAllFilesInDirectory("./media")) {
+            const deleteMediaFilesResult =
+              await common.deleteAllFilesInDirectory("./media");
+            if (deleteMediaFilesResult.success) {
               resolve(true);
             } else {
               sendMessageToMainWindow(
@@ -251,7 +268,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
               );
               resolve(false);
             }
-          }
+          } else resolve(true);
           // sendMessageToMainWindow("NOTIFICATION", "success--Tweets were deleted!");
         } else {
           resolve(false);
@@ -299,7 +316,7 @@ ipcMain.on("update-config-data", async (event, formData) => {
 });
 ipcMain.on("open-debug-session", async () => {
   try {
-    common.debugLog(process.env.DEBUG, "open-debug-session!");
+    common.debugLog("open-debug-session!");
 
     if (true) {
       sendMessageToMainWindow("NOTIFICATION", `success--open-debug-session!`);
@@ -334,7 +351,7 @@ const init = async () => {
       ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
       : "./savedx.db";
 
-  common.debugLog(process.env.DEBUG, "dbPath>", dbPath);
+  common.debugLog("dbPath>", dbPath);
 
   const openDbResult = await dbTools.openDb(dbPath);
 

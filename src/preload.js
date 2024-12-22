@@ -28,11 +28,15 @@ const api = {
     ipcRenderer.send("update-config-data", formData),
   // DEBUG: Boolean(process.env.DEBUG),
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
-  deleteSavedTweet: (tweetData) => {
-    return ipcRenderer.invoke("delete-saved-tweet", tweetData);
+  deleteSavedTweet: async (tweetData) => {
+    return await ipcRenderer.invoke("delete-saved-tweet", tweetData);
   },
-  deleteAllSavedTweets: async () =>
-    await ipcRenderer.invoke("delete-all-saved-tweets"),
+  deleteAllSavedTweets: async () => {
+    const deleteAllTweetsResult = await ipcRenderer.invoke(
+      "delete-all-saved-tweets",
+    );
+    return deleteAllTweetsResult;
+  },
   reportFoundTweet: (reportObj) => {
     common.debugLog(
       api.DEBUG,

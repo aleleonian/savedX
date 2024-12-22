@@ -16,7 +16,7 @@ function createDatabase(filePath) {
           errorMessage: err.message,
         });
       } else {
-        common.debugLog(process.env.DEBUG, "New database created.");
+        common.debugLog("New database created.");
         resolve({
           success: true,
           db, // Return the database object for further operations
@@ -30,7 +30,7 @@ export const runQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(query, params, function (err) {
       if (err) {
-        common.debugLog(process.env.DEBUG, "runQuery error: ", err.message);
+        common.debugLog("runQuery error: ", err.message);
         reject(createErrorResponse(err.message));
       } else {
         resolve(createSuccessResponse(this));
@@ -130,7 +130,7 @@ const createIfNotExist = async (filePath) => {
       "DOWNLOAD_MEDIA"	NUMERIC NOT NULL DEFAULT 0 )
      `);
 
-      common.debugLog(process.env.DEBUG, "Database schema initialized.");
+      common.debugLog("Database schema initialized.");
 
       await dbClose();
 
@@ -138,14 +138,14 @@ const createIfNotExist = async (filePath) => {
         success: true,
       };
     } catch (error) {
-      common.debugLog(process.env.DEBUG, "Error creating DB file! ", error);
+      common.debugLog("Error creating DB file! ", error);
       return {
         success: false,
       };
     }
   }
 
-  common.debugLog(process.env.DEBUG, "DB file exists.");
+  common.debugLog("DB file exists.");
 
   return {
     success: true,
@@ -223,7 +223,7 @@ export const storeTweets = async (tweetArray) => {
               tweet.hasLocalMedia ? tweet.hasLocalMedia : "no",
             ]
           );
-          common.debugLog(process.env.DEBUG, "Insertion result:", result);
+          common.debugLog("Insertion result:", result);
         } catch (error) {
           allSuccessful = false;
           common.debugLog(
@@ -251,17 +251,26 @@ export const storeTweets = async (tweetArray) => {
 
 export const deleteAllTweets = async () => {
   try {
-    await runQuery("DELETE FROM tweets_tags");
-    await runQuery("DELETE FROM tweets");
-    return {
-      success: true,
-    };
+    const runQueryResult1 = await runQuery("DELETE FROM tweets_tags");
+    if (runQueryResult1.success) {
+      const runQueryResult2 = await runQuery("DELETE FROM tweets");
+      if (runQueryResult2.success) {
+        common.debugLog(
+          process.env.DEBUG,
+          "deleteAllTweets->deleted all tweets!"
+        );
+        return createSuccessResponse();
+      } else {
+        return createErrorResponse("DELETE FROM tweets_tags failed!");
+      }
+    } else {
+      return createErrorResponse("DELETE FROM tweets_tags failed!");
+    }
   } catch (error) {
     console.error("deleteAllTweets: Error executing query:", error);
-    return {
-      success: false,
-      errorMessage: `Could not delete all tweets: ${error}`,
-    };
+    return createErrorResponse(
+      `deleteAllTweets: Could not delete all tweets: ${error}`
+    );
   }
 };
 export const setDb = (dbConnection) => {
@@ -370,7 +379,7 @@ export const readAllTags = async () => {
       };
     }
   } catch (error) {
-    common.debugLog(process.env.DEBUG, "readAllTags() error: ", error);
+    common.debugLog("readAllTags() error: ", error);
     return createErrorResponse(error.errorMessage);
   }
 };

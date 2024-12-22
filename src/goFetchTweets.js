@@ -29,7 +29,7 @@ export async function goFetchTweets(xBot, configData) {
     "localBot.botPassword->",
     localBot.botPassword,
   );
-  common.debugLog(process.env.DEBUG, "localBot.botEmail->", localBot.botEmail);
+  common.debugLog("localBot.botEmail->", localBot.botEmail);
   common.debugLog(
     process.env.DEBUG,
     "localBot.downloadMedia->",
