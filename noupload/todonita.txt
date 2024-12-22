@@ -9,5 +9,4 @@
 + handle the captcha case in a more tidy way, letting the user do the captcha and then we resume doing our thing
     + as opposed to setting a timer and letting the user do their thing before it ends
 
-+ que se puedan borrar los bookmarks pero de la cuenta de twitter.
-    + o que al menos puedas visitar ese bookmark guardado.
++ que siempre se muestre el original tweet url
