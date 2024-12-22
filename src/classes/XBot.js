@@ -927,24 +927,29 @@ export class XBot {
     await this.page.waitForSelector('[aria-label="Bookmarked"]');
 
     // Get all buttons with the `aria-label="Bookmarked"`
-    const bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
+    let bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
 
-    console.log(`Found ${bookmarkButtons.length} bookmark buttons.`);
-
-    // Function to delay execution for a specified time
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    // Loop through the buttons and click them with a 2-second delay
-    for (let i = 0; i < bookmarkButtons.length; i++) {
-      try {
-        await bookmarkButtons[i].click();
-        console.log(`Clicked button ${i + 1}`);
-      } catch (error) {
-        console.error(`Error clicking button ${i + 1}:`, error);
+    while (bookmarkButtons.length > 0) {
+      console.log(`Found ${bookmarkButtons.length} bookmark buttons.`);
+
+      // Function to delay execution for a specified time
+
+      // Loop through the buttons and click them with a 2-second delay
+      for (let i = 0; i < bookmarkButtons.length; i++) {
+        try {
+          await bookmarkButtons[i].click();
+          console.log(`Clicked button ${i + 1}`);
+        } catch (error) {
+          console.error(`Error clicking button ${i + 1}:`, error);
+        }
+
+        // Delay for 2 seconds
+        await delay(1500);
       }
 
-      // Delay for 2 seconds
-      await delay(1500);
+      bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
     }
 
     console.log("Finished clicking all bookmark buttons.");
