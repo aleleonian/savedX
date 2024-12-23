@@ -55,7 +55,7 @@ const createWindow = () => {
   mainWindow.webContents.on("did-finish-load", () => {
     const debugEnvVar = (() => {
       try {
-        const value = JSON.parse(process.env.DEBUG);
+        const value = process.env.DEBUG ? JSON.parse(process.env.DEBUG) : false;
         return value;
       } catch (error) {
         console.error("Error occurred:", error);
@@ -70,16 +70,14 @@ const createWindow = () => {
   if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
+    const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window";
     mainWindow.loadFile(
-      path.join(
-        __dirname,
-        `../renderer/${process.env.MAIN_WINDOW_VITE_NAME}/index.html`
-      )
+      path.join(__dirname, `../renderer/${viteName}/index.html`)
     );
   }
-
-  // mainWindow.webContents.openDevTools({ mode: "detach" });
-  mainWindow.webContents.openDevTools();
+  common.debugLog("MAIN_WINDOW_VITE_NAME->", MAIN_WINDOW_VITE_NAME);
+  mainWindow.webContents.openDevTools({ mode: "detach" });
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -339,7 +337,10 @@ ipcMain.on("open-debug-session", async () => {
   }
 });
 
-console.log("DEBUG in main process:", JSON.parse(process.env.DEBUG));
+common.debugLog(
+  "DEBUG in main process:",
+  process.env.DEBUG ? JSON.parse(process.env.DEBUG) : false
+);
 
 const init = async () => {
   let dbPath;
