@@ -73,8 +73,8 @@ const createWindow = () => {
     mainWindow.loadFile(
       path.join(
         __dirname,
-        `../renderer/${process.env.MAIN_WINDOW_VITE_NAME}/index.html`,
-      ),
+        `../renderer/${process.env.MAIN_WINDOW_VITE_NAME}/index.html`
+      )
     );
   }
 
@@ -93,7 +93,7 @@ app.whenReady().then(async () => {
   if (!initStatus.success) {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${initStatus.errorMessage}`,
+      `error--${initStatus.errorMessage}`
     );
   }
 
@@ -101,14 +101,16 @@ app.whenReady().then(async () => {
   common.debugLog(
     process.env.DEBUG,
     "allConfigDataResponse->",
-    JSON.stringify(allConfigDataResponse),
+    JSON.stringify(allConfigDataResponse)
   );
   if (allConfigDataResponse.success) {
     xBot.downloadMedia = allConfigDataResponse.data.DOWNLOAD_MEDIA;
+    xBot.deleteOnlineBookmarks =
+      allConfigDataResponse.data.DELETE_ONLINE_BOOKMARKS;
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${allConfigDataResponse.errorMessage}`,
+      `error--${allConfigDataResponse.errorMessage}`
     );
   }
 
@@ -188,13 +190,13 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
   if (!removeTagFromDBResult.success) {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${removeTagFromDBResult.errorMessage} 😫`,
+      `error--${removeTagFromDBResult.errorMessage} 😫`
     );
   }
   common.debugLog(
     process.env.DEBUG,
     "removeTagFromDBResult->",
-    removeTagFromDBResult,
+    removeTagFromDBResult
   );
 });
 
@@ -222,13 +224,13 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
               resolve(true);
               sendMessageToMainWindow(
                 "NOTIFICATION",
-                "success--Tweet was deleted!",
+                "success--Tweet was deleted!"
               );
             } else {
               resolve(false);
               sendMessageToMainWindow(
                 "NOTIFICATION",
-                "error--Tweet was deleted from db but not the media file!",
+                "error--Tweet was deleted from db but not the media file!"
               );
             }
           }
@@ -237,14 +239,14 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
           resolve(false);
           sendMessageToMainWindow(
             "NOTIFICATION",
-            "error--Tweet was not deleted",
+            "error--Tweet was not deleted"
           );
         }
       } catch (error) {
         resolve(false);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          "error--Tweet was not deleted: " + error,
+          "error--Tweet was not deleted: " + error
         );
       }
     })();
@@ -264,7 +266,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
             } else {
               sendMessageToMainWindow(
                 "NOTIFICATION",
-                "error--Tweets were deleted but not all files in the media folder",
+                "error--Tweets were deleted but not all files in the media folder"
               );
               resolve(false);
             }
@@ -278,7 +280,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
         resolve(false);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          "error--Tweet was not deleted: " + error,
+          "error--Tweet was not deleted: " + error
         );
       }
     })();
@@ -289,7 +291,7 @@ ipcMain.on("report-found-tweet", async (event, reportObj) => {
   common.debugLog(
     process.env.DEBUG,
     "report-found-tweet reportObj->",
-    JSON.stringify(reportObj),
+    JSON.stringify(reportObj)
   );
   mainEmitter.emit("report-found-tweet", reportObj);
 });
@@ -303,8 +305,8 @@ ipcMain.on("update-config-data", async (event, formData) => {
       sendMessageToMainWindow(
         "ALERT",
         `Trouble updating config data mai fren:  ${JSON.stringify(
-          updateConfigDataResponse.errorMessage,
-        )}`,
+          updateConfigDataResponse.errorMessage
+        )}`
       );
     }
   } catch (error) {
@@ -344,7 +346,7 @@ const init = async () => {
   common.debugLog(
     process.env.DEBUG,
     "process.env.NODE_ENV->",
-    process.env.NODE_ENV,
+    process.env.NODE_ENV
   );
   dbPath =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "debug"
@@ -386,7 +388,7 @@ const init = async () => {
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--There were issues opening / creating the db file 😫`,
+      `error--There were issues opening / creating the db file 😫`
     );
     sendMessageToMainWindow("DISABLE_GO_FETCH_BUTTON");
   }

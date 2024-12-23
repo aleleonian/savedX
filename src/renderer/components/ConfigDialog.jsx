@@ -62,11 +62,14 @@ export function ConfigDialog({ open, onClose, configData }) {
     password: configData?.TWITTER_BOT_PASSWORD ?? "",
     email: configData?.TWITTER_BOT_EMAIL ?? "",
     downloadMedia: configData?.DOWNLOAD_MEDIA ?? false,
+    deleteOnlineBookmarks: configData?.DELETE_ONLINE_BOOKMARKS ?? false,
   });
 
   const handleChange = (e) => {
     let { name, value } = e.target;
     if (name == "downloadMedia") {
+      value = e.target.checked;
+    } else if (name == "deleteOnlineBookmarks") {
       value = e.target.checked;
     }
     setFormData({ ...formData, [name]: value });
@@ -163,6 +166,16 @@ export function ConfigDialog({ open, onClose, configData }) {
                   onChange={handleChange}
                   color="primary"
                   name="downloadMedia"
+                />
+                <br />
+                <Typography variant="h5">
+                  Delete online bookmarks after save?
+                </Typography>
+                <Checkbox
+                  checked={formData.deleteOnlineBookmarks}
+                  onChange={handleChange}
+                  color="primary"
+                  name="deleteOnlineBookmarks"
                 />
               </Box>
             </Box>
