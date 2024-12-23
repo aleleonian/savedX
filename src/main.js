@@ -4,9 +4,11 @@ const path = require("path");
 // Determine the environment
 const isDevelopment = process.env.NODE_ENV === "development";
 
+process.env.DEBUG = process.env.DEBUG || "true";
+
 // Set the .env file path
 const envPath = isDevelopment
-  ? "/Users/axl5070/lab/projects/savedX/.env" // Absolute path for development
+  ? path.resolve(process.cwd(), ".env") // Absolute path for development
   : path.join(process.env.PORTABLE_EXECUTABLE_DIR || __dirname, ".env"); // Relative path for production
 
 // Load environment variables
