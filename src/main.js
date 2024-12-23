@@ -1,6 +1,28 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
+const path = require("path");
+
+// Determine the environment
+const isDevelopment = process.env.NODE_ENV === "development";
+
+// Set the .env file path
+const envPath = isDevelopment
+  ? "/Users/axl5070/lab/projects/savedX/.env" // Absolute path for development
+  : path.join(process.env.PORTABLE_EXECUTABLE_DIR || __dirname, ".env"); // Relative path for production
+
+// Load environment variables
+const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.error("Failed to load .env file:", result.error);
+} else {
+  console.log("Loaded environment variables:", result.parsed);
+}
+
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
-const path = require("node:path");
+// Determine environment
+
+console.log("Loading .env file from:", envPath);
+
 import { startExpressServer } from "./webserver";
 import * as dbTools from "./util/db";
 import * as common from "./util/common";
@@ -97,7 +119,6 @@ app.whenReady().then(async () => {
 
   const allConfigDataResponse = await getAllConfigData();
   common.debugLog(
-    process.env.DEBUG,
     "allConfigDataResponse->",
     JSON.stringify(allConfigDataResponse)
   );
@@ -191,11 +212,7 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
       `error--${removeTagFromDBResult.errorMessage} 😫`
     );
   }
-  common.debugLog(
-    process.env.DEBUG,
-    "removeTagFromDBResult->",
-    removeTagFromDBResult
-  );
+  common.debugLog("removeTagFromDBResult->", removeTagFromDBResult);
 });
 
 ipcMain.on("fetch-config-data", async () => {
@@ -286,11 +303,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
 });
 
 ipcMain.on("report-found-tweet", async (event, reportObj) => {
-  common.debugLog(
-    process.env.DEBUG,
-    "report-found-tweet reportObj->",
-    JSON.stringify(reportObj)
-  );
+  common.debugLog("report-found-tweet reportObj->", JSON.stringify(reportObj));
   mainEmitter.emit("report-found-tweet", reportObj);
 });
 
@@ -344,11 +357,7 @@ common.debugLog(
 
 const init = async () => {
   let dbPath;
-  common.debugLog(
-    process.env.DEBUG,
-    "process.env.NODE_ENV->",
-    process.env.NODE_ENV
-  );
+  common.debugLog("process.env.NODE_ENV->", process.env.NODE_ENV);
   dbPath =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "debug"
       ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")

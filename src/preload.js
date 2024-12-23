@@ -1,7 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 const { ipcRenderer, contextBridge, shell } = require("electron");
-import * as common from "./util/common";
+import * as common from "./renderer/util/common";
 
 let domContentLoaded = false;
 
@@ -33,7 +33,7 @@ const api = {
   },
   deleteAllSavedTweets: async () => {
     const deleteAllTweetsResult = await ipcRenderer.invoke(
-      "delete-all-saved-tweets",
+      "delete-all-saved-tweets"
     );
     return deleteAllTweetsResult;
   },
@@ -41,7 +41,7 @@ const api = {
     common.debugLog(
       api.DEBUG,
       "reportFoundTweet() reportObj:",
-      JSON.stringify(reportObj),
+      JSON.stringify(reportObj)
     );
     ipcRenderer.send("report-found-tweet", reportObj);
   },
@@ -98,7 +98,7 @@ ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
   common.debugLog(
     api.DEBUG,
     "SHOW_CONFIG_DIALOG preload configData:",
-    JSON.stringify(configData),
+    JSON.stringify(configData)
   );
   if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
   else {

@@ -20,22 +20,10 @@ export async function goFetchTweets(xBot, configData) {
   localBot.downloadMedia = configData.DOWNLOAD_MEDIA;
   localBot.deleteOnlineBookmarks = configData.DELETE_ONLINE_BOOKMARKS;
 
-  common.debugLog(
-    process.env.DEBUG,
-    "localBot.botUsername->",
-    localBot.botUsername,
-  );
-  common.debugLog(
-    process.env.DEBUG,
-    "localBot.botPassword->",
-    localBot.botPassword,
-  );
+  common.debugLog("localBot.botUsername->", localBot.botUsername);
+  common.debugLog("localBot.botPassword->", localBot.botPassword);
   common.debugLog("localBot.botEmail->", localBot.botEmail);
-  common.debugLog(
-    process.env.DEBUG,
-    "localBot.downloadMedia->",
-    localBot.downloadMedia,
-  );
+  common.debugLog("localBot.downloadMedia->", localBot.downloadMedia);
 
   //TODO here we have to check dependencies
   //if fail then modify configuration to change downloadMedia
@@ -46,13 +34,13 @@ export async function goFetchTweets(xBot, configData) {
     common.debugLog(
       process.env.DEBUG,
       "checkDependenciesResponse->",
-      JSON.stringify(checkDependenciesResponse),
+      JSON.stringify(checkDependenciesResponse)
     );
 
     if (!checkDependenciesResponse.success) {
       sendMessageToMainWindow(
         "NOTIFICATION",
-        `error--${checkDependenciesResponse.errorMessage} 😫. Gonna change the 'download tweets media' configuration for you. Please install the software and change it back. `,
+        `error--${checkDependenciesResponse.errorMessage} 😫. Gonna change the 'download tweets media' configuration for you. Please install the software and change it back. `
       );
 
       changeDownloadMediaConfig().then((response) => {
@@ -60,11 +48,11 @@ export async function goFetchTweets(xBot, configData) {
           common.debugLog(
             process.env.DEBUG,
             "response->",
-            JSON.stringify(response),
+            JSON.stringify(response)
           );
           sendMessageToMainWindow(
             "NOTIFICATION",
-            `error-- ${checkDependenciesResponse.errorMessage} 😫. Failed trying to changeDownloadMediaConfig(): ${response.errorMessage}`,
+            `error-- ${checkDependenciesResponse.errorMessage} 😫. Failed trying to changeDownloadMediaConfig(): ${response.errorMessage}`
           );
         }
       });
@@ -74,17 +62,17 @@ export async function goFetchTweets(xBot, configData) {
   let result = await localBot.init();
   if (result.success) {
     showProgress(
-      encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN),
+      encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN)
     );
     //TODO something's wrong with the passwords
     result = await localBot.loginToX(
       localBot.botUsername,
       localBot.botPassword,
-      localBot.botEmail,
+      localBot.botEmail
     );
     if (result.success) {
       showProgress(
-        encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN),
+        encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN)
       );
       await localBot.wait(3000);
       await localBot.goto("https://twitter.com/i/bookmarks");
@@ -92,8 +80,8 @@ export async function goFetchTweets(xBot, configData) {
         encode(
           constants.progress.INIT_PROGRESS,
           constants.progress.LOGGED_IN,
-          constants.progress.SCRAPING,
-        ),
+          constants.progress.SCRAPING
+        )
       );
       await localBot.wait(5000);
       const bookmarks = await localBot.scrapeBookmarks(showProgress);
@@ -101,14 +89,14 @@ export async function goFetchTweets(xBot, configData) {
         encode(
           constants.progress.INIT_PROGRESS,
           constants.progress.LOGGED_IN,
-          constants.progress.SCRAPED,
-        ),
+          constants.progress.SCRAPED
+        )
       );
       const storeTweetsResult = await dbTools.storeTweets(bookmarks);
       if (!storeTweetsResult.success) {
         sendMessageToMainWindow(
           "NOTIFICATION",
-          `error--Could not store tweets 😫 : ${storeTweetsResult.errorMessage}`,
+          `error--Could not store tweets 😫 : ${storeTweetsResult.errorMessage}`
         );
       }
       await localBot.wait(3000);
@@ -118,8 +106,8 @@ export async function goFetchTweets(xBot, configData) {
           constants.progress.INIT_PROGRESS,
           constants.progress.LOGGED_IN,
           constants.progress.SCRAPED,
-          constants.progress.LOGGED_OUT,
-        ),
+          constants.progress.LOGGED_OUT
+        )
       );
       await localBot.wait(3000);
       hideProgress();
@@ -127,7 +115,7 @@ export async function goFetchTweets(xBot, configData) {
       hideProgress();
       sendMessageToMainWindow(
         "NOTIFICATION",
-        `error--Could not log into X 😫 : ${result.message}`,
+        `error--Could not log into X 😫 : ${result.message}`
       );
       await localBot.closeBrowser();
       return;
@@ -144,19 +132,27 @@ export async function goFetchTweets(xBot, configData) {
 export async function goFetchTweetsFake() {
   showProgress(encode(constants.progress.INIT_PROGRESS));
   showProgress(
-    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN),
+    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN)
   );
   await common.wait(3000);
   showProgress(
-    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN),
+    encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN)
   );
   await common.wait(3000);
   showProgress(
     encode(
       constants.progress.INIT_PROGRESS,
       constants.progress.LOGGED_IN,
-      constants.progress.SCRAPING,
-    ),
+      constants.progress.SCRAPING
+    )
+  );
+  await common.wait(3000);
+  showProgress(
+    encode(
+      constants.progress.INIT_PROGRESS,
+      constants.progress.LOGGED_IN,
+      constants.progress.SCRAPED
+    )
   );
   await common.wait(3000);
   showProgress(
@@ -164,16 +160,8 @@ export async function goFetchTweetsFake() {
       constants.progress.INIT_PROGRESS,
       constants.progress.LOGGED_IN,
       constants.progress.SCRAPED,
-    ),
-  );
-  await common.wait(3000);
-  showProgress(
-    encode(
-      constants.progress.INIT_PROGRESS,
-      constants.progress.LOGGED_IN,
-      constants.progress.SCRAPED,
-      constants.progress.LOGGING_OUT,
-    ),
+      constants.progress.LOGGING_OUT
+    )
   );
   await common.wait(2000);
   showProgress(
@@ -181,8 +169,8 @@ export async function goFetchTweetsFake() {
       constants.progress.INIT_PROGRESS,
       constants.progress.LOGGED_IN,
       constants.progress.SCRAPED,
-      constants.progress.LOGGED_OUT,
-    ),
+      constants.progress.LOGGED_OUT
+    )
   );
   await common.wait(2000);
   hideProgress();

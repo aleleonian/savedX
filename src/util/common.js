@@ -2,6 +2,12 @@ import * as crypto from "crypto";
 const path = require("node:path");
 const fs = require("fs");
 const { exec } = require("child_process");
+const log = require("electron-log");
+//TODO: voy por aquí para loguear to a file
+log.transports.console.level = "debug"; // This will log to the console
+log.transports.file.level = "debug"; // This will log to the file
+const logFilePath = "./my-log-file.log";
+log.transports.file.resolvePathFn = () => logFilePath;
 
 // Function to check if a command exists
 const checkCommandExists = (command) => {
@@ -38,7 +44,7 @@ export const debugLog = (...strings) => {
   const debugValue = process.env.DEBUG;
   const string = strings.join(" "); // Join with space for readability
   if (debugValue) {
-    console.log(string);
+    log.debug(string);
   }
 };
 
@@ -101,11 +107,11 @@ export const deleteAllFilesInDirectory = async (dirPath) => {
           await fs.promises.unlink(filePath); // Deletes the file
           console.log(`Deleted file: ${filePath}`);
         }
-      }),
+      })
     );
 
     console.log(
-      `All files in directory "${absoluteDirPath}" have been deleted.`,
+      `All files in directory "${absoluteDirPath}" have been deleted.`
     );
     return createSuccessResponse();
   } catch (error) {
