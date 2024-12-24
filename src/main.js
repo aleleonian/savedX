@@ -1,15 +1,22 @@
 const dotenv = require("dotenv");
 const path = require("path");
+const { app, BrowserWindow, ipcMain, Menu } = require("electron");
+const fs = require("fs");
 
 // Determine the environment
 const isDevelopment = process.env.NODE_ENV === "development";
 
 process.env.DEBUG = process.env.DEBUG || "true";
 
+// Get the directory containing the .app bundle
+const appDir = path.dirname(app.getPath("exe")); // This is `Contents/MacOS`
+
 // Set the .env file path
 const envPath = isDevelopment
-  ? path.resolve(process.cwd(), ".env") // Absolute path for development
-  : path.join(process.env.PORTABLE_EXECUTABLE_DIR || __dirname, ".env"); // Relative path for production
+  ? path.resolve(process.cwd(), "savedX.env") // Absolute path for development
+  : path.resolve(process.env.HOME, "savedX.env");
+
+common.debugLog("envPath->", envPath);
 
 // Load environment variables
 const result = dotenv.config({ path: envPath });
@@ -17,13 +24,13 @@ const result = dotenv.config({ path: envPath });
 if (result.error) {
   console.error("Failed to load .env file:", result.error);
 } else {
-  console.log("Loaded environment variables:", result.parsed);
+  common.debugLog(
+    "Loaded environment variables:",
+    JSON.stringify(result.parsed)
+  );
 }
-
-const { app, BrowserWindow, ipcMain, Menu } = require("electron");
-// Determine environment
-
-console.log("Loading .env file from:", envPath);
+common.debugLog("Environment variables loaded from:", envPath);
+common.debugLog("result:", JSON.stringify(result));
 
 import { startExpressServer } from "./webserver";
 import * as dbTools from "./util/db";
@@ -363,7 +370,7 @@ const init = async () => {
   dbPath =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "debug"
       ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
-      : "./savedx.db";
+      : path.join(process.env.HOME || __dirname, "savedx.db");
 
   common.debugLog("dbPath>", dbPath);
 

@@ -1,0 +1,2 @@
++ why am i getting this error in the built version despite having installed all the necessary software?
+yt-dlp is not installed!Also you need to install ffmpeg. 😫. Gonna change the 'download tweets media' configuration for you. Please install the software and change it back.

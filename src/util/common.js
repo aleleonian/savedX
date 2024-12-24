@@ -7,7 +7,10 @@ const log = require("electron-log");
 log.transports.console.level = "debug"; // This will log to the console
 log.transports.file.level = "debug"; // This will log to the file
 // const logFilePath = "./my-log-file.log";
-const logFilePath = path.join(process.env.HOME || __dirname, "my-log-file.log");
+const isDevelopment = process.env.NODE_ENV === "development";
+const logFilePath = isDevelopment
+  ? "./my-log-file.log"
+  : path.join(process.env.HOME || __dirname, "my-log-file.log");
 log.transports.file.resolvePathFn = () => logFilePath;
 
 // Function to check if a command exists

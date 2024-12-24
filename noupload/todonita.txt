@@ -1,5 +1,4 @@
-
-+ agregar la configureta para tener la opción de borrar tweets online
++ turn xBot into a NPM package
 
 + dar la opción de guardar una copia del multimedia de los tweets
     + maybe also guardar un snapshot del tweet. 
