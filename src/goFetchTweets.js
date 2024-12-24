@@ -40,7 +40,7 @@ export async function goFetchTweets(xBot, configData) {
     if (!checkDependenciesResponse.success) {
       sendMessageToMainWindow(
         "NOTIFICATION",
-        `error--${checkDependenciesResponse.errorMessage} 😫. Gonna change the 'download tweets media' configuration for you. Please install the software and change it back. `
+        `error--${checkDependenciesResponse.errorMessage} 😫. Gonna change the 'download tweets media' configuration for you.\nPlease install the software and change it back.\nIf the software is installed, you can specify its location in savedX.env using YTDLP_INSTALLATION and FFMPEG_INSTALLATION  `
       );
 
       changeDownloadMediaConfig().then((response) => {

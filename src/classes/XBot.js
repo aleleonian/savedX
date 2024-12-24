@@ -1034,6 +1034,8 @@ export class XBot {
               "Gotta download the video at: ",
               videoPageUrl
             );
+            //TODO: where the fuck are videos stored in production??
+            //ALSO: why the fuck can't we see them in the app?
             const fetchVideoResult = await this.fetchAndSaveVideo(
               videoPageUrl,
               "media",

@@ -13,6 +13,27 @@ const logFilePath = isDevelopment
   : path.join(process.env.HOME || __dirname, "my-log-file.log");
 log.transports.file.resolvePathFn = () => logFilePath;
 
+const predefinedPaths = [
+  "/opt/homebrew/bin",
+  "/usr/local/bin",
+  "/usr/bin",
+  "/bin",
+];
+
+// Check for command existence in predefined paths
+const findCommandInPredefinedPaths = (command) => {
+  return new Promise((resolve, reject) => {
+    for (const dir of predefinedPaths) {
+      const commandPath = path.join(dir, command);
+      if (fs.existsSync(commandPath)) {
+        resolve(commandPath); // Found the command in one of the directories
+        return;
+      }
+    }
+    reject(`${command} not found in predefined paths.`);
+  });
+};
+
 // Function to check if a command exists
 const checkCommandExists = (command) => {
   return new Promise((resolve) => {
@@ -47,6 +68,22 @@ export const createSuccessResponse = (data) => {
   return responseObj;
 };
 
+//TODO: this is macOs dependant. Should include Windows.
+const findCommandPath = (command) => {
+  return new Promise((resolve, reject) => {
+    exec(`command -v ${command}`, (error, stdout, stderr) => {
+      if (error || stderr) {
+        debugLog(`Error finding ${command}: ${stderr || error.message}`);
+        resolve(false);
+      } else {
+        debugLog("stdout->", stdout);
+        const output = stdout.trim().split("\n").pop();
+        resolve(output); // The installation path
+      }
+    });
+  });
+};
+
 export const debugLog = (...strings) => {
   const debugValue = process.env.DEBUG;
   const string = strings.join(" "); // Join with space for readability
@@ -62,28 +99,40 @@ export function createHash(inputString) {
 }
 
 export async function checkDependencies() {
-  const ytdlpInstalled = await checkCommandExists("yt-dlp --version");
-  const ffmpegInstalled = await checkCommandExists("ffmpeg -version");
-  let errorMessage = "";
-
-  debugLog(process.env.DEBUG, "ytdlpInstalled->", ytdlpInstalled);
-
-  debugLog(process.env.DEBUG, "ffmpegInstalled->", ffmpegInstalled);
-
-  if (!ytdlpInstalled) {
-    errorMessage += "yt-dlp is not installed!";
+  let ytdlpInstallation, ffmpegInstallation;
+  if (process.env.YTDLP_INSTALLATION) {
+    ytdlpInstallation = process.env.YTDLP_INSTALLATION;
+  } else {
+    ytdlpInstallation = await findCommandInPredefinedPaths("yt-dlp");
   }
 
-  if (!ffmpegInstalled) {
+  if (process.env.FFMPEG_INSTALLATION) {
+    ffmpegInstallation = process.env.FFMPEG_INSTALLATION;
+  } else {
+    ffmpegInstallation = await findCommandInPredefinedPaths("ffmpeg");
+  }
+  let errorMessage = "";
+
+  debugLog("ytdlpInstallation->", ytdlpInstallation);
+
+  debugLog("ffmpegInstallation->", ffmpegInstallation);
+
+  if (!ytdlpInstallation) {
+    errorMessage += "yt-dlp could not be found! ";
+  }
+
+  if (!ffmpegInstallation) {
     errorMessage +=
       errorMessage == ""
         ? "ffmpeg is not installed!"
-        : "Also you need to install ffmpeg.";
+        : "Also ffmpeg could not be found.";
   }
 
   if (errorMessage != "") {
     return createErrorResponse(errorMessage);
   } else {
+    process.env.PATH += `:${ytdlpInstallation}`;
+    process.env.PATH += `:${ffmpegInstallation}`;
     return createSuccessResponse();
   }
 }
