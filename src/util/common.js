@@ -16,7 +16,10 @@ log.transports.file.resolvePathFn = () => logFilePath;
 // Function to check if a command exists
 const checkCommandExists = (command) => {
   return new Promise((resolve) => {
-    exec(`${command}`, (error) => {
+    exec(`${command}`, (error, stdout, stderr) => {
+      debugLog(
+        `Command: ${command}, Error: ${error}, Stdout: ${stdout}, Stderr: ${stderr}`
+      );
       if (error) {
         resolve(false); // Command not found
       } else {

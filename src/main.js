@@ -17,6 +17,7 @@ const envPath = isDevelopment
   : path.resolve(process.env.HOME, "savedX.env");
 
 common.debugLog("envPath->", envPath);
+common.debugLog("PATH->", process.env.PATH);
 
 // Load environment variables
 const result = dotenv.config({ path: envPath });
