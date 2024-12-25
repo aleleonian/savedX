@@ -4,7 +4,7 @@ const APP_FOLDER = path.join(process.env.HOME, appName);
 const envPath = path.resolve(APP_FOLDER, ".env");
 const dotenv = require("dotenv");
 const result = dotenv.config({ path: envPath });
-process.env.APP_FOLDER = path.join(APP_FOLDER);
+process.env.APP_FOLDER = APP_FOLDER;
 
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const fs = require("fs");
@@ -56,6 +56,7 @@ if (result.error) {
 common.debugLog("envPath->", envPath);
 common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
 common.debugLog("result:", JSON.stringify(result));
+common.debugLog("process.env.APP_FOLDER ->", process.env.APP_FOLDER);
 
 let mainWindow;
 let xBot;
@@ -385,12 +386,8 @@ common.debugLog(
 );
 
 const init = async () => {
-  let dbPath;
   common.debugLog("process.env.NODE_ENV->", process.env.NODE_ENV);
-  dbPath =
-    process.env.NODE_ENV === "development" || process.env.NODE_ENV === "debug"
-      ? path.resolve(app.getAppPath(), "src", "data", "savedx.db")
-      : path.join(process.env.HOME || __dirname, "savedx.db");
+  const dbPath = path.join(process.env.APP_FOLDER, "savedx.db");
 
   common.debugLog("dbPath>", dbPath);
 
