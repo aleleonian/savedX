@@ -1,37 +1,28 @@
-const dotenv = require("dotenv");
+const appName = "savedX";
 const path = require("path");
+const APP_FOLDER = path.join(process.env.HOME, appName);
+const envPath = path.resolve(APP_FOLDER, ".env");
+const dotenv = require("dotenv");
+const result = dotenv.config({ path: envPath });
+process.env.APP_FOLDER = path.join(APP_FOLDER);
+
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const fs = require("fs");
 
-// Determine the environment
-const isDevelopment = process.env.NODE_ENV === "development";
+/////// log stuff /////////
 
-process.env.DEBUG = process.env.DEBUG || "true";
+const log = require("electron-log");
+log.transports.console.level = "debug";
+log.transports.file.level = "debug";
 
-// Get the directory containing the .app bundle
-const appDir = path.dirname(app.getPath("exe")); // This is `Contents/MacOS`
+const logFilePath = path.join(APP_FOLDER, "my-log-file.log");
+log.transports.file.resolvePathFn = () => logFilePath;
 
-// Set the .env file path
-const envPath = isDevelopment
-  ? path.resolve(process.cwd(), "savedX.env") // Absolute path for development
-  : path.resolve(process.env.HOME, "savedX.env");
-
-common.debugLog("envPath->", envPath);
-common.debugLog("PATH->", process.env.PATH);
-
-// Load environment variables
-const result = dotenv.config({ path: envPath });
-
-if (result.error) {
-  console.error("Failed to load .env file:", result.error);
-} else {
-  common.debugLog(
-    "Loaded environment variables:",
-    JSON.stringify(result.parsed)
-  );
+if (!fs.existsSync(process.env.APP_FOLDER)) {
+  fs.mkdirSync(process.env.APP_FOLDER, { recursive: true });
 }
-common.debugLog("Environment variables loaded from:", envPath);
-common.debugLog("result:", JSON.stringify(result));
+
+process.env.MEDIA_FOLDER = path.join(process.env.APP_FOLDER, "Media");
 
 import { startExpressServer } from "./webserver";
 import * as dbTools from "./util/db";
@@ -54,6 +45,18 @@ import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
 
 import { mainEmitter } from "./util/event-emitter.js";
 
+if (result.error) {
+  common.debugLog("Failed to load .env file:", result.error);
+} else {
+  common.debugLog(
+    "Loaded environment variables:",
+    JSON.stringify(result.parsed)
+  );
+}
+common.debugLog("envPath->", envPath);
+common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
+common.debugLog("result:", JSON.stringify(result));
+
 let mainWindow;
 let xBot;
 
@@ -71,6 +74,7 @@ const createWindow = () => {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,
+      allowFileAccessFromFileURLs: true,
     },
   });
 
@@ -90,12 +94,27 @@ const createWindow = () => {
         const value = process.env.DEBUG ? JSON.parse(process.env.DEBUG) : false;
         return value;
       } catch (error) {
-        console.error("Error occurred:", error);
+        common.debugLog("Error occurred:", error);
         return false;
       }
     })();
 
-    sendMessageToMainWindow("env-debug", debugEnvVar || false);
+    const mediaFolderEnvVar = (() => {
+      try {
+        const value = process.env.MEDIA_FOLDER
+          ? process.env.MEDIA_FOLDER
+          : "UNDEFINED";
+        return value;
+      } catch (error) {
+        common.debugLog("Error occurred:", error);
+        return false;
+      }
+    })();
+
+    const envVarsValues = {};
+    envVarsValues["DEBUG"] = debugEnvVar;
+    envVarsValues["MEDIA_FOLDER"] = mediaFolderEnvVar;
+    sendMessageToMainWindow("env-vars", envVarsValues);
   });
 
   // and load the index.html of the app.
@@ -285,7 +304,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
         if (deleteAllTweestResult.success) {
           if (xBot.downloadMedia) {
             const deleteMediaFilesResult =
-              await common.deleteAllFilesInDirectory("./media");
+              await common.deleteAllFilesInDirectory(process.env.MEDIA_FOLDER);
             if (deleteMediaFilesResult.success) {
               resolve(true);
             } else {
@@ -293,7 +312,8 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
                 "NOTIFICATION",
                 "error--Tweets were deleted but not all files in the media folder"
               );
-              resolve(false);
+              // If we resolve false, then the local saved tweets array won't be updated
+              resolve(true);
             }
           } else resolve(true);
           // sendMessageToMainWindow("NOTIFICATION", "success--Tweets were deleted!");

@@ -25,9 +25,6 @@ export async function goFetchTweets(xBot, configData) {
   common.debugLog("localBot.botEmail->", localBot.botEmail);
   common.debugLog("localBot.downloadMedia->", localBot.downloadMedia);
 
-  //TODO here we have to check dependencies
-  //if fail then modify configuration to change downloadMedia
-  //and let the user know
   if (localBot.downloadMedia) {
     const checkDependenciesResponse = await common.checkDependencies();
 

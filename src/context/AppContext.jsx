@@ -9,6 +9,7 @@ export const AppProvider = ({ children }) => {
     savedTweets: [],
     tags: [],
     isDebug: false,
+    mediaFolder: "",
     communication: {
       notificatonMessage: "",
       alertTitle: "",

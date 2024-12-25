@@ -3,15 +3,6 @@ const path = require("node:path");
 const fs = require("fs");
 const { exec } = require("child_process");
 const log = require("electron-log");
-//TODO: voy por aquí para loguear to a file
-log.transports.console.level = "debug"; // This will log to the console
-log.transports.file.level = "debug"; // This will log to the file
-// const logFilePath = "./my-log-file.log";
-const isDevelopment = process.env.NODE_ENV === "development";
-const logFilePath = isDevelopment
-  ? "./my-log-file.log"
-  : path.join(process.env.HOME || __dirname, "my-log-file.log");
-log.transports.file.resolvePathFn = () => logFilePath;
 
 const predefinedPaths = [
   "/opt/homebrew/bin",
@@ -91,6 +82,10 @@ export const debugLog = (...strings) => {
     log.debug(string);
   }
 };
+export const errorLog = (...strings) => {
+  const string = strings.join(" "); // Join with space for readability
+  log.error(string);
+};
 
 export function createHash(inputString) {
   const hash = crypto.createHash("md5");
@@ -119,6 +114,8 @@ export async function checkDependencies() {
 
   if (!ytdlpInstallation) {
     errorMessage += "yt-dlp could not be found! ";
+  } else {
+    process.env.YTDLP_INSTALLATION = ytdlpInstallation;
   }
 
   if (!ffmpegInstallation) {
@@ -126,13 +123,15 @@ export async function checkDependencies() {
       errorMessage == ""
         ? "ffmpeg is not installed!"
         : "Also ffmpeg could not be found.";
+  } else {
+    process.env.FFMPEG_INSTALLATION = ffmpegInstallation;
   }
 
   if (errorMessage != "") {
     return createErrorResponse(errorMessage);
   } else {
-    process.env.PATH += `:${ytdlpInstallation}`;
-    process.env.PATH += `:${ffmpegInstallation}`;
+    // process.env.PATH += `:${ytdlpInstallation}`;
+    // process.env.PATH += `:${ffmpegInstallation}`;
     return createSuccessResponse();
   }
 }
@@ -144,7 +143,7 @@ export const deleteFile = async (filePath) => {
     debugLog(process.env.DEBUG, `File deleted: ${absolutePath}`);
     return true;
   } catch (error) {
-    console.error(`Error deleting file: ${error.message}`);
+    errorLog(`Error deleting file: ${error.message}`);
     return false;
   }
 };
@@ -172,7 +171,7 @@ export const deleteAllFilesInDirectory = async (dirPath) => {
     return createSuccessResponse();
   } catch (error) {
     const errorMessage = `Error deleting files in directory: ${error.message}`;
-    console.error(errorMessage);
+    errorLog(errorMessage);
     return createErrorResponse(errorMessage);
   }
 };

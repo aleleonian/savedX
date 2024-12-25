@@ -6,6 +6,7 @@ export const VideoPlayer = ({ videoSrc }) => {
       <h1>Video Player</h1>
       {videoSrc && (
         <video
+          type="video/mp4"
           src={videoSrc}
           controls
           style={{ width: "100%", maxWidth: "600px", borderRadius: "10px" }}

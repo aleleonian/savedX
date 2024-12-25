@@ -10,7 +10,7 @@ function createDatabase(filePath) {
   return new Promise((resolve, reject) => {
     db = new sqlite3.Database(filePath, (err) => {
       if (err) {
-        console.error("Error creating the database:", err.message);
+        common.errorLog("Error creating the database:", err.message);
         reject({
           success: false,
           errorMessage: err.message,
@@ -164,7 +164,7 @@ export const openDb = (filePath) => {
       }
       db = new sqlite3.Database(filePath, (err) => {
         if (err) {
-          console.error("Error opening database:", err);
+          common.errorLog("Error opening database:", err);
           resolve(false);
           return;
         } else {
@@ -176,7 +176,7 @@ export const openDb = (filePath) => {
         }
       });
     } catch (err) {
-      console.error("Error opening or creating db file:", err);
+      common.errorLog("Error opening or creating db file:", err);
       resolve(false);
     }
   });
@@ -268,7 +268,7 @@ export const deleteAllTweets = async () => {
       return createErrorResponse("DELETE FROM tweets_tags failed!");
     }
   } catch (error) {
-    console.error("deleteAllTweets: Error executing query:", error);
+    common.errorLog("deleteAllTweets: Error executing query:", error);
     return createErrorResponse(
       `deleteAllTweets: Could not delete all tweets: ${error}`
     );
@@ -304,7 +304,7 @@ export async function deleteTweetById(tweetId) {
       return false;
     }
   } catch (error) {
-    console.error("Error deleting tweet:", error);
+    common.errorLog("Error deleting tweet:", error);
     return false;
   }
 }
@@ -357,7 +357,7 @@ export const updateTags = async (tweetId, newTags) => {
     }
     return true;
   } catch (err) {
-    console.error("Error updating tags:", err);
+    common.errorLog("Error updating tags:", err);
     return false;
   }
 };
@@ -417,7 +417,7 @@ export const readAllTweets = async () => {
       };
     }
   } catch (error) {
-    console.error("Error executing query:", error);
+    common.errorLog("Error executing query:", error);
     return createErrorResponse(error.errorMessage);
   }
 };
@@ -440,7 +440,7 @@ export const removeTagFromDB = async (tagName) => {
     );
     return createSuccessResponse();
   } catch (error) {
-    console.error("Error removing tag from system:", error);
+    common.errorLog("Error removing tag from system:", error);
     return createErrorResponse(error.errorMessage);
   }
 };

@@ -77,18 +77,18 @@ export class XBot {
               });
             } else {
               const errorMessage = `Failed to fetch image. Status code: ${response.statusCode}`;
-              console.error(errorMessage);
+              common.debugLog(errorMessage);
               resolve(common.createErrorResponse(errorMessage));
             }
           })
           .on("error", (err) => {
             const errorMessage = `Error fetching the image: ${err.message}`;
-            console.error(errorMessage);
+            common.errorLog(errorMessage);
             resolve(common.createErrorResponse(errorMessage));
           });
       } catch (error) {
         const errorMessage = `Error fetching the image: ${error.message}`;
-        console.error(errorMessage);
+        common.errorLog(errorMessage);
         resolve(common.createErrorResponse(errorMessage));
       }
     });
@@ -102,16 +102,16 @@ export class XBot {
           fs.mkdirSync(saveDir, { recursive: true });
         }
 
-        const command = `yt-dlp -o "${saveDir}/${saveFileName}" ${videoPageurl}`;
+        const command = `${process.env.YTDLP_INSTALLATION} -o "${saveDir}/${saveFileName}" ${videoPageurl}`;
 
         exec(command, (error, stdout, stderr) => {
           if (error) {
-            console.error(`Error executing yt-dlp: ${error.message}`);
+            common.errorLog(`Error executing yt-dlp: ${error.message}`);
             resolve(common.createErrorResponse(error.message));
             return;
           }
           if (stderr) {
-            console.error(`stderr: ${stderr}`);
+            common.errorLog(`stderr: ${stderr}`);
             resolve(common.createErrorResponse(stderr));
             return;
           }
@@ -119,7 +119,7 @@ export class XBot {
           resolve(common.createSuccessResponse(stdout));
         });
       } catch (error) {
-        console.error(`fetchAndSaveVideo: Error occurred: ${error.message}`);
+        common.errorLog(`fetchAndSaveVideo: Error occurred: ${error.message}`);
         resolve(common.createErrorResponse(error.message));
       }
     });
@@ -495,7 +495,7 @@ export class XBot {
         return false;
       }
     } catch (error) {
-      console.error("An error occurred:", error);
+      common.errorLog("An error occurred:", error);
       return false;
     }
   }
@@ -942,7 +942,7 @@ export class XBot {
           await bookmarkButtons[i].click();
           console.log(`Clicked button ${i + 1}`);
         } catch (error) {
-          console.error(`Error clicking button ${i + 1}:`, error);
+          common.errorLog(`Error clicking button ${i + 1}:`, error);
         }
 
         // Delay for 2 seconds
@@ -1038,12 +1038,16 @@ export class XBot {
             //ALSO: why the fuck can't we see them in the app?
             const fetchVideoResult = await this.fetchAndSaveVideo(
               videoPageUrl,
-              "media",
+              process.env.MEDIA_FOLDER,
               newBookmark.tweetUrlHash + ".mp4"
             );
 
             if (!fetchVideoResult.success) {
               newBookmark.hasLocalMedia = "no";
+              sendMessageToMainWindow(
+                "NOTIFICATION",
+                `error--Trouble with fetchAndSaveVideo(): ${fetchVideoResult.errorMessage}`
+              );
             }
           } else if (imageDiv.length > 0) {
             newBookmark.hasLocalMedia = "image";
@@ -1060,7 +1064,12 @@ export class XBot {
               "media",
               newBookmark.tweetUrlHash + ".jpg"
             );
+            // TODO: we got to report this error somehow
             if (!fecthImageResult.success) {
+              sendMessageToMainWindow(
+                "NOTIFICATION",
+                `error--Trouble with fetchAndSaveImage(): ${fecthImageResult.errorMessage}`
+              );
               newBookmark.hasLocalMedia = "no";
             }
           }

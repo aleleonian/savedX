@@ -47,13 +47,14 @@ const api = {
   },
 };
 
-let debugValueSet = false;
+let envVarsValuesSet = false;
 
-ipcRenderer.on("env-debug", (event, debugValue) => {
-  api.DEBUG = debugValue;
-  debugValueSet = true;
+ipcRenderer.on("env-vars", (event, envVarsValues) => {
+  api.DEBUG = envVarsValues["DEBUG"];
+  api.MEDIA_FOLDER = envVarsValues["MEDIA_FOLDER"];
+  envVarsValuesSet = true;
   // Only expose API once the DEBUG value is set
-  if (debugValueSet) {
+  if (envVarsValuesSet) {
     contextBridge.exposeInMainWorld("savedXApi", api);
   }
 });

@@ -31,7 +31,7 @@ const handleClick = (path) => {
   if (window.savedXApi && window.savedXApi.openUrl) {
     window.savedXApi.openUrl("https://www.x.com" + path); // Open the external URL using the exposed API
   } else {
-    console.error("The openUrl method is not available");
+    common.errorLog("The openUrl method is not available");
   }
 };
 
@@ -98,7 +98,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g",
+      "g"
     );
     return originalString.replace(regex, "").trim();
   }
@@ -164,7 +164,7 @@ export function TweetDetailDialog({
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
       );
       setNotificationMessage(null);
       onClose();
@@ -259,13 +259,15 @@ export function TweetDetailDialog({
                 )
               ) : tweetData.hasLocalMedia == "image" ? (
                 <img
-                  src={`media/${tweetData.tweetUrlHash}.jpg`}
+                  src={`${window.savedXApi.MEDIA_FOLDER}/${tweetData.tweetUrlHash}.jpg`}
                   className="mt-2 rounded-lg"
                   width="75%"
                   alt="tweet image"
                 />
               ) : (
-                <VideoPlayer videoSrc={`media/${tweetData.tweetUrlHash}.mp4`} />
+                <VideoPlayer
+                  videoSrc={`file://${window.savedXApi.MEDIA_FOLDER}/${tweetData.tweetUrlHash}.mp4`}
+                />
               )}
             </div>
           </div>
