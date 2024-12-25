@@ -130,8 +130,6 @@ export async function checkDependencies() {
   if (errorMessage != "") {
     return createErrorResponse(errorMessage);
   } else {
-    // process.env.PATH += `:${ytdlpInstallation}`;
-    // process.env.PATH += `:${ffmpegInstallation}`;
     return createSuccessResponse();
   }
 }

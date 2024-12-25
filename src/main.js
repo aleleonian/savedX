@@ -162,9 +162,7 @@ app.whenReady().then(async () => {
     );
   }
 
-  if (process.env.DEBUG) {
-    startExpressServer(xBot); // Start the Express server here
-  }
+  startExpressServer(xBot);
 });
 
 // On OS X it's common to re-create a window in the app when the
@@ -257,7 +255,8 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
         if (deleteTweetResult) {
           // delete media if necessary
           if (tweetData.hasLocalMedia !== "no") {
-            let filePath = "media/" + tweetData.tweetUrlHash;
+            let filePath =
+              process.env.MEDIA_FOLDER + "/" + tweetData.tweetUrlHash;
             if (tweetData.hasLocalMedia === "image") {
               filePath += ".jpg";
             } else if (tweetData.hasLocalMedia === "video") {

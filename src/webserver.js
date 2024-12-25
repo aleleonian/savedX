@@ -7,10 +7,10 @@ let xBotPointer;
 export const startExpressServer = (xBot) => {
   xBotPointer = xBot;
   const server = express();
-
+  // Serve the media files
+  server.use("/media", express.static(process.env.MEDIA_FOLDER));
   // Add middleware if needed
   server.use(express.json());
-
   // Example route to fetch data
   server.get("/debug-xbot", async (req, res) => {
     try {
@@ -40,7 +40,7 @@ export const startExpressServer = (xBot) => {
   server.listen(port, () => {
     common.debugLog(
       process.env.DEBUG,
-      `Express server running at http://localhost:${port}`,
+      `Express server running at http://localhost:${port}`
     );
   });
 };

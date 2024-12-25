@@ -258,15 +258,16 @@ export function TweetDetailDialog({
                   </a>
                 )
               ) : tweetData.hasLocalMedia == "image" ? (
+                //TODO: make this localhost:3000 dynamic and sent from the main process
                 <img
-                  src={`${window.savedXApi.MEDIA_FOLDER}/${tweetData.tweetUrlHash}.jpg`}
+                  src={`http://localhost:3000/media/${tweetData.tweetUrlHash}.jpg`}
                   className="mt-2 rounded-lg"
                   width="75%"
                   alt="tweet image"
                 />
               ) : (
                 <VideoPlayer
-                  videoSrc={`file://${window.savedXApi.MEDIA_FOLDER}/${tweetData.tweetUrlHash}.mp4`}
+                  videoSrc={`http://localhost:3000/media/${tweetData.tweetUrlHash}.mp4`}
                 />
               )}
             </div>

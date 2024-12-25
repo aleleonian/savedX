@@ -1061,7 +1061,7 @@ export class XBot {
             );
             const fecthImageResult = await this.fetchAndSaveImage(
               tweetPhothUrl,
-              "media",
+              process.env.MEDIA_FOLDER,
               newBookmark.tweetUrlHash + ".jpg"
             );
             // TODO: we got to report this error somehow
