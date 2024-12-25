@@ -48,16 +48,12 @@ export class XBot {
     this.botPassword;
     this.botEmail;
     this.downloadMedia;
+    this.deleteOnlineBookmarks;
   }
 
   async fetchAndSaveImage(imageUrl, saveDir, saveFileName) {
     return new Promise((resolve) => {
       try {
-        // Ensure the save directory exists
-        if (!fs.existsSync(saveDir)) {
-          fs.mkdirSync(saveDir, { recursive: true });
-        }
-
         // Path to save the image
         const savePath = path.join(saveDir, saveFileName);
 
@@ -97,12 +93,7 @@ export class XBot {
   async fetchAndSaveVideo(videoPageurl, saveDir, saveFileName) {
     return new Promise((resolve) => {
       try {
-        // Ensure the save directory exists
-        if (!fs.existsSync(saveDir)) {
-          fs.mkdirSync(saveDir, { recursive: true });
-        }
-
-        const command = `${process.env.YTDLP_INSTALLATION} -o "${saveDir}/${saveFileName}" ${videoPageurl}`;
+        const command = `${process.env.YTDLP_INSTALLATION} --ffmpeg-location ${process.env.FFMPEG_INSTALLATION} -o "${saveDir}/${saveFileName}" ${videoPageurl}`;
 
         exec(command, (error, stdout, stderr) => {
           if (error) {
@@ -1034,8 +1025,6 @@ export class XBot {
               "Gotta download the video at: ",
               videoPageUrl
             );
-            //TODO: where the fuck are videos stored in production??
-            //ALSO: why the fuck can't we see them in the app?
             const fetchVideoResult = await this.fetchAndSaveVideo(
               videoPageUrl,
               process.env.MEDIA_FOLDER,
@@ -1131,8 +1120,9 @@ export class XBot {
         break;
       }
     }
-    //TODO: if DELETE_BOOKMARK == true then
-    await this.deleteTwitterBookmarks();
+    if (this.deleteOnlineBookmarks) {
+      await this.deleteTwitterBookmarks();
+    }
     const bookmarksCopy = [...this.bookmarks];
     this.bookmarks = [];
     return bookmarksCopy;

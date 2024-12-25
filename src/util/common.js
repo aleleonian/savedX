@@ -1,4 +1,6 @@
+import { common } from "@mui/material/colors";
 import * as crypto from "crypto";
+import { comma } from "postcss/lib/list";
 const path = require("node:path");
 const fs = require("fs");
 const { exec } = require("child_process");
@@ -130,6 +132,10 @@ export async function checkDependencies() {
   if (errorMessage != "") {
     return createErrorResponse(errorMessage);
   } else {
+    // process.env.PATH += `:${ytdlpInstallation}`;
+    debugLog("Updated PATH:", process.env.PATH);
+    process.env.PATH += `:${ffmpegInstallation}`;
+    debugLog("Updated PATH:", process.env.PATH);
     return createSuccessResponse();
   }
 }
