@@ -1084,11 +1084,11 @@ export class XBot {
     return this.bookmarks;
   };
   scrapeBookmarks = async (showProgressFunction) => {
-    await this.storeBookmarks();
-
-    let scrollPosition = 0;
-
     while (this.goAheadScrape) {
+      await this.storeBookmarks();
+
+      let scrollPosition = 0;
+
       common.debugLog("Gonna scroll...");
       await this.page.evaluate(() => {
         window.scrollBy(0, window.innerHeight);
