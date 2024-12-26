@@ -917,6 +917,7 @@ export class XBot {
 
     await this.page.waitForSelector('[aria-label="Bookmarked"]');
 
+    //TODO: Bookmarked is in english, but it could be another language
     // Get all buttons with the `aria-label="Bookmarked"`
     let bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
 
