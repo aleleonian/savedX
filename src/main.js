@@ -266,16 +266,8 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
             const fileDeletionResult = await common.deleteFile(filePath);
             if (fileDeletionResult) {
               resolve(true);
-              sendMessageToMainWindow(
-                "NOTIFICATION",
-                "success--Tweet was deleted!"
-              );
             } else {
               resolve(false);
-              sendMessageToMainWindow(
-                "NOTIFICATION",
-                "error--Tweet was deleted from db but not the media file!"
-              );
             }
           }
           resolve(true);

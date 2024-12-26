@@ -155,20 +155,26 @@ export function TweetDetailDialog({
   };
 
   const handleConfirmAction = async () => {
-    // Add your confirmation logic here (e.g., delete item)
     setConfirmationDialogOpen(false);
     const tweetDeleteResult =
       await window.savedXApi.deleteSavedTweet(tweetData);
     // Gotta update the array of tweets and re-render
     if (tweetDeleteResult) {
+      setNotificationMessage("success--Tweet was deleted!");
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
         newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
       );
-      setNotificationMessage(null);
-      onClose();
+      // Delay clearing the notification and closing the dialog
+      setTimeout(() => {
+        setNotificationMessage(null);
+        onClose();
+      }, 3000); // Adjust delay time (in milliseconds) as needed
     } else {
+      setNotificationMessage(
+        "error--Tweet was deleted from db but not the media file!"
+      );
       debugLog(window.savedXApi.DEBUG, "tweetDeleteResult:", tweetDeleteResult);
     }
   };
@@ -204,7 +210,10 @@ export function TweetDetailDialog({
                 title="⚠️"
                 message={notificationMessage}
                 openFlag={true}
-                cleanUp={() => setNotificationMessage(null)}
+                cleanUp={() => {
+                  setNotificationMessage(null);
+                  onClose();
+                }}
               />
             )}
 
