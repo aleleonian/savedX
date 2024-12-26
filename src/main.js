@@ -228,7 +228,6 @@ ipcMain.on("stop-scraping", async () => {
 });
 
 ipcMain.handle("update-tags-for-tweet", async (event, tweetId, newTags) => {
-  return common.createErrorResponse("donde las putas!");
   const updateTagsResult = await dbTools.updateTags(tweetId, newTags);
   common.debugLog("updateTagsResult->", updateTagsResult);
   return updateTagsResult;
