@@ -21,7 +21,7 @@ const api = {
   openUrl: (url) => shell.openExternal(url),
   updateTagsForTweet: (tweetId, newTags) =>
     ipcRenderer.invoke("update-tags-for-tweet", tweetId, newTags),
-  removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
+  removeTagFromDB: (tag) => ipcRenderer.invoke("remove-tag-from-db", tag),
   getConfigData: () => ipcRenderer.invoke("fetch-config-data"),
   updateConfigData: (formData) =>
     ipcRenderer.send("update-config-data", formData),
@@ -32,7 +32,7 @@ const api = {
   },
   deleteAllSavedTweets: async () => {
     const deleteAllTweetsResult = await ipcRenderer.invoke(
-      "delete-all-saved-tweets",
+      "delete-all-saved-tweets"
     );
     return deleteAllTweetsResult;
   },
@@ -40,7 +40,7 @@ const api = {
     common.debugLog(
       api.DEBUG,
       "reportFoundTweet() reportObj:",
-      JSON.stringify(reportObj),
+      JSON.stringify(reportObj)
     );
     ipcRenderer.send("report-found-tweet", reportObj);
   },
@@ -98,7 +98,7 @@ ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
   common.debugLog(
     api.DEBUG,
     "SHOW_CONFIG_DIALOG preload configData:",
-    JSON.stringify(configData),
+    JSON.stringify(configData)
   );
   if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
   else {

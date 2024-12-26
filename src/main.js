@@ -50,7 +50,7 @@ if (result.error) {
 } else {
   common.debugLog(
     "Loaded environment variables:",
-    JSON.stringify(result.parsed),
+    JSON.stringify(result.parsed)
   );
 }
 common.debugLog("envPath->", envPath);
@@ -124,7 +124,7 @@ const createWindow = () => {
   } else {
     const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window";
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${viteName}/index.html`),
+      path.join(__dirname, `../renderer/${viteName}/index.html`)
     );
   }
   common.debugLog("MAIN_WINDOW_VITE_NAME->", MAIN_WINDOW_VITE_NAME);
@@ -143,14 +143,14 @@ app.whenReady().then(async () => {
   if (!initStatus.success) {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${initStatus.errorMessage}`,
+      `error--${initStatus.errorMessage}`
     );
   }
 
   const allConfigDataResponse = await getAllConfigData();
   common.debugLog(
     "allConfigDataResponse->",
-    JSON.stringify(allConfigDataResponse),
+    JSON.stringify(allConfigDataResponse)
   );
   if (allConfigDataResponse.success) {
     xBot.downloadMedia = allConfigDataResponse.data.DOWNLOAD_MEDIA;
@@ -159,7 +159,7 @@ app.whenReady().then(async () => {
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${allConfigDataResponse.errorMessage}`,
+      `error--${allConfigDataResponse.errorMessage}`
     );
   }
 
@@ -222,7 +222,7 @@ ipcMain.handle("go-fetch-tweets", async () => {
   return common.createErrorResponse(failedResponseObject.message);
 });
 
-ipcMain.on("stop-scraping", async () => {
+ipcMain.on("stop-scraping", () => {
   common.debugLog("we gonna stop scraping then.");
   stopScraping();
 });
@@ -233,17 +233,14 @@ ipcMain.handle("update-tags-for-tweet", async (event, tweetId, newTags) => {
   return updateTagsResult;
 });
 
-ipcMain.on("remove-tag-from-db", async (event, tag) => {
-  const removeTagFromDBResult = await dbTools.removeTagFromDB(tag);
-  //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
-  //O MAL EL UPDATE
-  if (!removeTagFromDBResult.success) {
-    sendMessageToMainWindow(
-      "NOTIFICATION",
-      `error--${removeTagFromDBResult.errorMessage} 😫`,
-    );
+ipcMain.handle("remove-tag-from-db", async (event, tag) => {
+  try {
+    const removeTagFromDBResult = await dbTools.removeTagFromDB(tag);
+    common.debugLog("removeTagFromDBResult->", removeTagFromDBResult);
+    return removeTagFromDBResult;
+  } catch (error) {
+    return common.createErrorResponse(error);
   }
-  common.debugLog("removeTagFromDBResult->", removeTagFromDBResult);
 });
 
 ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
@@ -273,14 +270,14 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
           resolve(false);
           sendMessageToMainWindow(
             "NOTIFICATION",
-            "error--Tweet was not deleted",
+            "error--Tweet was not deleted"
           );
         }
       } catch (error) {
         resolve(false);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          "error--Tweet was not deleted: " + error,
+          "error--Tweet was not deleted: " + error
         );
       }
     })();
@@ -300,7 +297,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
             } else {
               sendMessageToMainWindow(
                 "NOTIFICATION",
-                "error--Tweets were deleted but not all files in the media folder",
+                "error--Tweets were deleted but not all files in the media folder"
               );
               // If we resolve false, then the local saved tweets array won't be updated
               resolve(true);
@@ -315,7 +312,7 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
         resolve(false);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          "error--Tweet was not deleted: " + error,
+          "error--Tweet was not deleted: " + error
         );
       }
     })();
@@ -336,8 +333,8 @@ ipcMain.on("update-config-data", async (event, formData) => {
       sendMessageToMainWindow(
         "ALERT",
         `Trouble updating config data mai fren:  ${JSON.stringify(
-          updateConfigDataResponse.errorMessage,
-        )}`,
+          updateConfigDataResponse.errorMessage
+        )}`
       );
     }
   } catch (error) {
@@ -372,7 +369,7 @@ ipcMain.on("open-debug-session", async () => {
 
 common.debugLog(
   "DEBUG in main process:",
-  process.env.DEBUG ? JSON.parse(process.env.DEBUG) : false,
+  process.env.DEBUG ? JSON.parse(process.env.DEBUG) : false
 );
 
 const init = async () => {
@@ -414,7 +411,7 @@ const init = async () => {
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--There were issues opening / creating the db file 😫`,
+      `error--There were issues opening / creating the db file 😫`
     );
     sendMessageToMainWindow("DISABLE_GO_FETCH_BUTTON");
   }
