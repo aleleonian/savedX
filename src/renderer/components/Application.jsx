@@ -226,8 +226,17 @@ export const Application = () => {
     }
   };
 
-  function goFetchTweets() {
-    window.savedXApi.goFetchTweets();
+  async function goFetchTweets() {
+    const goFetchTweetsResult = await window.savedXApi.goFetchTweets();
+    if (!goFetchTweetsResult.success) {
+      setAlertTitle("Err...");
+      setAlertMessage(
+        goFetchTweetsResult.errorMessage + "\nPlease check configuration."
+      );
+      setOpenConfigDialog(true);
+    }
+    // sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
+    // sendMessageToMainWindow("ALERT", failedResponseObject);
   }
 
   function openDebugSession() {

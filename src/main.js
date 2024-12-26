@@ -192,27 +192,29 @@ app.on("before-quit", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ipcMain.on("go-fetch-tweets", async () => {
+ipcMain.handle("go-fetch-tweets", async () => {
   const checkUserAndPassResponse = await checkUserAndPass();
   const failedResponseObject = {
     title: "Bro...",
     message: "An unknown error occurred 😕",
   };
 
+  return common.createErrorResponse(failedResponseObject.message);
+
   if (checkUserAndPassResponse.success) {
     const allConfigDataResponse = await getAllConfigData();
     if (allConfigDataResponse.success) {
       await goFetchTweets(xBot, allConfigDataResponse.data);
-      return;
+      return common.createSuccessResponse();
     } else {
-      failedResponseObject.message = `There's some error with the db 😫 : ${allConfigDataResponse.errorMessage}`;
+      failedResponseObject.errorMessage = `There's some error with the db 😫 : ${allConfigDataResponse.errorMessage}`;
     }
   } else {
-    failedResponseObject.message = `There's no user and pass 😫`;
+    failedResponseObject.errorMessage = `There's no user and pass 😫`;
   }
-  sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
-  sendMessageToMainWindow("ALERT", failedResponseObject);
-  return;
+  // sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
+  // sendMessageToMainWindow("ALERT", failedResponseObject);
+  return common.createErrorResponse(failedResponseObject.message);
 });
 
 ipcMain.on("stop-scraping", async () => {
@@ -241,11 +243,6 @@ ipcMain.on("remove-tag-from-db", async (event, tag) => {
     );
   }
   common.debugLog("removeTagFromDBResult->", removeTagFromDBResult);
-});
-
-ipcMain.on("fetch-config-data", async () => {
-  const getAllConfigDataResponse = await getAllConfigData();
-  sendMessageToMainWindow("CONFIG_DATA", getAllConfigDataResponse);
 });
 
 ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {

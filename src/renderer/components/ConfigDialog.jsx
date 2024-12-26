@@ -32,30 +32,16 @@ export function ConfigDialog({ open, onClose, configData }) {
         setNotificationMessage(data[1]);
       }
     };
-    // TODO: esto está al pedo?
-    // const configDataDialogEventListener = (event) => {
-    //   if (event.detail) {
-    //     if (event.detail.success) {
-    //     }
-    //   }
-    // };
 
     window.addEventListener("NOTIFICATION", notificationEventListener);
-    // window.addEventListener("CONFIG_DATA", configDataDialogEventListener);
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
-      // window.removeEventListener("CONFIG_DATA", configDataDialogEventListener);
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState(null);
-
-  // TODO: al pedo?
-  // useEffect(() => {
-  //   window.savedXApi.getConfigData();
-  // }, []);
 
   const [formData, setFormData] = useState({
     username: configData?.TWITTER_BOT_USERNAME ?? "",

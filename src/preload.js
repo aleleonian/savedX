@@ -15,15 +15,13 @@ function dispatchNotification(eventType, message) {
 
 /// Single object to expose all APIs
 const api = {
-  goFetchTweets: () => ipcRenderer.send("go-fetch-tweets"),
+  goFetchTweets: () => ipcRenderer.invoke("go-fetch-tweets"),
   stopScraping: () => ipcRenderer.send("stop-scraping"),
   getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
   openUrl: (url) => shell.openExternal(url),
   updateTagsForTweet: (tweetId, newTags) =>
     ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
   removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
-  //TODO: medio al pedo esto de getConfigData (de momento)
-  getConfigData: () => ipcRenderer.send("fetch-config-data"),
   updateConfigData: (formData) =>
     ipcRenderer.send("update-config-data", formData),
   // DEBUG: Boolean(process.env.DEBUG),
