@@ -31,7 +31,7 @@ const handleClick = (path) => {
   if (window.savedXApi && window.savedXApi.openUrl) {
     window.savedXApi.openUrl("https://www.x.com" + path); // Open the external URL using the exposed API
   } else {
-    common.errorLog("The openUrl method is not available");
+    console.error("The openUrl method is not available");
   }
 };
 
@@ -98,7 +98,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g"
+      "g",
     );
     return originalString.replace(regex, "").trim();
   }
@@ -164,7 +164,7 @@ export function TweetDetailDialog({
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
       );
       // Delay clearing the notification and closing the dialog
       setTimeout(() => {
@@ -173,7 +173,7 @@ export function TweetDetailDialog({
       }, 3000); // Adjust delay time (in milliseconds) as needed
     } else {
       setNotificationMessage(
-        "error--Tweet was deleted from db but not the media file!"
+        "error--Tweet was deleted from db but not the media file!",
       );
       debugLog(window.savedXApi.DEBUG, "tweetDeleteResult:", tweetDeleteResult);
     }

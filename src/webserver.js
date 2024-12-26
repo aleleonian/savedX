@@ -40,7 +40,7 @@ export const startExpressServer = (xBot) => {
   server.listen(port, () => {
     common.debugLog(
       process.env.DEBUG,
-      `Express server running at http://localhost:${port}`
+      `Express server running at http://localhost:${port}`,
     );
   });
 };

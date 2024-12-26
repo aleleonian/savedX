@@ -59,7 +59,7 @@ const TweetsTable = () => {
     const updatedArray = array.map((item) =>
       item.id === id
         ? { ...item, ...newProperty } // Create a new object with updated properties
-        : item
+        : item,
     );
 
     return updatedArray;
@@ -100,7 +100,7 @@ const TweetsTable = () => {
     debugLog("Updated tags:", newTags);
     const updateTagsForTweetResult = await window.savedXApi.updateTagsForTweet(
       tweetId,
-      newTags
+      newTags,
     );
     if (!updateTagsForTweetResult.success) {
       const errorMessage =
