@@ -324,18 +324,14 @@ ipcMain.on("report-found-tweet", async (event, reportObj) => {
   mainEmitter.emit("report-found-tweet", reportObj);
 });
 
-ipcMain.on("update-config-data", async (event, formData) => {
+ipcMain.handle("update-config-data", async (event, formData) => {
   try {
+    return common.createErrorResponse("pedos");
     const updateConfigDataResponse = await updateConfigData(formData);
     if (updateConfigDataResponse.success) {
-      sendMessageToMainWindow("NOTIFICATION", `success--Config data updated!`);
+      return common.createSuccessResponse();
     } else {
-      sendMessageToMainWindow(
-        "ALERT",
-        `Trouble updating config data mai fren:  ${JSON.stringify(
-          updateConfigDataResponse.errorMessage
-        )}`
-      );
+      return common.createErrorResponse(updateConfigDataResponse.errorMessage);
     }
   } catch (error) {
     sendMessageToMainWindow("ALERT", {

@@ -61,10 +61,18 @@ export function ConfigDialog({ open, onClose, configData }) {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.username && formData.password && formData.email) {
-      window.savedXApi.updateConfigData(formData);
+      const updateConfigDataResponse =
+        await window.savedXApi.updateConfigData(formData);
+      if (updateConfigDataResponse.success) {
+        setNotificationMessage(`Config data updated!`);
+      } else {
+        setNotificationMessage(
+          `Trouble updating config data mai fren: ${updateConfigDataResponse.errorMessage}!`
+        );
+      }
     }
   };
 

@@ -24,7 +24,7 @@ const api = {
   removeTagFromDB: (tag) => ipcRenderer.invoke("remove-tag-from-db", tag),
   getConfigData: () => ipcRenderer.invoke("fetch-config-data"),
   updateConfigData: (formData) =>
-    ipcRenderer.send("update-config-data", formData),
+    ipcRenderer.invoke("update-config-data", formData),
   // DEBUG: Boolean(process.env.DEBUG),
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
   deleteSavedTweet: async (tweetData) => {
