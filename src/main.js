@@ -260,25 +260,21 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
             }
             const fileDeletionResult = await common.deleteFile(filePath);
             if (fileDeletionResult) {
-              resolve(true);
+              resolve(common.createSuccessResponse());
             } else {
-              resolve(false);
+              resolve(
+                common.createSuccessResponse(
+                  "The tweet was deleted but the associated file was not."
+                )
+              );
             }
           }
-          resolve(true);
+          resolve(common.createSuccessResponse());
         } else {
-          resolve(false);
-          sendMessageToMainWindow(
-            "NOTIFICATION",
-            "error--Tweet was not deleted"
-          );
+          resolve(common.createErrorResponse("Tweet was not deleted"));
         }
       } catch (error) {
-        resolve(false);
-        sendMessageToMainWindow(
-          "NOTIFICATION",
-          "error--Tweet was not deleted: " + error
-        );
+        resolve(common.createErrorResponse("Tweet was not deleted: " + error));
       }
     })();
   });

@@ -98,7 +98,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g",
+      "g"
     );
     return originalString.replace(regex, "").trim();
   }
@@ -159,12 +159,15 @@ export function TweetDetailDialog({
     const tweetDeleteResult =
       await window.savedXApi.deleteSavedTweet(tweetData);
     // Gotta update the array of tweets and re-render
-    if (tweetDeleteResult) {
-      setNotificationMessage("success--Tweet was deleted!");
+    if (tweetDeleteResult.success) {
+      setNotificationClass("success");
+      if (tweetDeleteResult.data) {
+        setNotificationMessage(tweetDeleteResult.data);
+      } else setNotificationMessage("Tweet was deleted!");
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
       );
       // Delay clearing the notification and closing the dialog
       setTimeout(() => {
@@ -172,8 +175,9 @@ export function TweetDetailDialog({
         onClose();
       }, 3000); // Adjust delay time (in milliseconds) as needed
     } else {
+      setNotificationClass("error");
       setNotificationMessage(
-        "error--Tweet was deleted from db but not the media file!",
+        "Tweet was not deleted!: " + tweetDeleteResult.errorMessage
       );
       debugLog(window.savedXApi.DEBUG, "tweetDeleteResult:", tweetDeleteResult);
     }

@@ -28,7 +28,7 @@ const api = {
   // DEBUG: Boolean(process.env.DEBUG),
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
   deleteSavedTweet: async (tweetData) => {
-    return await ipcRenderer.invoke("delete-saved-tweet", tweetData);
+    return ipcRenderer.invoke("delete-saved-tweet", tweetData);
   },
   deleteAllSavedTweets: async () => {
     const deleteAllTweetsResult = await ipcRenderer.invoke(
