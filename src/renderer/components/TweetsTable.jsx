@@ -6,6 +6,7 @@ import { TweetDetailDialog } from "./TweetDetailDialog";
 import { AppContext } from "../../context/AppContext";
 import { BasicSelect } from "./BasicSelect";
 import { debugLog } from "../util/common";
+import { AlertDialog } from "./AlertDialog";
 
 const TweetsTable = () => {
   const { state, updateState } = useContext(AppContext);
@@ -14,6 +15,8 @@ const TweetsTable = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tweetData, setTweetData] = useState(null);
   const [paginationState, setPaginationState] = useState({ page: 0, size: 10 });
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [alertTitle, setAlertTitle] = useState(null);
 
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
@@ -56,7 +59,7 @@ const TweetsTable = () => {
     const updatedArray = array.map((item) =>
       item.id === id
         ? { ...item, ...newProperty } // Create a new object with updated properties
-        : item,
+        : item
     );
 
     return updatedArray;
@@ -93,10 +96,20 @@ const TweetsTable = () => {
   function onPaginationChange(action, state) {
     setPaginationState(state);
   }
-  const handleTagsUpdate = (tweetId, newTags) => {
+  const handleTagsUpdate = async (tweetId, newTags) => {
     debugLog("Updated tags:", newTags);
-    window.savedXApi.updateTagsForTweet(tweetId, newTags);
-    // Update the database or state with the new tags
+    const updateTagsForTweetResult = await window.savedXApi.updateTagsForTweet(
+      tweetId,
+      newTags
+    );
+    if (!updateTagsForTweetResult.success) {
+      const errorMessage =
+        "Error updating tags for tweet on db:" +
+        updateTagsForTweetResult.errorMessage;
+      setAlertTitle("Oops!");
+      setAlertMessage(errorMessage);
+      console.error(errorMessage);
+    }
   };
 
   const handleSelectChange = (filterString) => {
@@ -109,6 +122,18 @@ const TweetsTable = () => {
 
   return (
     <>
+      {alertMessage && (
+        <AlertDialog
+          title={alertTitle}
+          message={alertMessage}
+          openFlag={true}
+          cleanUp={() => {
+            setAlertTitle(null);
+            setAlertMessage(null);
+          }}
+        />
+      )}
+
       <div className="search-box p-[11px] text-left flex justify-between">
         <div>Search by Tweet Text:</div>
         <div className="bg-red">

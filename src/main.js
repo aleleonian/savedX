@@ -219,24 +219,19 @@ ipcMain.handle("go-fetch-tweets", async () => {
   } else {
     failedResponseObject.errorMessage = `There's no user and pass 😫`;
   }
-  // sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
-  // sendMessageToMainWindow("ALERT", failedResponseObject);
   return common.createErrorResponse(failedResponseObject.message);
 });
 
 ipcMain.on("stop-scraping", async () => {
-  // const credentials = await dbTools.getXCredentials();
-  // await goFetchTweetsFake();
   common.debugLog("we gonna stop scraping then.");
-  await stopScraping();
+  stopScraping();
 });
 
-ipcMain.on("update-tags-for-tweet", async (event, tweetId, newTags) => {
+ipcMain.handle("update-tags-for-tweet", async (event, tweetId, newTags) => {
+  return common.createErrorResponse("donde las putas!");
   const updateTagsResult = await dbTools.updateTags(tweetId, newTags);
-
-  //TODO TENGO QUE COMUNICAR A REACT SI FUE BIEN
-  //O MAL EL UPDATE
   common.debugLog("updateTagsResult->", updateTagsResult);
+  return updateTagsResult;
 });
 
 ipcMain.on("remove-tag-from-db", async (event, tag) => {

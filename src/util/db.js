@@ -355,10 +355,10 @@ export const updateTags = async (tweetId, newTags) => {
         );
       }
     }
-    return true;
+    return createSuccessResponse();
   } catch (err) {
     common.errorLog("Error updating tags:", err);
-    return false;
+    return createErrorResponse(err);
   }
 };
 

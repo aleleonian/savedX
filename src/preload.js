@@ -20,7 +20,7 @@ const api = {
   getDataFromBackend: () => ipcRenderer.send("read-tweets-from-db"),
   openUrl: (url) => shell.openExternal(url),
   updateTagsForTweet: (tweetId, newTags) =>
-    ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
+    ipcRenderer.invoke("update-tags-for-tweet", tweetId, newTags),
   removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
   getConfigData: () => ipcRenderer.invoke("fetch-config-data"),
   updateConfigData: (formData) =>
