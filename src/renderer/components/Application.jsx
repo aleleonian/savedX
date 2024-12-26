@@ -44,12 +44,12 @@ export const Application = () => {
         common.debugLog(
           window.savedXApi.DEBUG,
           "isDebug updated to:",
-          window.savedXApi.DEBUG,
+          window.savedXApi.DEBUG
         );
         common.debugLog(
           window.savedXApi.DEBUG,
           "mediaFolder updated to:",
-          window.savedXApi.MEDIA_FOLDER,
+          window.savedXApi.MEDIA_FOLDER
         );
         clearInterval(interval);
       }
@@ -131,10 +131,18 @@ export const Application = () => {
       setIsDisabled(true);
     };
 
+    const showConfigDialogEventListener = (event) => {
+      const configData = event.detail;
+      if (configData) {
+        setConfigData(configData);
+      }
+      setOpenConfigDialog(true);
+    };
+
     const checkSavedTweetEventListener = (event) => {
       const tweetUrl = event.detail;
       const found = stateRef.current.savedTweets.find(
-        (savedTweet) => savedTweet.tweetUrl === tweetUrl,
+        (savedTweet) => savedTweet.tweetUrl === tweetUrl
       );
       const reportResponse = {
         success: found ? true : false,
@@ -159,16 +167,20 @@ export const Application = () => {
     window.addEventListener("SHOW_PROGRESS", progressEventListener);
     window.addEventListener(
       "DISABLE_GO_FETCH_BUTTON",
-      disableGoFetchButtonEventListener,
+      disableGoFetchButtonEventListener
     );
     window.addEventListener(
       "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-      showDeleteSavedTweetsEventListener,
+      showDeleteSavedTweetsEventListener
     );
 
     window.addEventListener(
       "CHECK_SAVED_TWEET_EXISTS",
-      checkSavedTweetEventListener,
+      checkSavedTweetEventListener
+    );
+    window.addEventListener(
+      "SHOW_CONFIG_DIALOG",
+      showConfigDialogEventListener
     );
 
     // Clean up event listener on component unmount
@@ -179,15 +191,19 @@ export const Application = () => {
       window.removeEventListener("SHOW_PROGRESS", progressEventListener);
       window.removeEventListener(
         "DISABLE_GO_FETCH_BUTTON",
-        disableGoFetchButtonEventListener,
+        disableGoFetchButtonEventListener
       );
       window.removeEventListener(
         "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
-        showDeleteSavedTweetsEventListener,
+        showDeleteSavedTweetsEventListener
       );
       window.removeEventListener(
         "CHECK_SAVED_TWEET_EXISTS",
-        checkSavedTweetEventListener,
+        checkSavedTweetEventListener
+      );
+      window.removeEventListener(
+        "SHOW_CONFIG_DIALOG",
+        showConfigDialogEventListener
       );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
@@ -214,7 +230,7 @@ export const Application = () => {
     if (!goFetchTweetsResult.success) {
       setAlertTitle("Err...");
       setAlertMessage(
-        goFetchTweetsResult.errorMessage + "\nPlease check configuration.",
+        goFetchTweetsResult.errorMessage + "\nPlease check configuration."
       );
       const getConfigDataResponse = await window.savedXApi.getConfigData();
       if (getConfigDataResponse.success) {

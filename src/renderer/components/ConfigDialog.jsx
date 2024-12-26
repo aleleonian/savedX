@@ -67,8 +67,10 @@ export function ConfigDialog({ open, onClose, configData }) {
       const updateConfigDataResponse =
         await window.savedXApi.updateConfigData(formData);
       if (updateConfigDataResponse.success) {
+        setNotificationClass(`success`);
         setNotificationMessage(`Config data updated!`);
       } else {
+        setNotificationClass(`error`);
         setNotificationMessage(
           `Trouble updating config data mai fren: ${updateConfigDataResponse.errorMessage}!`
         );

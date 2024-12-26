@@ -326,7 +326,6 @@ ipcMain.on("report-found-tweet", async (event, reportObj) => {
 
 ipcMain.handle("update-config-data", async (event, formData) => {
   try {
-    return common.createErrorResponse("pedos");
     const updateConfigDataResponse = await updateConfigData(formData);
     if (updateConfigDataResponse.success) {
       return common.createSuccessResponse();
