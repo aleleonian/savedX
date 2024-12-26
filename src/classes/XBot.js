@@ -861,88 +861,65 @@ export class XBot {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async deleteTwitterBookmarks() {
-    // await this.page.evaluateHandle((theIndexId) => {
-    //   const theDivs = Array.from(
-    //     document.querySelectorAll('div[data-testid="cellInnerDiv"]')
-    //   );
-    //   theDivs
-    //     .find((div) =>
-    //       div.style.transform.includes(`translateY(${theIndexId}px)`)
-    //     )
-    //     .querySelectorAll(
-    //       ".css-175oi2r.r-1777fci.r-bt1l66.r-bztko3.r-lrvibr.r-1loqt21.r-1ny4l3l"
-    //     )[5];
-    //   if (bookmarkButton) bookmarkButton.click();
-    // }, indexId);
+  async deleteTwitterBookmarks2() {
+    // loop all the stored bookmarks
+    // get the bookmarked button
+    // click it
 
-    //TODO: this works but not perfect. It does not remove all bookmarks, but some.
-    // common.debugLog("indexId->", indexId);
+    //TODO: Bookmarked is in english, but it could be another language
+    // Get all buttons with the `aria-label="Bookmarked"`
+    let bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
 
-    // const parentDiv = await this.page.evaluateHandle((theIndexId) => {
-    //   // Find all divs with data-testid="cellInnerDiv"
-    //   const divs = Array.from(
-    //     document.querySelectorAll('div[data-testid="cellInnerDiv"]')
-    //   );
-    //   // Find the one with the desired style
-    //   return divs.find((div) =>
-    //     div.style.transform.includes(`translateY(${theIndexId}px)`)
-    //   );
-    // }, indexId);
-    // common.debugLog("parentDiv->", parentDiv);
-    // if (parentDiv) {
-    //   // const bookMarkButton = await parentDiv.$$(
-    //   //   '.css-175oi2r.r-1777fci.r-bt1l66.r-bztko3.r-lrvibr.r-1loqt21.r-1ny4l3l[aria-label="Bookmarked"]'
-    //   // );
-    //   const bookMarkButtons = await parentDiv.$$(
-    //     '.css-175oi2r.r-1777fci.r-bt1l66.r-bztko3.r-lrvibr.r-1loqt21.r-1ny4l3l[aria-label="Bookmarked"]'
-    //   );
+    // while (bookmarkButtons.length > 0) {
+    console.log(`Found ${bookmarkButtons.length} bookmark buttons.`);
 
-    //   if (bookMarkButtons.length > 0) {
-    //     common.debugLog("bookMarkButtons[0]->", bookMarkButtons[0]);
-    //     await bookMarkButtons[0].click(); // Click the first button
-    //     console.log("First bookmark button clicked!");
-    //   } else {
-    //     console.log("No bookmark buttons found.");
-    //   }
-    // } else {
-    //   common.debugLog(
-    //     process.env.DEBUG,
-    //     "Parent div with the specified style not found."
-    //   );
-    //   return false;
+    // Function to delay execution for a specified time
+
+    // Loop through the buttons and click them with a 2-second delay
+    for (let i = 0; i < bookmarkButtons.length; i++) {
+      try {
+        await bookmarkButtons[i].click();
+        console.log(`Clicked button ${i + 1}`);
+      } catch (error) {
+        common.errorLog(`Error clicking button ${i + 1}:`, error);
+      }
+
+      // Delay for 2 seconds
+      await this.wait(1000);
+    }
+
+    //   bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
     // }
 
-    // '.css-175oi2r.r-1777fci.r-bt1l66.r-bztko3.r-lrvibr.r-1loqt21.r-1ny4l3l[aria-label="Bookmarked"]'
-
+    console.log("Finished clicking all bookmark buttons.");
+  }
+  async deleteTwitterBookmarks() {
     await this.page.waitForSelector('[aria-label="Bookmarked"]');
 
     //TODO: Bookmarked is in english, but it could be another language
     // Get all buttons with the `aria-label="Bookmarked"`
     let bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
 
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // while (bookmarkButtons.length > 0) {
+    console.log(`Found ${bookmarkButtons.length} bookmark buttons.`);
 
-    while (bookmarkButtons.length > 0) {
-      console.log(`Found ${bookmarkButtons.length} bookmark buttons.`);
+    // Function to delay execution for a specified time
 
-      // Function to delay execution for a specified time
-
-      // Loop through the buttons and click them with a 2-second delay
-      for (let i = 0; i < bookmarkButtons.length; i++) {
-        try {
-          await bookmarkButtons[i].click();
-          console.log(`Clicked button ${i + 1}`);
-        } catch (error) {
-          common.errorLog(`Error clicking button ${i + 1}:`, error);
-        }
-
-        // Delay for 2 seconds
-        await delay(1500);
+    // Loop through the buttons and click them with a 2-second delay
+    for (let i = 0; i < bookmarkButtons.length; i++) {
+      try {
+        await bookmarkButtons[i].click();
+        console.log(`Clicked button ${i + 1}`);
+      } catch (error) {
+        common.errorLog(`Error clicking button ${i + 1}:`, error);
       }
 
-      bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
+      // Delay for 2 seconds
+      await this.wait(1000);
     }
+
+    //   bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
+    // }
 
     console.log("Finished clicking all bookmark buttons.");
   }
@@ -1003,8 +980,7 @@ export class XBot {
         continue;
       }
 
-      // now enter a while loop that breaks only when the front end responds
-
+      // have we processed this bookmark already?
       const idExists = this.bookmarks.some(
         (bookmark) => bookmark.indexId === newBookmark.indexId
       );
@@ -1054,7 +1030,6 @@ export class XBot {
               process.env.MEDIA_FOLDER,
               newBookmark.tweetUrlHash + ".jpg"
             );
-            // TODO: we got to report this error somehow
             if (!fecthImageResult.success) {
               sendMessageToMainWindow(
                 "NOTIFICATION",
@@ -1081,18 +1056,13 @@ export class XBot {
           newBookmark.indexId
         );
     }
-    return this.bookmarks;
+    return this.bookmarks.length;
   };
   scrapeBookmarks = async (showProgressFunction) => {
+    let bookmarksCopy = [];
+    let scrollPosition = 0;
+
     while (this.goAheadScrape) {
-      await this.storeBookmarks();
-
-      let scrollPosition = 0;
-
-      common.debugLog("Gonna scroll...");
-      await this.page.evaluate(() => {
-        window.scrollBy(0, window.innerHeight);
-      });
       showProgressFunction(
         encode(
           constants.progress.INIT_PROGRESS,
@@ -1100,32 +1070,42 @@ export class XBot {
           constants.progress.SCRAPING
         )
       );
+      let howManyStoredBookmarks = await this.storeBookmarks();
+      common.debugLog("howManyStoredBookmarks->", howManyStoredBookmarks);
+      if (howManyStoredBookmarks < 1) break;
+      bookmarksCopy = bookmarksCopy.concat(this.bookmarks);
+      this.bookmarks = [];
+      if (this.deleteOnlineBookmarks) {
+        await this.deleteTwitterBookmarks();
+      } else {
+        common.debugLog("Gonna scroll...");
+        await this.page.evaluate(() => {
+          window.scrollBy(0, window.innerHeight);
+        });
+        // Wait for a while after each scroll to give time for content loading
+        await this.wait(3000);
 
-      // Wait for a while after each scroll to give time for content loading
-      await this.wait(3000);
+        howManyStoredBookmarks = await this.storeBookmarks();
+        if (howManyStoredBookmarks < 1) break;
+        bookmarksCopy = bookmarksCopy.concat(this.bookmarks);
+        this.bookmarks = [];
+        common.debugLog("bookmarks stored.");
 
-      await this.storeBookmarks();
+        // Get the scroll position
+        const newScrollPosition = await this.page.evaluate(() => {
+          return window.scrollY;
+        });
 
-      common.debugLog("bookmarks stored.");
-
-      // Get the scroll position
-      const newScrollPosition = await this.page.evaluate(() => {
-        return window.scrollY;
-      });
-
-      if (newScrollPosition > scrollPosition) {
-        common.debugLog("looping again.");
-        scrollPosition = newScrollPosition;
-      } else if (newScrollPosition <= scrollPosition) {
-        common.debugLog("End of page reached. Stopping.");
-        break;
+        if (newScrollPosition > scrollPosition) {
+          common.debugLog("looping again.");
+          scrollPosition = newScrollPosition;
+        } else if (newScrollPosition <= scrollPosition) {
+          common.debugLog("End of page reached. Stopping.");
+          break;
+        }
       }
     }
-    if (this.deleteOnlineBookmarks) {
-      await this.deleteTwitterBookmarks();
-    }
-    const bookmarksCopy = [...this.bookmarks];
-    this.bookmarks = [];
+
     return bookmarksCopy;
   };
 
