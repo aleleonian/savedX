@@ -144,14 +144,6 @@ export const Application = () => {
       window.savedXApi.reportFoundTweet(reportResponse);
     };
 
-    const showConfigDialogEventListener = (event) => {
-      const configData = event.detail;
-      if (configData) {
-        setConfigData(configData);
-      }
-      setOpenConfigDialog(true);
-    };
-
     const showDeleteSavedTweetsEventListener = () => {
       setDeleteAllSavedTweetsConfirmationDialogOpen(true);
     };
@@ -169,11 +161,6 @@ export const Application = () => {
       "DISABLE_GO_FETCH_BUTTON",
       disableGoFetchButtonEventListener
     );
-    window.addEventListener(
-      "SHOW_CONFIG_DIALOG",
-      showConfigDialogEventListener
-    );
-
     window.addEventListener(
       "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
       showDeleteSavedTweetsEventListener
@@ -193,10 +180,6 @@ export const Application = () => {
       window.removeEventListener(
         "DISABLE_GO_FETCH_BUTTON",
         disableGoFetchButtonEventListener
-      );
-      window.removeEventListener(
-        "SHOW_CONFIG_DIALOG",
-        showConfigDialogEventListener
       );
       window.removeEventListener(
         "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG",
@@ -233,10 +216,14 @@ export const Application = () => {
       setAlertMessage(
         goFetchTweetsResult.errorMessage + "\nPlease check configuration."
       );
+      const getConfigDataResponse = await window.savedXApi.getConfigData();
+      if (getConfigDataResponse.success) {
+        setConfigData(getConfigDataResponse.data);
+      } else {
+        setAlertMessage(getConfigDataResponse.errorMessage);
+      }
       setOpenConfigDialog(true);
     }
-    // sendMessageToMainWindow("SHOW_CONFIG_DIALOG");
-    // sendMessageToMainWindow("ALERT", failedResponseObject);
   }
 
   function openDebugSession() {

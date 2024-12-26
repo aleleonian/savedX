@@ -22,6 +22,7 @@ const api = {
   updateTagsForTweet: (tweetId, newTags) =>
     ipcRenderer.send("update-tags-for-tweet", tweetId, newTags),
   removeTagFromDB: (tag) => ipcRenderer.send("remove-tag-from-db", tag),
+  getConfigData: () => ipcRenderer.invoke("fetch-config-data"),
   updateConfigData: (formData) =>
     ipcRenderer.send("update-config-data", formData),
   // DEBUG: Boolean(process.env.DEBUG),

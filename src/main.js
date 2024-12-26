@@ -190,6 +190,15 @@ app.on("before-quit", () => {
   // Save data, perform cleanup, etc.
 });
 
+ipcMain.handle("fetch-config-data", async () => {
+  try {
+    const getAllConfigDataResponse = await getAllConfigData();
+    return getAllConfigDataResponse;
+  } catch (error) {
+    return common.createErrorResponse(error);
+  }
+});
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.handle("go-fetch-tweets", async () => {
@@ -198,8 +207,6 @@ ipcMain.handle("go-fetch-tweets", async () => {
     title: "Bro...",
     message: "An unknown error occurred 😕",
   };
-
-  return common.createErrorResponse(failedResponseObject.message);
 
   if (checkUserAndPassResponse.success) {
     const allConfigDataResponse = await getAllConfigData();
