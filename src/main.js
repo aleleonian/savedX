@@ -244,75 +244,62 @@ ipcMain.handle("remove-tag-from-db", async (event, tag) => {
 });
 
 ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
-  return new Promise((resolve) => {
-    (async () => {
-      try {
-        const deleteTweetResult = await dbTools.deleteTweetById(tweetData.id);
-        if (deleteTweetResult) {
-          // delete media if necessary
-          if (tweetData.hasLocalMedia !== "no") {
-            let filePath =
-              process.env.MEDIA_FOLDER + "/" + tweetData.tweetUrlHash;
-            if (tweetData.hasLocalMedia === "image") {
-              filePath += ".jpg";
-            } else if (tweetData.hasLocalMedia === "video") {
-              filePath += ".mp4";
-            }
-            const fileDeletionResult = await common.deleteFile(filePath);
-            if (fileDeletionResult) {
-              resolve(common.createSuccessResponse());
-            } else {
-              resolve(
-                common.createSuccessResponse(
-                  "The tweet was deleted but the associated file was not."
-                )
-              );
-            }
+  (async () => {
+    try {
+      const deleteTweetResult = await dbTools.deleteTweetById(tweetData.id);
+      if (deleteTweetResult) {
+        // delete media if necessary
+        if (tweetData.hasLocalMedia !== "no") {
+          let filePath =
+            process.env.MEDIA_FOLDER + "/" + tweetData.tweetUrlHash;
+          if (tweetData.hasLocalMedia === "image") {
+            filePath += ".jpg";
+          } else if (tweetData.hasLocalMedia === "video") {
+            filePath += ".mp4";
           }
-          resolve(common.createSuccessResponse());
-        } else {
-          resolve(common.createErrorResponse("Tweet was not deleted"));
+          const fileDeletionResult = await common.deleteFile(filePath);
+          if (fileDeletionResult) {
+            resolve(common.createSuccessResponse());
+          } else {
+            resolve(
+              common.createSuccessResponse(
+                "The tweet was deleted but the associated file was not."
+              )
+            );
+          }
         }
-      } catch (error) {
-        resolve(common.createErrorResponse("Tweet was not deleted: " + error));
+        resolve(common.createSuccessResponse());
+      } else {
+        resolve(common.createErrorResponse("Tweet was not deleted"));
       }
-    })();
-  });
+    } catch (error) {
+      resolve(common.createErrorResponse("Tweet was not deleted: " + error));
+    }
+  })();
 });
 ipcMain.handle("delete-all-saved-tweets", async () => {
-  return new Promise((resolve) => {
-    (async () => {
-      try {
-        const deleteAllTweestResult = await dbTools.deleteAllTweets();
-        if (deleteAllTweestResult.success) {
-          if (xBot.downloadMedia) {
-            const deleteMediaFilesResult =
-              await common.deleteAllFilesInDirectory(process.env.MEDIA_FOLDER);
-            if (deleteMediaFilesResult.success) {
-              resolve(true);
-            } else {
-              sendMessageToMainWindow(
-                "NOTIFICATION",
-                "error--Tweets were deleted but not all files in the media folder"
-              );
-              // If we resolve false, then the local saved tweets array won't be updated
-              resolve(true);
-            }
-          } else resolve(true);
-          // sendMessageToMainWindow("NOTIFICATION", "success--Tweets were deleted!");
-        } else {
-          resolve(false);
-          // sendMessageToMainWindow("NOTIFICATION", "error--Tweets were NOT deleted");
-        }
-      } catch (error) {
-        resolve(false);
-        sendMessageToMainWindow(
-          "NOTIFICATION",
-          "error--Tweet was not deleted: " + error
+  try {
+    const deleteAllTweestResult = await dbTools.deleteAllTweets();
+    if (deleteAllTweestResult.success) {
+      if (xBot.downloadMedia) {
+        const deleteMediaFilesResult = await common.deleteAllFilesInDirectory(
+          process.env.MEDIA_FOLDER
         );
-      }
-    })();
-  });
+        if (deleteMediaFilesResult.success) {
+          return common.createSuccessResponse();
+        } else {
+          // If we resolve false, then the local saved tweets array won't be updated
+          return common.createSuccessResponse(
+            "Tweets were deleted but not all files in the media folder"
+          );
+        }
+      } else return common.createSuccessResponse();
+    } else {
+      return common.createErrorResponse(deleteAllTweestResult.errorMessage);
+    }
+  } catch (error) {
+    return common.createErrorResponse("Tweet was not deleted: " + error);
+  }
 });
 
 ipcMain.on("report-found-tweet", async (event, reportObj) => {

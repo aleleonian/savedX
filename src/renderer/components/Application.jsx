@@ -215,13 +215,20 @@ export const Application = () => {
   const handleConfirmDeleteSavedTweetsAction = async () => {
     const tweetsDeleteResult = await window.savedXApi.deleteAllSavedTweets();
     handleCloseConfirmDeleteSavedTweetsDialog();
-    if (tweetsDeleteResult) {
+    if (tweetsDeleteResult.success) {
       updateState("savedTweets", []);
-      setAlertTitle("All good!");
-      setAlertMessage("All saved tweets deleted!");
+      if (tweetsDeleteResult.data) {
+        setAlertTitle("All good but...");
+        setAlertMessage(tweetsDeleteResult.data);
+      } else {
+        setAlertTitle("All good!");
+        setAlertMessage("All saved tweets deleted!");
+      }
     } else {
       setAlertTitle("Something happened...");
-      setAlertMessage("Tweets were not deleted :(");
+      setAlertMessage(
+        "Tweets were not deleted: " + tweetsDeleteResult.errorMessage
+      );
     }
   };
 
