@@ -311,10 +311,7 @@ ipcMain.handle("update-config-data", async (event, formData) => {
       return common.createErrorResponse(updateConfigDataResponse.errorMessage);
     }
   } catch (error) {
-    sendMessageToMainWindow("ALERT", {
-      title: "Something happened...",
-      message: `Trouble updating config data: ${error}`,
-    });
+    return common.createErrorResponse(`Trouble updating config data: ${error}`);
   }
 });
 ipcMain.on("open-debug-session", async () => {
@@ -333,10 +330,7 @@ ipcMain.on("open-debug-session", async () => {
     //   );
     // }
   } catch (error) {
-    sendMessageToMainWindow("ALERT", {
-      title: "Ouch...",
-      message: `Trouble updating config data: ${error}`,
-    });
+    common.debugLog("open-debug-session error:", error);
   }
 });
 

@@ -15,3 +15,7 @@
     + as opposed to setting a timer and letting the user do their thing before it ends
 
 + que siempre se muestre el original tweet url
+
++ que haya mejor animaciones para cada momento del scraping
+
++ hacer la windows version
