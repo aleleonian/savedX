@@ -244,38 +244,33 @@ ipcMain.handle("remove-tag-from-db", async (event, tag) => {
 });
 
 ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
-  (async () => {
-    try {
-      const deleteTweetResult = await dbTools.deleteTweetById(tweetData.id);
-      if (deleteTweetResult) {
-        // delete media if necessary
-        if (tweetData.hasLocalMedia !== "no") {
-          let filePath =
-            process.env.MEDIA_FOLDER + "/" + tweetData.tweetUrlHash;
-          if (tweetData.hasLocalMedia === "image") {
-            filePath += ".jpg";
-          } else if (tweetData.hasLocalMedia === "video") {
-            filePath += ".mp4";
-          }
-          const fileDeletionResult = await common.deleteFile(filePath);
-          if (fileDeletionResult) {
-            resolve(common.createSuccessResponse());
-          } else {
-            resolve(
-              common.createSuccessResponse(
-                "The tweet was deleted but the associated file was not."
-              )
-            );
-          }
+  try {
+    const deleteTweetResult = await dbTools.deleteTweetById(tweetData.id);
+    if (deleteTweetResult) {
+      // delete media if necessary
+      if (tweetData.hasLocalMedia !== "no") {
+        let filePath = process.env.MEDIA_FOLDER + "/" + tweetData.tweetUrlHash;
+        if (tweetData.hasLocalMedia === "image") {
+          filePath += ".jpg";
+        } else if (tweetData.hasLocalMedia === "video") {
+          filePath += ".mp4";
         }
-        resolve(common.createSuccessResponse());
-      } else {
-        resolve(common.createErrorResponse("Tweet was not deleted"));
+        const fileDeletionResult = await common.deleteFile(filePath);
+        if (fileDeletionResult) {
+          return common.createSuccessResponse();
+        } else {
+          return common.createSuccessResponse(
+            "The tweet was deleted but the associated file was not."
+          );
+        }
       }
-    } catch (error) {
-      resolve(common.createErrorResponse("Tweet was not deleted: " + error));
+      return common.createSuccessResponse();
+    } else {
+      return common.createErrorResponse("Tweet was not deleted");
     }
-  })();
+  } catch (error) {
+    return common.createErrorResponse("Tweet was not deleted: " + error);
+  }
 });
 ipcMain.handle("delete-all-saved-tweets", async () => {
   try {
