@@ -28,6 +28,8 @@ export const Progress = ({ whichState }) => {
   const [currentTaskText, setCurrentTaskText] = useState("Sleeping...");
   const [currentTaskImage, setCurrentTaskImage] = useState(null);
 
+  let currentTaskClass = "flex items-center text-gray-400 py-4";
+
   useEffect(() => {
     if (whichState.logingIn) {
       setCurrentTaskText("Logging into X...");
@@ -114,7 +116,7 @@ export const Progress = ({ whichState }) => {
         )}
         Current Task:
         <div className="flex flex-col items-center py-8">
-          <div id="currentTask">
+          <div id="currentTask" className={currentTaskClass}>
             {currentTaskText}
             {(whichState.logingIn ||
               whichState.scraping ||
