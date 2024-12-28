@@ -116,7 +116,7 @@ export const Progress = ({ whichState }) => {
         <div className="flex flex-col items-center py-8">
           <div id="currentTask">
             {currentTaskText}
-            {(whichState.loggedIn ||
+            {(whichState.logingIn ||
               whichState.scraping ||
               whichState.loggingOut) && <ProgressIcon />}
           </div>
