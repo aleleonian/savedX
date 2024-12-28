@@ -4,6 +4,9 @@ import { AlertDialog } from "./AlertDialog";
 import { ProgressIcon } from "./ProgressIcon";
 import Button from "@mui/material/Button";
 import { Notification } from "./Notification";
+import dialUpImage from "/src/assets/images/dial-up-modem.gif";
+import doneImage from "/src/assets/images/done.webp";
+import superMarioImage from "/src/assets/images/super.mario.1.gif";
 
 const addClass = (classList, className) => {
   const classesArray = classList.split(/\s+/);
@@ -22,45 +25,34 @@ export const Progress = ({ whichState }) => {
   const [notificationClass, setNotificationClass] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertTitle, setAlertTitle] = useState(null);
+  const [currentTaskText, setCurrentTaskText] = useState("Sleeping...");
+  const [currentTaskImage, setCurrentTaskImage] = useState(null);
 
-  let logginClass = "flex items-center text-gray-400 py-4";
-  let loginText = "Log into X.";
+  useEffect(() => {
+    if (whichState.logingIn) {
+      setCurrentTaskText("Logging into X...");
+      setCurrentTaskImage(dialUpImage);
+    } else if (whichState.loggedIn) {
+      setCurrentTaskText("Logged into X ✅");
+      setCurrentTaskImage(null);
+    }
 
-  let scrapingClass = "flex items-center text-gray-400 py-4";
-  let scrapingText = "Scrape bookmarks.";
+    if (whichState.scraping) {
+      setCurrentTaskText("Scraping bookmarks ⏳");
+      setCurrentTaskImage(superMarioImage);
+    } else if (whichState.scraped) {
+      setCurrentTaskText("Scraped bookmarks ✅");
+      setCurrentTaskImage(null);
+    }
 
-  let logoutClass = "flex items-center text-gray-400 py-4";
-  let logoutText = "Log out of X.";
-
-  if (whichState.logingIn) {
-    logginClass = removeClass(logginClass, "text-gray-400");
-    logginClass = addClass(logginClass, "text-blue-500");
-    loginText = "Logging into X...";
-  } else if (whichState.loggedIn) {
-    logginClass = removeClass(logginClass, "text-gray-400");
-    logginClass = addClass(logginClass, "text-blue-500");
-    loginText = "Logged into X ✅";
-  }
-
-  if (whichState.scraping) {
-    scrapingClass = removeClass(scrapingClass, "text-gray-400");
-    scrapingClass = addClass(scrapingClass, "text-blue-500");
-    scrapingText = "Scraping bookmarks ⏳";
-  } else if (whichState.scraped) {
-    scrapingClass = removeClass(scrapingClass, "text-gray-400");
-    scrapingClass = addClass(scrapingClass, "text-blue-500");
-    scrapingText = "Scraped bookmarks ✅";
-  }
-
-  if (whichState.loggingOut) {
-    logoutClass = removeClass(logoutClass, "text-gray-400");
-    logoutClass = addClass(logoutClass, "text-blue-500");
-    logoutText = "Logging out of X...";
-  } else if (whichState.loggedOut) {
-    logoutClass = removeClass(logoutClass, "text-gray-400");
-    logoutClass = addClass(logoutClass, "text-blue-500");
-    logoutText = "Logged out of X ✅";
-  }
+    if (whichState.loggingOut) {
+      setCurrentTaskText("Logging out of X...");
+      setCurrentTaskImage(doneImage);
+    } else if (whichState.loggedOut) {
+      setCurrentTaskText("Logged out of X ✅");
+      setCurrentTaskImage(doneImage);
+    }
+  }, [whichState]);
 
   const handleAlertClose = () => {
     setNotificationMessage(null);
@@ -120,20 +112,27 @@ export const Progress = ({ whichState }) => {
             handleAlertClose={handleAlertClose}
           />
         )}
-        📝Todo list:
+        Current Task:
         <div className="flex flex-col items-center py-8">
-          <div id="login" className={logginClass}>
-            {loginText}
-            {whichState.logingIn && <ProgressIcon />}
+          <div id="currentTask">
+            {currentTaskText}
+            {(whichState.loggedIn ||
+              whichState.scraping ||
+              whichState.loggingOut) && <ProgressIcon />}
           </div>
-          <div id="scraping" className={scrapingClass}>
+          <div>
+            {currentTaskImage && (
+              <img src={currentTaskImage} alt="Connecting..." />
+            )}
+          </div>
+          {/* <div id="scraping" className={scrapingClass}>
             {scrapingText}
             {whichState.scraping && <ProgressIcon />}
           </div>
           <div id="logout" className={logoutClass}>
             {logoutText}
             {whichState.loggingOut && <ProgressIcon />}
-          </div>
+          </div> */}
         </div>
         <div>
           {/* <button onClick={stopScraping}>Stop the scrape 🛑</button> */}
