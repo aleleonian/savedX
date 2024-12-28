@@ -4,9 +4,10 @@ import { AlertDialog } from "./AlertDialog";
 import { ProgressIcon } from "./ProgressIcon";
 import Button from "@mui/material/Button";
 import { Notification } from "./Notification";
-import dialUpImage from "/src/assets/images/dial-up-modem.gif";
-import doneImage from "/src/assets/images/done.webp";
-import superMarioImage from "/src/assets/images/super.mario.1.gif";
+import dialUpImage from "/src/assets/images/dial-up-modem-crop.gif";
+import doneImage from "/src/assets/images/done.resized.webp";
+import superMarioImage from "/src/assets/images/super.mario.1.resized.webp";
+import whiteNoiseImage from "/src/assets/images/white.noise.resized.webp";
 
 const addClass = (classList, className) => {
   const classesArray = classList.split(/\s+/);
@@ -36,7 +37,7 @@ export const Progress = ({ whichState }) => {
       setCurrentTaskImage(dialUpImage);
     } else if (whichState.loggedIn) {
       setCurrentTaskText("Logged into X ✅");
-      setCurrentTaskImage(null);
+      setCurrentTaskImage(whiteNoiseImage);
     }
 
     if (whichState.scraping) {
@@ -44,10 +45,10 @@ export const Progress = ({ whichState }) => {
       setCurrentTaskImage(superMarioImage);
     } else if (whichState.scraped) {
       setCurrentTaskText("Scraped bookmarks ✅");
-      setCurrentTaskImage(null);
+      setCurrentTaskImage(whiteNoiseImage);
     }
 
-    if (whichState.loggingOut) {
+    if (whichState.logingOut) {
       setCurrentTaskText("Logging out of X...");
       setCurrentTaskImage(doneImage);
     } else if (whichState.loggedOut) {
@@ -73,6 +74,13 @@ export const Progress = ({ whichState }) => {
       }
     };
 
+    const snapshotTakenEventListener = () => {
+      console.log("snapshot arrived!");
+      setCurrentTaskImage(
+        "http://localhost:3000/media/bookmark-screenshot.png"
+      );
+    };
+
     const alertEventListener = (event) => {
       if (event.detail) {
         const alertMessage = event.detail.message;
@@ -84,11 +92,13 @@ export const Progress = ({ whichState }) => {
 
     window.addEventListener("ALERT", alertEventListener);
     window.addEventListener("NOTIFICATION", notificationEventListener);
+    window.addEventListener("SNAPSHOT_TAKEN", snapshotTakenEventListener);
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
       window.removeEventListener("ALERT", alertEventListener);
+      window.removeEventListener("SNAPSHOT_TAKEN", snapshotTakenEventListener);
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
 
@@ -114,26 +124,22 @@ export const Progress = ({ whichState }) => {
             handleAlertClose={handleAlertClose}
           />
         )}
-        Current Task:
+
         <div className="flex flex-col items-center py-8">
           <div id="currentTask" className={currentTaskClass}>
-            {currentTaskText}
-            {(whichState.logingIn ||
+            Current Task: {currentTaskText}
+            {/* {(whichState.logingIn ||
               whichState.scraping ||
-              whichState.loggingOut) && <ProgressIcon />}
+              whichState.logingOut) && <ProgressIcon />} */}
           </div>
-          <div>
-            {currentTaskImage && (
-              <img src={currentTaskImage} alt="Connecting..." />
-            )}
-          </div>
+          <div>{currentTaskImage && <img src={currentTaskImage} alt="" />}</div>
           {/* <div id="scraping" className={scrapingClass}>
             {scrapingText}
             {whichState.scraping && <ProgressIcon />}
           </div>
           <div id="logout" className={logoutClass}>
             {logoutText}
-            {whichState.loggingOut && <ProgressIcon />}
+            {whichState.logingOut && <ProgressIcon />}
           </div> */}
         </div>
         <div>

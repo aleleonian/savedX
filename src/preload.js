@@ -124,3 +124,7 @@ ipcRenderer.on("CONFIG_DATA", (event, message) => {
 ipcRenderer.on("CHECK_SAVED_TWEET_EXISTS", (event, tweetUrl) => {
   dispatchNotification("CHECK_SAVED_TWEET_EXISTS", tweetUrl);
 });
+
+ipcRenderer.on("SNAPSHOT_TAKEN", () => {
+  dispatchNotification("SNAPSHOT_TAKEN");
+});

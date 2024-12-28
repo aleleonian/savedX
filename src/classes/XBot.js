@@ -21,17 +21,6 @@ const https = require("https");
 const BROWSER_OPEN_FAIL = 0;
 const exitCodeStrings = ["Could not open browser :(!"];
 
-let pupConfig = {
-  headless: process.env.XBOT_HEADLESS
-    ? JSON.parse(process.env.XBOT_HEADLESS)
-    : false,
-  defaultViewport: null,
-  ignoreDefaultArgs: ["--enable-automation"],
-  args: ["--start-maximized", "--no-sandbox", "--disable-setuid-sandbox"],
-};
-if (process.env.EXECUTABLE_PATH) {
-  pupConfig.executablePath = process.env.EXECUTABLE_PATH;
-}
 export class XBot {
   constructor() {
     this.browser;
@@ -145,6 +134,16 @@ export class XBot {
     return this.tweets[userId];
   }
   async init() {
+    let pupConfig = {
+      headless: process.env.XBOT_HEADLESS ? process.env.XBOT_HEADLESS : false, // Default to false if not set
+      ignoreDefaultArgs: ["--enable-automation"],
+      args: ["--start-maximized", "--no-sandbox", "--disable-setuid-sandbox"],
+    };
+
+    if (process.env.EXECUTABLE_PATH) {
+      pupConfig.executablePath = process.env.EXECUTABLE_PATH;
+    }
+
     const browser = await puppeteer.launch(pupConfig);
     let responseObject = {};
     if (!browser) {
@@ -873,7 +872,7 @@ export class XBot {
         const boundingBox = await elementHandle.boundingBox();
 
         if (boundingBox) {
-          const screenshotPath = `./media/bookmark-screenshot-${indexId}.png`;
+          const screenshotPath = `${process.env.MEDIA_FOLDER}/bookmark-screenshot.png`;
           await this.page.screenshot({
             path: screenshotPath,
             clip: {
@@ -1088,7 +1087,10 @@ export class XBot {
           "takeSnapshotOfBookmarkResponse->",
           JSON.stringify(takeSnapshotOfBookmarkResponse)
         );
-
+        // not sure about this
+        // if (takeSnapshotOfBookmarkResponse.success) {
+        //   sendMessageToMainWindow("SNAPSHOT_TAKEN");
+        // }
         common.debugLog(
           process.env.DEBUG,
           "newBookmark.indexId->",

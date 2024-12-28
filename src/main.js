@@ -57,6 +57,10 @@ common.debugLog("envPath->", envPath);
 common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
 common.debugLog("result:", JSON.stringify(result));
 common.debugLog("process.env.APP_FOLDER ->", process.env.APP_FOLDER);
+common.debugLog(
+  "main.js: process.env.XBOT_HEADLESS->",
+  process.env.XBOT_HEADLESS
+);
 
 let mainWindow;
 let xBot;

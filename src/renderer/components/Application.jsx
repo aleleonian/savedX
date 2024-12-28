@@ -22,7 +22,7 @@ export const Application = () => {
     loggedIn: false,
     scraping: false,
     scraped: false,
-    loggingOut: false,
+    logingOut: false,
     loggedOut: false,
   });
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
@@ -98,7 +98,7 @@ export const Application = () => {
           newShowProgress.loggedIn = false;
           newShowProgress.scraping = false;
           newShowProgress.scraped = false;
-          newShowProgress.loggingOut = false;
+          newShowProgress.logingOut = false;
           newShowProgress.loggedOut = false;
         }
         if (progressStages & constants.progress.LOGGING_IN) {
@@ -116,10 +116,10 @@ export const Application = () => {
           newShowProgress.scraped = true;
         }
         if (progressStages & constants.progress.LOGGING_OUT) {
-          newShowProgress.loggingOut = true;
+          newShowProgress.logingOut = true;
         }
         if (progressStages & constants.progress.LOGGED_OUT) {
-          newShowProgress.loggingOut = false;
+          newShowProgress.logingOut = false;
           newShowProgress.loggedOut = true;
         }
 
