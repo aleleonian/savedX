@@ -3,6 +3,7 @@ import { encode } from "../util/messaging";
 import { waitForNewReport } from "../util/event-emitter";
 import { sendMessageToMainWindow } from "../util/messaging";
 import * as common from "../util/common";
+import { CommitOutlined } from "@mui/icons-material";
 
 const { exec } = require("child_process");
 const puppeteer = require("puppeteer-extra");
@@ -899,37 +900,37 @@ export class XBot {
   }
 
   async deleteTwitterBookmarks2() {
-    // loop all the stored bookmarks
-    // get the bookmarked button
-    // click it
+    // Obtain all divs with data-testid="cellInnerDiv"
+    common.debugLog("deleteTwitterBookmarks2() started");
 
-    //TODO: Bookmarked is in english, but it could be another language
-    // Get all buttons with the `aria-label="Bookmarked"`
-    let bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
+    const handles = await this.page.$$('[data-testid="cellInnerDiv"]');
 
-    // while (bookmarkButtons.length > 0) {
-    console.log(`Found ${bookmarkButtons.length} bookmark buttons.`);
+    common.debugLog("handles.length->", handles.length);
+    for (const handle of handles) {
+      // Get all buttons matching the selector inside the current cellInnerDiv
+      const buttonHandles = await handle.$$('[role="button"][aria-label]');
+      common.debugLog("buttonHandles.length->", buttonHandles.length);
 
-    // Function to delay execution for a specified time
+      // Check if the fifth button exists
+      //TODO: ojo con esto cuando solo hay UN bookmark saved
+      if (buttonHandles.length >= 5) {
+        const fifthButton = buttonHandles[4]; // Index 4 is the fifth element (0-based index)
 
-    // Loop through the buttons and click them with a 2-second delay
-    for (let i = 0; i < bookmarkButtons.length; i++) {
-      try {
-        await bookmarkButtons[i].click();
-        console.log(`Clicked button ${i + 1}`);
-      } catch (error) {
-        common.errorLog(`Error clicking button ${i + 1}:`, error);
+        // Optionally log the aria-label to verify
+        const ariaLabel = await fifthButton.evaluate((el) =>
+          el.getAttribute("aria-label")
+        );
+        console.log(`Fifth button aria-label: ${ariaLabel}`);
+        // Perform an action, e.g., clicking the button
+        await fifthButton.click();
+      } else {
+        common.debugLog("Less than 5 buttons found in this cellInnerDiv");
       }
-
-      // Delay for 2 seconds
-      await this.wait(1000);
     }
-
-    //   bookmarkButtons = await this.page.$$('[aria-label="Bookmarked"]');
-    // }
-
-    console.log("Finished clicking all bookmark buttons.");
+    common.debugLog("deleteTwitterBookmarks2() finished");
+    return common.createSuccessResponse();
   }
+
   async deleteTwitterBookmarks() {
     await this.page.waitForSelector('[aria-label="Bookmarked"]');
 
@@ -1123,7 +1124,7 @@ export class XBot {
       bookmarksCopy = bookmarksCopy.concat(this.bookmarks);
       this.bookmarks = [];
       if (this.deleteOnlineBookmarks) {
-        await this.deleteTwitterBookmarks();
+        await this.deleteTwitterBookmarks2();
       } else {
         common.debugLog("Gonna scroll...");
         await this.page.evaluate(() => {

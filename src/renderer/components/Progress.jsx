@@ -4,7 +4,7 @@ import { AlertDialog } from "./AlertDialog";
 import { ProgressIcon } from "./ProgressIcon";
 import Button from "@mui/material/Button";
 import { Notification } from "./Notification";
-import dialUpImage from "/src/assets/images/dial-up-modem-crop.gif";
+import dialUpImage from "/src/assets/images/dialup.smaller.gif";
 import doneImage from "/src/assets/images/done.resized.webp";
 import superMarioImage from "/src/assets/images/super.mario.1.resized.webp";
 import whiteNoiseImage from "/src/assets/images/white.noise.resized.webp";

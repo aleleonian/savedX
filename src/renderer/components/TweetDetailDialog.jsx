@@ -170,10 +170,10 @@ export function TweetDetailDialog({
         newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
       );
       // Delay clearing the notification and closing the dialog
-      setTimeout(() => {
-        setNotificationMessage(null);
-        onClose();
-      }, 3000); // Adjust delay time (in milliseconds) as needed
+      // setTimeout(() => {
+      //   setNotificationMessage(null);
+      //   onClose();
+      // }, 3000); // Adjust delay time (in milliseconds) as needed
     } else {
       setNotificationClass("error");
       setNotificationMessage(

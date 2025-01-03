@@ -1,1 +1,8 @@
 + cuando se borra UN saved tweet, queda el 'alert' desplegado en el tweetDetailsDialog y se ve cuando abris un nuevo tweet.
+
++ if my saved bookmarks on twitter are 5 and i already have them saved, they won't be added to savedX but if 
+    the 'delete after scrape = true', they will be deleted after the session is over. 
+    + Maybe i should have a way to exclusively delete one by one only if they were added to savedX.
+
++ after an individual saved tweet is deleted, there is this timer that will hide the dialog but if i delete, hide it and open a new
+    tweetdetaildialog, then it will hide the new one.

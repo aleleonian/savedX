@@ -215,8 +215,14 @@ ipcMain.handle("go-fetch-tweets", async () => {
   if (checkUserAndPassResponse.success) {
     const allConfigDataResponse = await getAllConfigData();
     if (allConfigDataResponse.success) {
-      await goFetchTweets(xBot, allConfigDataResponse.data);
-      return common.createSuccessResponse();
+      try {
+        //TODO: voy por acá. que pasa cuando 'bookmarked' en español;
+        await goFetchTweets(xBot, allConfigDataResponse.data);
+
+        return common.createSuccessResponse();
+      } catch (error) {
+        return common.createErrorResponse(error);
+      }
     } else {
       failedResponseObject.errorMessage = `There's some error with the db 😫 : ${allConfigDataResponse.errorMessage}`;
     }
