@@ -72,7 +72,7 @@ export function ConfigDialog({ open, onClose, configData }) {
       } else {
         setNotificationClass(`error`);
         setNotificationMessage(
-          `Trouble updating config data mai fren: ${updateConfigDataResponse.errorMessage}!`
+          `Trouble updating config data mai fren: ${updateConfigDataResponse.errorMessage}!`,
         );
       }
     }

@@ -98,7 +98,7 @@ export function TweetDetailDialog({
   function removeSubstring(originalString, substringToRemove) {
     const regex = new RegExp(
       `\\b${substringToRemove}\\b,?\\s?|,?\\s?\\b${substringToRemove}\\b`,
-      "g"
+      "g",
     );
     return originalString.replace(regex, "").trim();
   }
@@ -167,7 +167,7 @@ export function TweetDetailDialog({
       const newSavedTweets = [...state.savedTweets];
       updateState(
         "savedTweets",
-        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id)
+        newSavedTweets.filter((savedTweet) => savedTweet.id != tweetData.id),
       );
       // Delay clearing the notification and closing the dialog
       // setTimeout(() => {
@@ -177,7 +177,7 @@ export function TweetDetailDialog({
     } else {
       setNotificationClass("error");
       setNotificationMessage(
-        "Tweet was not deleted!: " + tweetDeleteResult.errorMessage
+        "Tweet was not deleted!: " + tweetDeleteResult.errorMessage,
       );
       debugLog(window.savedXApi.DEBUG, "tweetDeleteResult:", tweetDeleteResult);
     }
