@@ -1,9 +1,36 @@
 const appName = "savedX";
 const path = require("path");
-const APP_FOLDER = path.join(process.env.HOME, appName);
+const os = require("os");
+
+const homeDir = os.homedir();
+
+if (!homeDir) {
+  console.error("homeDir error: no exists!");
+  process.abort();
+}
+
+const APP_FOLDER = path.join(homeDir, appName);
+
+if (!APP_FOLDER) {
+  console.error("APP_FOLDER error: does not exist!");
+  process.abort();
+}
+
 const envPath = path.resolve(APP_FOLDER, ".env");
+if (!envPath) {
+  console.error("envPath error: does not exist!");
+  process.abort();
+}
+
+//TODO: make this warnings alerts so they can be seen graphically or smth
+
 const dotenv = require("dotenv");
 const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.error("env file error:", result.error);
+}
+
 process.env.APP_FOLDER = APP_FOLDER;
 
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
@@ -16,6 +43,7 @@ log.transports.console.level = "debug";
 log.transports.file.level = "debug";
 
 const logFilePath = path.join(APP_FOLDER, "my-log-file.log");
+
 log.transports.file.resolvePathFn = () => logFilePath;
 
 if (!fs.existsSync(process.env.APP_FOLDER)) {
@@ -44,13 +72,14 @@ import {
 import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
 
 import { mainEmitter } from "./util/event-emitter.js";
+import res from "express/lib/response";
 
 if (result.error) {
   common.debugLog("Failed to load .env file:", result.error);
 } else {
   common.debugLog(
     "Loaded environment variables:",
-    JSON.stringify(result.parsed)
+    JSON.stringify(result.parsed),
   );
 }
 common.debugLog("envPath->", envPath);
@@ -59,7 +88,7 @@ common.debugLog("result:", JSON.stringify(result));
 common.debugLog("process.env.APP_FOLDER ->", process.env.APP_FOLDER);
 common.debugLog(
   "main.js: process.env.XBOT_HEADLESS->",
-  process.env.XBOT_HEADLESS
+  process.env.XBOT_HEADLESS,
 );
 
 let mainWindow;
@@ -128,7 +157,7 @@ const createWindow = () => {
   } else {
     const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window";
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${viteName}/index.html`)
+      path.join(__dirname, `../renderer/${viteName}/index.html`),
     );
   }
   common.debugLog("MAIN_WINDOW_VITE_NAME->", MAIN_WINDOW_VITE_NAME);
@@ -147,14 +176,14 @@ app.whenReady().then(async () => {
   if (!initStatus.success) {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${initStatus.errorMessage}`
+      `error--${initStatus.errorMessage}`,
     );
   }
 
   const allConfigDataResponse = await getAllConfigData();
   common.debugLog(
     "allConfigDataResponse->",
-    JSON.stringify(allConfigDataResponse)
+    JSON.stringify(allConfigDataResponse),
   );
   if (allConfigDataResponse.success) {
     xBot.downloadMedia = allConfigDataResponse.data.DOWNLOAD_MEDIA;
@@ -163,7 +192,7 @@ app.whenReady().then(async () => {
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--${allConfigDataResponse.errorMessage}`
+      `error--${allConfigDataResponse.errorMessage}`,
     );
   }
 
@@ -270,7 +299,7 @@ ipcMain.handle("delete-saved-tweet", async (event, tweetData) => {
           return common.createSuccessResponse();
         } else {
           return common.createSuccessResponse(
-            "The tweet was deleted but the associated file was not."
+            "The tweet was deleted but the associated file was not.",
           );
         }
       }
@@ -288,14 +317,14 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
     if (deleteAllTweestResult.success) {
       if (xBot.downloadMedia) {
         const deleteMediaFilesResult = await common.deleteAllFilesInDirectory(
-          process.env.MEDIA_FOLDER
+          process.env.MEDIA_FOLDER,
         );
         if (deleteMediaFilesResult.success) {
           return common.createSuccessResponse();
         } else {
           // If we resolve false, then the local saved tweets array won't be updated
           return common.createSuccessResponse(
-            "Tweets were deleted but not all files in the media folder"
+            "Tweets were deleted but not all files in the media folder",
           );
         }
       } else return common.createSuccessResponse();
@@ -346,7 +375,7 @@ ipcMain.on("open-debug-session", async () => {
 
 common.debugLog(
   "DEBUG in main process:",
-  process.env.DEBUG ? JSON.parse(process.env.DEBUG) : false
+  process.env.DEBUG ? JSON.parse(process.env.DEBUG) : false,
 );
 
 const init = async () => {
@@ -388,7 +417,7 @@ const init = async () => {
   } else {
     sendMessageToMainWindow(
       "NOTIFICATION",
-      `error--There were issues opening / creating the db file 😫`
+      `error--There were issues opening / creating the db file 😫`,
     );
     sendMessageToMainWindow("DISABLE_GO_FETCH_BUTTON");
   }

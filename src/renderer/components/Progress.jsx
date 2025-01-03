@@ -77,7 +77,7 @@ export const Progress = ({ whichState }) => {
     const snapshotTakenEventListener = () => {
       console.log("snapshot arrived!");
       setCurrentTaskImage(
-        "http://localhost:3000/media/bookmark-screenshot.png"
+        "http://localhost:3000/media/bookmark-screenshot.png",
       );
     };
 
