@@ -20,7 +20,7 @@ const findCommandInPredefinedPaths = (command) => {
         return;
       }
     }
-    reject(`${command} not found in predefined paths.`);
+    resolve(false);
   });
 };
 
