@@ -1,25 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Title } from "./Title";
 import { AlertDialog } from "./AlertDialog";
-import { ProgressIcon } from "./ProgressIcon";
 import Button from "@mui/material/Button";
 import { Notification } from "./Notification";
 import dialUpImage from "/src/assets/images/dialup.smaller.gif";
 import doneImage from "/src/assets/images/done.resized.webp";
 import superMarioImage from "/src/assets/images/super.mario.1.resized.webp";
 import whiteNoiseImage from "/src/assets/images/white.noise.resized.webp";
-
-const addClass = (classList, className) => {
-  const classesArray = classList.split(/\s+/);
-  classesArray.push(className);
-  return classesArray.join(" ");
-};
-const removeClass = (classList, className) => {
-  return classList
-    .split(/\s+/)
-    .filter((classItem) => classItem !== className)
-    .join(" ");
-};
 
 export const Progress = ({ whichState }) => {
   const [notificationMessage, setNotificationMessage] = useState(null);

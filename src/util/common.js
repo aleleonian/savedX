@@ -12,7 +12,7 @@ const predefinedPaths = [
 
 // Check for command existence in predefined paths
 const findCommandInPredefinedPaths = (command) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     for (const dir of predefinedPaths) {
       const commandPath = path.join(dir, command);
       if (fs.existsSync(commandPath)) {

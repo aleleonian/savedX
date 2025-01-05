@@ -72,7 +72,6 @@ import {
 import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
 
 import { mainEmitter } from "./util/event-emitter.js";
-import res from "express/lib/response";
 
 if (result.error) {
   common.debugLog("Failed to load .env file:", result.error);
