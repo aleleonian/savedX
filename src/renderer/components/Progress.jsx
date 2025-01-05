@@ -74,6 +74,7 @@ export const Progress = ({ whichState }) => {
       }
     };
 
+    //TODO: this is ON HOLD
     const snapshotTakenEventListener = () => {
       console.log("snapshot arrived!");
       setCurrentTaskImage(
@@ -92,6 +93,7 @@ export const Progress = ({ whichState }) => {
 
     window.addEventListener("ALERT", alertEventListener);
     window.addEventListener("NOTIFICATION", notificationEventListener);
+    //TODO: this is ON HOLD
     window.addEventListener("SNAPSHOT_TAKEN", snapshotTakenEventListener);
 
     // Clean up event listener on component unmount
