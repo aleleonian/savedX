@@ -125,6 +125,7 @@ ipcRenderer.on("CHECK_SAVED_TWEET_EXISTS", (event, tweetUrl) => {
   dispatchNotification("CHECK_SAVED_TWEET_EXISTS", tweetUrl);
 });
 
+//TODO: this is ON HOLD
 ipcRenderer.on("SNAPSHOT_TAKEN", () => {
   dispatchNotification("SNAPSHOT_TAKEN");
 });

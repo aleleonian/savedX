@@ -3,7 +3,6 @@ import { encode } from "../util/messaging";
 import { waitForNewReport } from "../util/event-emitter";
 import { sendMessageToMainWindow } from "../util/messaging";
 import * as common from "../util/common";
-import { CommitOutlined } from "@mui/icons-material";
 
 const { exec } = require("child_process");
 const puppeteer = require("puppeteer-extra");
@@ -136,7 +135,7 @@ export class XBot {
   }
   async init() {
     let pupConfig = {
-      headless: process.env.XBOT_HEADLESS ? process.env.XBOT_HEADLESS : false, // Default to false if not set
+      headless: process.env.XBOT_HEADLESS === "true",
       ignoreDefaultArgs: ["--enable-automation"],
       args: ["--start-maximized", "--no-sandbox", "--disable-setuid-sandbox"],
     };
@@ -1082,12 +1081,13 @@ export class XBot {
             "We do NOT have to download images!",
           );
         }
-        const takeSnapshotOfBookmarkResponse =
-          await this.takeSnapshotOfBookmark(newBookmark.indexId);
-        common.debugLog(
-          "takeSnapshotOfBookmarkResponse->",
-          JSON.stringify(takeSnapshotOfBookmarkResponse),
-        );
+        // TODO: on HOLD
+        // const takeSnapshotOfBookmarkResponse =
+        //   await this.takeSnapshotOfBookmark(newBookmark.indexId);
+        // common.debugLog(
+        //   "takeSnapshotOfBookmarkResponse->",
+        //   JSON.stringify(takeSnapshotOfBookmarkResponse)
+        // );
         // not sure about this
         // if (takeSnapshotOfBookmarkResponse.success) {
         //   sendMessageToMainWindow("SNAPSHOT_TAKEN");
@@ -1120,8 +1120,10 @@ export class XBot {
       );
       let howManyStoredBookmarks = await this.storeBookmarks();
       common.debugLog("howManyStoredBookmarks->", howManyStoredBookmarks);
-      if (howManyStoredBookmarks < 1) break;
-      bookmarksCopy = bookmarksCopy.concat(this.bookmarks);
+      //TODO: this is flawed because if i have 500 bookmarks but the last 5 were already saved, i'd be breaking
+      // without further analysis, which is wrong.
+      // if (howManyStoredBookmarks < 1) break;
+      if (howManyStoredBookmarks > 0) bookmarksCopy.concat(this.bookmarks);
       this.bookmarks = [];
       if (this.deleteOnlineBookmarks) {
         await this.deleteTwitterBookmarks2();
@@ -1134,8 +1136,8 @@ export class XBot {
         await this.wait(3000);
 
         howManyStoredBookmarks = await this.storeBookmarks();
-        if (howManyStoredBookmarks < 1) break;
-        bookmarksCopy = bookmarksCopy.concat(this.bookmarks);
+        // if (howManyStoredBookmarks < 1) break;
+        if (howManyStoredBookmarks > 0) bookmarksCopy.concat(this.bookmarks);
         this.bookmarks = [];
         common.debugLog("bookmarks stored.");
 
