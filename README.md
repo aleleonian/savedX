@@ -7,3 +7,8 @@ rm node_modules/sqlite3/node_modules/.bin/nopt
 cp node_modules/sqlite3/node_modules/nopt/bin/nopt.js node_modules/sqlite3/node_modules/.bin/nopt
 
 find node_modules/sqlite3 -type l
+
+/////
+
+Quarantine thingy for macos binaries:
+xattr -rd com.apple.quarantine /path/to/binary
