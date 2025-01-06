@@ -6,3 +6,5 @@
 
 + after an individual saved tweet is deleted, there is this timer that will hide the dialog but if i delete, hide it and open a new
     tweetdetaildialog, then it will hide the new one.
+
++ text search and filters only are applied to the current list of tweets being shown and not to ALL of them
