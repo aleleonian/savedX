@@ -1113,6 +1113,7 @@ export class XBot {
     return this.bookmarks.length;
   };
   scrapeBookmarks = async (showProgressFunction) => {
+    this.keepScraping = true;
     let bookmarksCopy = [];
     let scrollPosition = 0;
 
