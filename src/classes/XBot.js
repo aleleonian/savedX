@@ -898,38 +898,71 @@ export class XBot {
     }
   }
 
+
   async deleteTwitterBookmarks2() {
-    // Obtain all divs with data-testid="cellInnerDiv"
+    const timeout = (ms) =>
+      new Promise((resolve) =>
+        setTimeout(() => resolve(common.createErrorResponse("Function timed out")), ms)
+      );
+
+    return Promise.race([
+      this.deleteTwitterBookmarks2Core(),
+      timeout(5 * 60 * 1000), // 5 minutes
+    ]);
+  }
+
+  async deleteTwitterBookmarks2Core() {
     common.debugLog("deleteTwitterBookmarks2() started");
 
-    const handles = await this.page.$$('[data-testid="cellInnerDiv"]');
-
-    common.debugLog("cellInnerDiv handles.length->", handles.length);
-    for (const handle of handles) {
-      // Get all buttons matching the selector inside the current cellInnerDiv
-      const buttonHandles = await handle.$$(
-        '[role="button"][aria-label][class="css-175oi2r r-1777fci r-bt1l66 r-bztko3 r-lrvibr r-1loqt21 r-1ny4l3l"]'
+    try {
+      // Usage
+      const handles = await this.withTimeout(
+        "cellInnerDiv",
+        this.page.$$('[data-testid="cellInnerDiv"]'),
+        10000 // 10 seconds
       );
-      common.debugLog("buttonHandles.length->", buttonHandles.length);
+      common.debugLog("cellInnerDiv handles.length->", handles.length);
 
-      // Check if the fifth button exists
-      //TODO: ojo con esto cuando solo hay UN bookmark saved
-      if (buttonHandles.length >= 6) {
-        const fifthButton = buttonHandles[4]; // Index 4 is the fifth element (0-based index)
+      for (const handle of handles) {
 
-        // Optionally log the aria-label to verify
-        const ariaLabel = await fifthButton.evaluate((el) =>
-          el.getAttribute("aria-label")
+        const buttonHandles = await this.withTimeout(
+          "bookmarkButton",
+          await handle.$$(
+            '[role="button"][aria-label][class="css-175oi2r r-1777fci r-bt1l66 r-bztko3 r-lrvibr r-1loqt21 r-1ny4l3l"]'
+          ),
+          10000
         );
-        console.log(`Fifth button aria-label: ${ariaLabel}`);
-        // Perform an action, e.g., clicking the button
-        await fifthButton.click();
-      } else {
-        common.debugLog("Less than 5 buttons found in this cellInnerDiv");
+
+        // const buttonHandles = await handle.$$(
+        //   '[role="button"][aria-label][class="css-175oi2r r-1777fci r-bt1l66 r-bztko3 r-lrvibr r-1loqt21 r-1ny4l3l"]'
+        // );
+        common.debugLog("buttonHandles.length->", buttonHandles.length);
+
+        if (buttonHandles.length >= 6) {
+          const fifthButton = buttonHandles[4];
+
+          const ariaLabel = await this.withTimeout(
+            "ariaLabel",
+            await fifthButton.evaluate((el) =>
+              el.getAttribute("aria-label")),
+            10000);
+
+          // const ariaLabel = await fifthButton.evaluate((el) =>
+          //   el.getAttribute("aria-label")
+          // );
+          console.log(`Fifth button aria-label: ${ariaLabel}`);
+          await fifthButton.click();
+        } else {
+          common.debugLog("Less than 5 buttons found in this cellInnerDiv");
+        }
       }
+
+      common.debugLog("deleteTwitterBookmarks2() finished");
+      return common.createSuccessResponse();
     }
-    common.debugLog("deleteTwitterBookmarks2() finished");
-    return common.createSuccessResponse();
+    catch (error) {
+      return common.createErrorResponse(error);
+    }
   }
 
   async deleteTwitterBookmarks() {
@@ -1135,7 +1168,8 @@ export class XBot {
         bookmarksCopy = bookmarksCopy.concat(this.bookmarks);
       this.bookmarks = [];
       if (this.deleteOnlineBookmarks) {
-        await this.deleteTwitterBookmarks2();
+        const deleteTwitterBookmarks2Response = await this.deleteTwitterBookmarks2();
+        common.debugLog("deleteTwitterBookmarks2Response->", JSON.stringify(deleteTwitterBookmarks2Response));
       } else {
         common.debugLog("Gonna scroll...");
         await this.page.evaluate(() => {
@@ -1179,5 +1213,13 @@ export class XBot {
     });
     return result;
   };
+  async withTimeout(id, promise, ms) {
+    const errorMessage = id + " operation timed out";
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(errorMessage)), ms)
+    );
+    return Promise.race([promise, timeout]);
+  }
+
 }
 module.exports = XBot;
