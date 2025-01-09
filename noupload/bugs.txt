@@ -9,5 +9,5 @@
 
 + text search and filters only are applied to the current list of tweets being shown and not to ALL of them
 
-+ apparently after a yt-dlp error ocurred, if you want to scrape again you won't be able. You have to close and open the program again.
-    + check stuff around checkDependencies
++ Sometimes this happens: [2025-01-08 08:29:32.190] [debug] deleteTwitterBookmarks2() started
+    + but it never ends! 
