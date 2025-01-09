@@ -3,6 +3,7 @@
 + que si deleteOnlineBookmarks == true, entonces se borre cada bookmark luego de ser scrapeada. No todas al final.
     + de esta manera si yo paro el scraping antes de tiempo, solo se borran las que fueron scrapeadas y no hay que esperar
     hasta el final para que se borren todas. makes more sense.
+        + improved this by deleting bookmarks in batches, not all of them together at the end.
     
 + dar la opción de guardar una copia del multimedia de los tweets
     + maybe also guardar un snapshot del tweet. 
@@ -17,5 +18,9 @@
 + que siempre se muestre el original tweet url
 
 + que haya mejor animaciones para cada momento del scraping
+    + implemented some, need to random display others while scraping
 
 + hacer la windows version
+    + need to implement the dependencies detection and installation
+
++ implement Vitest
