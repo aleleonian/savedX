@@ -11,8 +11,8 @@
 
 + Sometimes this happens: [2025-01-08 08:29:32.190] [debug] deleteTwitterBookmarks2() started
     + but it never ends! 
+        + probably handled
 
-+ the deleteTwitterBookmarks2Core function is not determining properly in each case which is the 'bookmarks' button
-    + we need a better way to determine that.
-    + find whoever is the parent of: <path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5z">
-</path>    
++ improve 'stop the scrape' sometimes it takes too long
+
++ For some reason (or strange coincidence) a saved tweet whose media could not be saved to disk, cannot be deleted when calling deleteTwitterBookmarks2Core at the end.
