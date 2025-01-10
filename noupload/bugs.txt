@@ -14,5 +14,3 @@
         + probably handled
 
 + improve 'stop the scrape' sometimes it takes too long
-
-+ For some reason (or strange coincidence) a saved tweet whose media could not be saved to disk, cannot be deleted when calling deleteTwitterBookmarks2Core at the end.

@@ -934,8 +934,9 @@ export class XBot {
           10000
         );
 
-        if (buttonHandles.length >= 6) {
+        if (buttonHandles.length > 0) {
           let matchingParentHandle = null;
+          let savedTweetHtml = "";
 
           for (const buttonHandle of buttonHandles) {
             const hasMatchingChild = await buttonHandle.evaluate((parent) => {
@@ -950,7 +951,10 @@ export class XBot {
               const htmlContent = await matchingParentHandle.evaluate(
                 (el) => el.outerHTML
               );
-              common.debugLog("HTML of matchingParentHandle:", htmlContent);
+              const savedTweetHtml = await handle.evaluate(
+                (el) => el.outerHTML
+              );
+              common.debugLog("HTML of savedTweetHtml:", savedTweetHtml);
               break;
             }
           }
@@ -960,7 +964,7 @@ export class XBot {
             common.debugLog("No matching parent handle found.");
           }
         } else {
-          common.debugLog("Less than 5 buttons found in this cellInnerDiv");
+          common.debugLog("Less than 1 button found in this cellInnerDiv");
         }
       }
       common.debugLog("deleteTwitterBookmarks2() finished");
