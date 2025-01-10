@@ -948,13 +948,6 @@ export class XBot {
             });
             if (hasMatchingChild) {
               matchingParentHandle = buttonHandle;
-              const htmlContent = await matchingParentHandle.evaluate(
-                (el) => el.outerHTML
-              );
-              const savedTweetHtml = await handle.evaluate(
-                (el) => el.outerHTML
-              );
-              common.debugLog("HTML of savedTweetHtml:", savedTweetHtml);
               break;
             }
           }
