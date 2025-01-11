@@ -952,6 +952,7 @@ export class XBot {
             }
           }
           if (matchingParentHandle) {
+            common.debugLog("Gonna click the bookmarked button");
             await matchingParentHandle.click();
           } else {
             common.debugLog("No matching parent handle found.");
