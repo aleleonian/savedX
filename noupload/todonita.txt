@@ -8,8 +8,6 @@
 + dar la opción de guardar una copia del multimedia de los tweets
     + maybe also guardar un snapshot del tweet. 
 
-+ que se baje la configuración de los selectors desde latigo.com.ar/savedX
-
 + que haya un dialog para managear los tags
 
 + handle the captcha case in a more tidy way, letting the user do the captcha and then we resume doing our thing
