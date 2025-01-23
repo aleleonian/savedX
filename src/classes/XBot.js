@@ -519,6 +519,10 @@ export class XBot {
       );
       if (!foundAndClicked) {
         common.debugLog("Can't find TWITTER_USERNAME_INPUT");
+        common.debugLog(
+          "TWITTER_USERNAME_INPUT->",
+          process.env.TWITTER_USERNAME_INPUT
+        );
         this.isBusy = false;
         return this.respond(false, "Can't find TWITTER_USERNAME_INPUT");
       }
