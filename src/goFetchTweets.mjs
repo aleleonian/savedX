@@ -3,6 +3,7 @@ import * as dbTools from "./util/db.mjs";
 import * as common from "./util/common.mjs";
 import { changeDownloadMediaConfig } from "./util/account.mjs";
 import { sendMessageToMainWindow, encode } from "./util/messaging.mjs";
+import { waitForNewReport } from "./util/event-emitter.mjs";
 
 let localBot;
 
@@ -56,12 +57,19 @@ export async function goFetchTweets(xBot, configData) {
     }
   }
 
-  let result = await localBot.init();
+  const showProgressFunction = () => showProgress(
+    encode(
+      constants.progress.INIT_PROGRESS,
+      constants.progress.LOGGED_IN,
+      constants.progress.SCRAPING
+    )
+  );
+
+  let result = await localBot.init(showProgressFunction, sendMessageToMainWindow, waitForNewReport);
   if (result.success) {
     showProgress(
       encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN),
     );
-    //TODO something's wrong with the passwords
     result = await localBot.loginToX(
       localBot.botUsername,
       localBot.botPassword,
@@ -81,7 +89,7 @@ export async function goFetchTweets(xBot, configData) {
         ),
       );
       await localBot.wait(5000);
-      const bookmarks = await localBot.scrapeBookmarks(showProgress);
+      const bookmarks = await localBot.scrapeBookmarks();
       common.debugLog(bookmarks.length, " bookmarks scraped.");
       showProgress(
         encode(

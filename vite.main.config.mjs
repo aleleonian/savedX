@@ -14,6 +14,7 @@ export default defineConfig((env) => {
 
   const config = {
     build: {
+      sourcemap: "inline",
       lib: {
         entry: forgeConfigSelf.entry,
         fileName: () => 'main.mjs',  // 🔥 Ensure output is main.mjs
