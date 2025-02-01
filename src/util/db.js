@@ -1,7 +1,7 @@
 const sqlite3 = require("sqlite3").verbose();
 import { createErrorResponse, createSuccessResponse } from "./common";
 import * as common from "./common";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 const fs = require("fs");
 
 let db;

@@ -67,7 +67,7 @@ import {
   getAllConfigData,
 } from "./util/account";
 import { menuTemplate } from "./data/menu-template";
-import { XBot } from "./classes/XBot";
+import { XBot } from "xbot-js";
 
 import {
   goFetchTweets,
