@@ -88,24 +88,33 @@ export async function goFetchTweets(xBot, configData) {
           constants.progress.SCRAPING,
         ),
       );
-      await localBot.wait(5000);
-      const bookmarks = await localBot.scrapeBookmarks();
-      common.debugLog(bookmarks.length, " bookmarks scraped.");
-      showProgress(
-        encode(
-          constants.progress.INIT_PROGRESS,
-          constants.progress.LOGGED_IN,
-          constants.progress.SCRAPED,
-        ),
-      );
-      const storeTweetsResult = await dbTools.storeTweets(bookmarks);
-      if (!storeTweetsResult.success) {
+      // await localBot.wait(5000);
+      try {
+        const bookmarks = await localBot.scrapeBookmarks();
+        common.debugLog(bookmarks.length, " bookmarks scraped.");
+        showProgress(
+          encode(
+            constants.progress.INIT_PROGRESS,
+            constants.progress.LOGGED_IN,
+            constants.progress.SCRAPED,
+          ),
+        );
+        const storeTweetsResult = await dbTools.storeTweets(bookmarks);
+        if (!storeTweetsResult.success) {
+          sendMessageToMainWindow(
+            "NOTIFICATION",
+            `error--Could not store tweets 😫 : ${storeTweetsResult.errorMessage}`,
+          );
+        }
+        await localBot.wait(1000);
+      }
+      catch (error) {
+        common.debugLog("error scraping bookmarks: ", error);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          `error--Could not store tweets 😫 : ${storeTweetsResult.errorMessage}`,
+          `error--Error scraping bookmarks! 😫 : ${error}`,
         );
       }
-      await localBot.wait(1000);
       await localBot.logOut();
       showProgress(
         encode(
