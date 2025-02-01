@@ -13,6 +13,10 @@ export default defineConfig((env) => {
   /** @type {import('vite').UserConfig} */
   const config = {
     build: {
+      lib: {
+        entry: "src/preload.mjs", // Ensure this points to the right file
+        formats: ["es"], // Only generate ESM!
+      },
       rollupOptions: {
         external,
         // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.

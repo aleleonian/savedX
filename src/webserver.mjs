@@ -1,4 +1,4 @@
-import * as common from "./util/common";
+import * as common from "./util/common.mjs";
 import express from "express";
 
 let xBotPointer;

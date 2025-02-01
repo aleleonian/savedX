@@ -1,8 +1,8 @@
-import * as constants from "./util/constants";
-import * as dbTools from "./util/db";
-import * as common from "./util/common";
-import { changeDownloadMediaConfig } from "./util/account";
-import { sendMessageToMainWindow, encode } from "./util/messaging";
+import * as constants from "./util/constants.mjs";
+import * as dbTools from "./util/db.mjs";
+import * as common from "./util/common.mjs";
+import { changeDownloadMediaConfig } from "./util/account.mjs";
+import { sendMessageToMainWindow, encode } from "./util/messaging.mjs";
 
 let localBot;
 

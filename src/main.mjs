@@ -1,7 +1,7 @@
 const appName = "savedX";
 import path from "node:path";
 import os from "node:os";
-import { loadEnvFromUrl } from "./util/common.js";
+import { loadEnvFromUrl } from "./util/common.mjs";
 
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
@@ -66,26 +66,26 @@ if (!fs.existsSync(process.env.APP_FOLDER)) {
 
 process.env.MEDIA_FOLDER = path.join(process.env.APP_FOLDER, "Media");
 
-import { startExpressServer } from "./webserver";
-import * as dbTools from "./util/db";
-import * as common from "./util/common";
+import { startExpressServer } from "./webserver.mjs";
+import * as dbTools from "./util/db.mjs";
+import * as common from "./util/common.mjs";
 import {
   checkUserAndPass,
   updateConfigData,
   getAllConfigData,
-} from "./util/account";
-import { menuTemplate } from "./data/menu-template";
+} from "./util/account.mjs";
+import { menuTemplate } from "./data/menu-template.mjs";
 import { XBot } from "xbot-js";
 
 import {
   goFetchTweets,
   goFetchTweetsFake,
   stopScraping,
-} from "./goFetchTweets";
+} from "./goFetchTweets.mjs";
 
-import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
+import { sendMessageToMainWindow, setMainWindow } from "./util/messaging.mjs";
 
-import { mainEmitter } from "./util/event-emitter.js";
+import { mainEmitter } from "./util/event-emitter.mjs";
 
 if (result.error) {
   common.debugLog("Failed to load .env file:", result.error);
@@ -100,7 +100,7 @@ common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
 common.debugLog("result:", JSON.stringify(result));
 common.debugLog("process.env.APP_FOLDER ->", process.env.APP_FOLDER);
 common.debugLog(
-  "main.js: process.env.XBOT_HEADLESS->",
+  "main.mjs: process.env.XBOT_HEADLESS->",
   process.env.XBOT_HEADLESS
 );
 
@@ -119,7 +119,7 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.mjs"),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,

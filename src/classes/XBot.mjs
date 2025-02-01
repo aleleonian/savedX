@@ -1,8 +1,8 @@
-import * as constants from "../util/constants";
-import { encode } from "../util/messaging";
-import { waitForNewReport } from "../util/event-emitter";
-import { sendMessageToMainWindow } from "../util/messaging";
-import * as common from "../util/common";
+import * as constants from "../util/constants.mjs";
+import { encode } from "../util/messaging.mjs";
+import { waitForNewReport } from "../util/event-emitter.mjs";
+import { sendMessageToMainWindow } from "../util/messaging.mjs";
+import * as common from "../util/common.mjs";
 
 import { exec } from "node:child_process";
 import puppeteer from "puppeteer-extra";

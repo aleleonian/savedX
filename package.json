@@ -8,7 +8,7 @@
     "forge": "./forge.config.cjs"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development electron .vite/build/main.mjs",
+    "start": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=true DEBUG=true electron .vite/build/main.mjs",
     "package": "electron-forge package",
     "build": "vite build && electron-forge package",
     "make": "electron-forge make",
