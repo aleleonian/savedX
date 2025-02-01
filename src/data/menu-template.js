@@ -1,4 +1,5 @@
-const { app, BrowserWindow } = require("electron");
+import { app, BrowserWindow } from "electron";
+
 import { sendMessageToMainWindow } from "../util/messaging";
 import { checkUserAndPass, getAllConfigData } from "../util/account";
 import { goFetchTweets } from "../goFetchTweets";

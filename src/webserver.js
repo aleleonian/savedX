@@ -1,5 +1,5 @@
 import * as common from "./util/common";
-const express = require("express");
+import express from "express";
 
 let xBotPointer;
 

@@ -1,7 +1,15 @@
 const appName = "savedX";
-const path = require("path");
-const os = require("os");
+import path from "node:path";
+import os from "node:os";
 import { loadEnvFromUrl } from "./util/common.js";
+
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
+
+// 👇 Convert ESM URL to file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 const homeDir = os.homedir();
 
@@ -39,12 +47,12 @@ loadEnvFromUrl(envUrl);
 
 process.env.APP_FOLDER = APP_FOLDER;
 
-const { app, BrowserWindow, ipcMain, Menu } = require("electron");
-const fs = require("fs");
+import { app, BrowserWindow, ipcMain, Menu, ipcRenderer, contextBridge, shell } from "electron";
+import fs from "node:fs";
 
 /////// log stuff /////////
 
-const log = require("electron-log");
+import log from "electron-log";
 log.transports.console.level = "debug";
 log.transports.file.level = "debug";
 
@@ -100,9 +108,11 @@ let mainWindow;
 let xBot;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require("electron-squirrel-startup")) {
+import electronSquirrelStartup from "electron-squirrel-startup";
+if (electronSquirrelStartup) {
   app.quit();
 }
+
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({

@@ -10,6 +10,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development electron .vite/build/main.mjs",
     "package": "electron-forge package",
+    "build": "vite build && electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ignore-pattern 'noupload/*'  --ignore-pattern '.vite/*'",

@@ -1,10 +1,8 @@
 import * as crypto from "crypto";
-const path = require("node:path");
-const fs = require("fs");
-const log = require("electron-log");
+import path from "node:path";
+import fs from "node:fs";
+import log from "electron-log";
 import fetch from "node-fetch"; // You can use axios or native fetch if you're in the browser
-import dotenv from "dotenv";
-import { comma } from "postcss/lib/list";
 
 const predefinedPaths = [
   "/opt/homebrew/bin",

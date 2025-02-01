@@ -1,8 +1,10 @@
-const sqlite3 = require("sqlite3").verbose();
+import sqlite3Module from "sqlite3";
+const sqlite3 = sqlite3Module.verbose();
+
 import { createErrorResponse, createSuccessResponse } from "./common";
 import * as common from "./common";
 import * as cheerio from "cheerio";
-const fs = require("fs");
+import fs from "node:fs";
 
 let db;
 
