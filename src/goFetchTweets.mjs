@@ -1,8 +1,9 @@
-import * as constants from "./util/constants";
-import * as dbTools from "./util/db";
-import * as common from "./util/common";
-import { changeDownloadMediaConfig } from "./util/account";
-import { sendMessageToMainWindow, encode } from "./util/messaging";
+import * as constants from "./util/constants.mjs";
+import * as dbTools from "./util/db.mjs";
+import * as common from "./util/common.mjs";
+import { changeDownloadMediaConfig } from "./util/account.mjs";
+import { sendMessageToMainWindow, encode } from "./util/messaging.mjs";
+import { waitForNewReport } from "./util/event-emitter.mjs";
 
 let localBot;
 
@@ -56,12 +57,19 @@ export async function goFetchTweets(xBot, configData) {
     }
   }
 
-  let result = await localBot.init();
+  const showProgressFunction = () => showProgress(
+    encode(
+      constants.progress.INIT_PROGRESS,
+      constants.progress.LOGGED_IN,
+      constants.progress.SCRAPING
+    )
+  );
+
+  let result = await localBot.init(showProgressFunction, sendMessageToMainWindow, waitForNewReport);
   if (result.success) {
     showProgress(
       encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGING_IN),
     );
-    //TODO something's wrong with the passwords
     result = await localBot.loginToX(
       localBot.botUsername,
       localBot.botPassword,
@@ -80,24 +88,34 @@ export async function goFetchTweets(xBot, configData) {
           constants.progress.SCRAPING,
         ),
       );
+      // we gotta wait for the html to be 'settled'
       await localBot.wait(5000);
-      const bookmarks = await localBot.scrapeBookmarks(showProgress);
-      common.debugLog(bookmarks.length, " bookmarks scraped.");
-      showProgress(
-        encode(
-          constants.progress.INIT_PROGRESS,
-          constants.progress.LOGGED_IN,
-          constants.progress.SCRAPED,
-        ),
-      );
-      const storeTweetsResult = await dbTools.storeTweets(bookmarks);
-      if (!storeTweetsResult.success) {
+      try {
+        const bookmarks = await localBot.scrapeBookmarks();
+        common.debugLog(bookmarks.length, " bookmarks scraped.");
+        showProgress(
+          encode(
+            constants.progress.INIT_PROGRESS,
+            constants.progress.LOGGED_IN,
+            constants.progress.SCRAPED,
+          ),
+        );
+        const storeTweetsResult = await dbTools.storeTweets(bookmarks);
+        if (!storeTweetsResult.success) {
+          sendMessageToMainWindow(
+            "NOTIFICATION",
+            `error--Could not store tweets 😫 : ${storeTweetsResult.errorMessage}`,
+          );
+        }
+        await localBot.wait(1000);
+      }
+      catch (error) {
+        common.debugLog("error scraping bookmarks: ", error);
         sendMessageToMainWindow(
           "NOTIFICATION",
-          `error--Could not store tweets 😫 : ${storeTweetsResult.errorMessage}`,
+          `error--Error scraping bookmarks! 😫 : ${error}`,
         );
       }
-      await localBot.wait(1000);
       await localBot.logOut();
       showProgress(
         encode(

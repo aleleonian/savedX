@@ -1,7 +1,15 @@
 const appName = "savedX";
-const path = require("path");
-const os = require("os");
-import { loadEnvFromUrl } from "./util/common.js";
+import path from "node:path";
+import os from "node:os";
+import { loadEnvFromUrl } from "./util/common.mjs";
+
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
+
+// 👇 Convert ESM URL to file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 const homeDir = os.homedir();
 
@@ -39,12 +47,12 @@ loadEnvFromUrl(envUrl);
 
 process.env.APP_FOLDER = APP_FOLDER;
 
-const { app, BrowserWindow, ipcMain, Menu } = require("electron");
-const fs = require("fs");
+import { app, BrowserWindow, ipcMain, Menu, ipcRenderer, contextBridge, shell } from "electron";
+import fs from "node:fs";
 
 /////// log stuff /////////
 
-const log = require("electron-log");
+import log from "electron-log";
 log.transports.console.level = "debug";
 log.transports.file.level = "debug";
 
@@ -58,26 +66,30 @@ if (!fs.existsSync(process.env.APP_FOLDER)) {
 
 process.env.MEDIA_FOLDER = path.join(process.env.APP_FOLDER, "Media");
 
-import { startExpressServer } from "./webserver";
-import * as dbTools from "./util/db";
-import * as common from "./util/common";
+if (!fs.existsSync(process.env.MEDIA_FOLDER)) {
+  fs.mkdirSync(process.env.MEDIA_FOLDER, { recursive: true });
+}
+
+import { startExpressServer } from "./webserver.mjs";
+import * as dbTools from "./util/db.mjs";
+import * as common from "./util/common.mjs";
 import {
   checkUserAndPass,
   updateConfigData,
   getAllConfigData,
-} from "./util/account";
-import { menuTemplate } from "./data/menu-template";
-import { XBot } from "./classes/XBot";
+} from "./util/account.mjs";
+import { menuTemplate } from "./data/menu-template.mjs";
+import { XBot } from "xbot-js";
 
 import {
   goFetchTweets,
   goFetchTweetsFake,
   stopScraping,
-} from "./goFetchTweets";
+} from "./goFetchTweets.mjs";
 
-import { sendMessageToMainWindow, setMainWindow } from "./util/messaging";
+import { sendMessageToMainWindow, setMainWindow } from "./util/messaging.mjs";
 
-import { mainEmitter } from "./util/event-emitter.js";
+import { mainEmitter } from "./util/event-emitter.mjs";
 
 if (result.error) {
   common.debugLog("Failed to load .env file:", result.error);
@@ -92,7 +104,7 @@ common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
 common.debugLog("result:", JSON.stringify(result));
 common.debugLog("process.env.APP_FOLDER ->", process.env.APP_FOLDER);
 common.debugLog(
-  "main.js: process.env.XBOT_HEADLESS->",
+  "main.mjs: process.env.XBOT_HEADLESS->",
   process.env.XBOT_HEADLESS
 );
 
@@ -100,16 +112,18 @@ let mainWindow;
 let xBot;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require("electron-squirrel-startup")) {
+import electronSquirrelStartup from "electron-squirrel-startup";
+if (electronSquirrelStartup) {
   app.quit();
 }
+
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.mjs"),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,

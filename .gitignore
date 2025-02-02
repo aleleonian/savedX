@@ -89,6 +89,7 @@ old.env
 
 # Vite
 .vite/
+dist/
 
 # Electron-Forge
 out/

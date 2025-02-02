@@ -1,18 +1,25 @@
-import * as constants from "../util/constants";
-import { encode } from "../util/messaging";
-import { waitForNewReport } from "../util/event-emitter";
-import { sendMessageToMainWindow } from "../util/messaging";
-import * as common from "../util/common";
+import * as constants from "../util/constants.mjs";
+import { encode } from "../util/messaging.mjs";
+import { waitForNewReport } from "../util/event-emitter.mjs";
+import { sendMessageToMainWindow } from "../util/messaging.mjs";
+import * as common from "../util/common.mjs";
 
-const { exec } = require("child_process");
-const puppeteer = require("puppeteer-extra");
-const pluginStealth = require("puppeteer-extra-plugin-stealth");
+import { exec } from "node:child_process";
+import puppeteer from "puppeteer-extra";
+import pluginStealth from "puppeteer-extra-plugin-stealth";
 puppeteer.use(pluginStealth());
-const path = require("path");
-const cheerio = require("cheerio");
+import path from "node:path";
+import * as cheerio from "cheerio";
 
-const fs = require("fs");
-const https = require("https");
+import fs from "node:fs";
+import https from "node:https";
+
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
+
+// 👇 Convert ESM URL to file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // const puppeteerClassic = require("puppeteer");
 // const iPhone = KnownDevices["iPhone X"];

@@ -3,10 +3,14 @@
   "productName": "savedX",
   "version": "1.0.0",
   "description": "The X bookmark manager",
-  "main": ".vite/build/main.js",
+  "main": ".vite/build/main.mjs",
+  "config": {
+    "forge": "./forge.config.cjs"
+  },
   "scripts": {
-    "start": "cross-env NODE_ENV=development electron-forge start",
+    "start": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=true DEBUG=true electron .vite/build/main.mjs",
     "package": "electron-forge package",
+    "build": "vite build && electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ignore-pattern 'noupload/*'  --ignore-pattern '.vite/*'",
@@ -40,6 +44,7 @@
     "name": "Alejandro Leonian",
     "email": "66581753+aleleonian@users.noreply.github.com"
   },
+  "type": "module",
   "license": "MIT",
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -64,6 +69,7 @@
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
     "react-loader-spinner": "^6.1.6",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "xbot-js": "^1.0.13"
   }
 }

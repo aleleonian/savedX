@@ -1,7 +1,8 @@
-const { app, BrowserWindow } = require("electron");
-import { sendMessageToMainWindow } from "../util/messaging";
-import { checkUserAndPass, getAllConfigData } from "../util/account";
-import { goFetchTweets } from "../goFetchTweets";
+import { app, BrowserWindow } from "electron";
+
+import { sendMessageToMainWindow } from "../util/messaging.mjs";
+import { checkUserAndPass, getAllConfigData } from "../util/account.mjs";
+import { goFetchTweets } from "../goFetchTweets.mjs";
 
 export const menuTemplate = [
   {

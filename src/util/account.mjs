@@ -1,6 +1,6 @@
-import { createErrorResponse, createSuccessResponse } from "./common";
-import * as dbTools from "./db";
-import * as common from "../util/common";
+import { createErrorResponse, createSuccessResponse } from "./common.mjs";
+import * as dbTools from "./db.mjs";
+import * as common from "./common.mjs";
 
 export const checkUserAndPass = () => {
   return new Promise(function checkUserAndPassPromise(resolve) {
