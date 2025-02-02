@@ -88,7 +88,8 @@ export async function goFetchTweets(xBot, configData) {
           constants.progress.SCRAPING,
         ),
       );
-      // await localBot.wait(5000);
+      // we gotta wait for the html to be 'settled'
+      await localBot.wait(5000);
       try {
         const bookmarks = await localBot.scrapeBookmarks();
         common.debugLog(bookmarks.length, " bookmarks scraped.");

@@ -66,6 +66,10 @@ if (!fs.existsSync(process.env.APP_FOLDER)) {
 
 process.env.MEDIA_FOLDER = path.join(process.env.APP_FOLDER, "Media");
 
+if (!fs.existsSync(process.env.MEDIA_FOLDER)) {
+  fs.mkdirSync(process.env.MEDIA_FOLDER, { recursive: true });
+}
+
 import { startExpressServer } from "./webserver.mjs";
 import * as dbTools from "./util/db.mjs";
 import * as common from "./util/common.mjs";
