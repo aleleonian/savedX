@@ -20,3 +20,7 @@
     + need to implement the dependencies detection and installation
 
 + implement Vitest
+
++ emprolijar xbot-js:  
+    + decouple (pass only a logger and extend EventEmitter)
+    + refactor XBot class code
