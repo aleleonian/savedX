@@ -1,3 +1,7 @@
++ text search and filters only are applied to the current list of tweets being shown and not to ALL of them
+
++ when TWITTER_UNUSUAL_LOGIN_TEXT is found, there's a bug. Make sure this case is handled properly.
+
 + cuando se borra UN saved tweet, queda el 'alert' desplegado en el tweetDetailsDialog y se ve cuando abris un nuevo tweet.
 
 + if my saved bookmarks on twitter are 5 and i already have them saved, they won't be added to savedX but if 
@@ -7,7 +11,7 @@
 + after an individual saved tweet is deleted, there is this timer that will hide the dialog but if i delete, hide it and open a new
     tweetdetaildialog, then it will hide the new one.
 
-+ text search and filters only are applied to the current list of tweets being shown and not to ALL of them
+
 
 + Sometimes this happens: [2025-01-08 08:29:32.190] [debug] deleteTwitterBookmarks2() started
     + but it never ends! 
