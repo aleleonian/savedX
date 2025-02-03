@@ -10,7 +10,6 @@ import { dirname } from "node:path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-
 const homeDir = os.homedir();
 
 if (!homeDir) {
@@ -172,13 +171,14 @@ const createWindow = () => {
 
   // and load the index.html of the app.
 
+  const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window";
   const isDev = process.env.NODE_ENV === "development";
   const appUrl = isDev
     ? "http://localhost:5173" // Replace with your Vite dev server URL
     : `file://${path.join(__dirname, `../renderer/${viteName}/index.html`)}`;
 
+  common.debugLog(`Loading URL: ${appUrl}`);
   mainWindow.loadURL(appUrl);
-
 
   // if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
   //   mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
