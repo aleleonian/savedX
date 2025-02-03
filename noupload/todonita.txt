@@ -24,3 +24,4 @@
 + emprolijar xbot-js:  
     + decouple (pass only a logger and extend EventEmitter)
     + refactor XBot class code
+    + refactor scrapeBookmarks() into smaller functions
