@@ -47,7 +47,7 @@ loadEnvFromUrl(envUrl);
 
 process.env.APP_FOLDER = APP_FOLDER;
 
-import { app, BrowserWindow, ipcMain, Menu, ipcRenderer, contextBridge, shell } from "electron";
+import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import fs from "node:fs";
 
 /////// log stuff /////////
@@ -171,14 +171,23 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window";
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${viteName}/index.html`)
-    );
-  }
+
+  const isDev = process.env.NODE_ENV === "development";
+  const appUrl = isDev
+    ? "http://localhost:5173" // Replace with your Vite dev server URL
+    : `file://${path.join(__dirname, `../renderer/${viteName}/index.html`)}`;
+
+  mainWindow.loadURL(appUrl);
+
+
+  // if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+  //   mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  // } else {
+  //   const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window";
+  //   mainWindow.loadFile(
+  //     path.join(__dirname, `../renderer/${viteName}/index.html`)
+  //   );
+  // }
   common.debugLog("MAIN_WINDOW_VITE_NAME->", MAIN_WINDOW_VITE_NAME);
   mainWindow.webContents.openDevTools({ mode: "detach" });
   // mainWindow.webContents.openDevTools();

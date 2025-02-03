@@ -320,8 +320,8 @@ export const Application = () => {
 
       <div className="text-center">
         {!progressState.active &&
-        state.savedTweets &&
-        state.savedTweets.length > 0
+          state.savedTweets &&
+          state.savedTweets.length > 0
           ? displayTweetsData()
           : "There's nothing to show, bro 😣"}
         <div className="text-center my-4">
