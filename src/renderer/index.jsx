@@ -36,5 +36,5 @@ root.render(
     <StrictMode>
       <Application />
     </StrictMode>
-  </AppProvider>,
+  </AppProvider>
 );

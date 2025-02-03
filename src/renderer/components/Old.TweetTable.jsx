@@ -55,7 +55,7 @@ export const TweetTable = ({ nodes }) => {
 
   data = {
     nodes: data.nodes.filter((item) =>
-      item.tweetText.toLowerCase().includes(search.toLowerCase()),
+      item.tweetText.toLowerCase().includes(search.toLowerCase())
     ),
   };
 
