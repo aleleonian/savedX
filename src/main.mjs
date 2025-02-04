@@ -2,9 +2,10 @@ const appName = "savedX";
 import path from "node:path";
 import os from "node:os";
 import { loadEnvFromUrl } from "./util/common.mjs";
-
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
+import { XBotEvents } from "xbot-js/util/constants.mjs";
+
 
 // 👇 Convert ESM URL to file path
 const __filename = fileURLToPath(import.meta.url);
@@ -200,6 +201,22 @@ console.log("before app.whenready");
 
 app.whenReady().then(async () => {
   xBot = new XBot();
+
+  xBot.on(XBotEvents.NOTIFICATION, (data) => {
+    common.debugLog(`✅ NOTIFICATION: ${data}`);
+    sendMessageToMainWindow(
+      "NOTIFICATION",
+      data
+    );
+  });
+
+  xBot.on(XBotEvents.CHECK_SAVED_TWEET_EXISTS, (data) => {
+    log.info(`✅ CHECK_SAVED_TWEET_EXISTS: ${data}`);
+    sendMessageToMainWindow(
+      "CHECK_SAVED_TWEET_EXISTS",
+      data
+    );
+  });
 
   createWindow();
   const initStatus = await init();
