@@ -2,6 +2,7 @@ import { EventEmitter } from "node:events";
 
 export const mainEmitter = new EventEmitter(); // Export the EventEmitter instance
 
+//TODO: this is not being currently used
 export function waitForNewReport() {
   return new Promise((resolve) => {
     mainEmitter.once("report-found-tweet", (reportResponse) => {
@@ -9,11 +10,3 @@ export function waitForNewReport() {
     });
   });
 }
-
-// mainEmitter.once("report-found-tweet", (reportResponse) => {
-//   const reportObj = {
-//     success: true,
-//     data: reportResponse,
-//   };
-//   resolve(reportObj);
-// });

@@ -3,7 +3,6 @@ import * as dbTools from "./util/db.mjs";
 import * as common from "./util/common.mjs";
 import { changeDownloadMediaConfig } from "./util/account.mjs";
 import { sendMessageToMainWindow, encode } from "./util/messaging.mjs";
-import { waitForNewReport } from "./util/event-emitter.mjs";
 
 let localBot;
 
