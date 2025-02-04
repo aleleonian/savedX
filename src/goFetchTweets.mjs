@@ -57,14 +57,6 @@ export async function goFetchTweets(xBot, configData) {
     }
   }
 
-  showProgress(
-    encode(
-      constants.progress.INIT_PROGRESS,
-      constants.progress.LOGGED_IN,
-      constants.progress.SCRAPING
-    )
-  );
-
   let result = await localBot.init();
 
   if (result.success) {
