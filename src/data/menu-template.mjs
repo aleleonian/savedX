@@ -48,6 +48,7 @@ export const menuTemplate = [
           try {
             getAllConfigDataResponse = await getAllConfigData();
             debugLog("getAllConfigDataResponse->", JSON.stringify(getAllConfigDataResponse));
+            const focusedWindow = BrowserWindow.getFocusedWindow();
             if (focusedWindow && getAllConfigDataResponse.success) {
               sendMessageToMainWindow(
                 "SHOW_CONFIG_DIALOG",
@@ -67,7 +68,6 @@ export const menuTemplate = [
               message: `Errors retrieving config info 😫: ${getAllConfigDataResponse.errorMessage}`,
             });
           }
-          const focusedWindow = BrowserWindow.getFocusedWindow();
         },
       },
       { type: "separator" },
