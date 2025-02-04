@@ -57,7 +57,7 @@ export const getAllConfigData = () => {
         );
         resolve(
           createErrorResponse(
-            error.errorMessage ? error.errorMessage : JSON.stringify(error),
+            error.errorMessage ? error.errorMessage : error.message,
           ),
         );
       }

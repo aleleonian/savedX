@@ -3,6 +3,7 @@ import { app, BrowserWindow } from "electron";
 import { sendMessageToMainWindow } from "../util/messaging.mjs";
 import { checkUserAndPass, getAllConfigData } from "../util/account.mjs";
 import { goFetchTweets } from "../goFetchTweets.mjs";
+import { debugLog } from "../util/common.mjs";
 
 export const menuTemplate = [
   {
@@ -43,14 +44,30 @@ export const menuTemplate = [
         label: "Settings",
         click: async () => {
           // Show a dialog when the "Open Dialog" menu item is clicked
-          const getAllConfigDataResponse = await getAllConfigData();
-          const focusedWindow = BrowserWindow.getFocusedWindow();
-          if (focusedWindow) {
-            sendMessageToMainWindow(
-              "SHOW_CONFIG_DIALOG",
-              getAllConfigDataResponse.data,
-            );
+          let getAllConfigDataResponse;
+          try {
+            getAllConfigDataResponse = await getAllConfigData();
+            debugLog("getAllConfigDataResponse->", JSON.stringify(getAllConfigDataResponse));
+            if (focusedWindow && getAllConfigDataResponse.success) {
+              sendMessageToMainWindow(
+                "SHOW_CONFIG_DIALOG",
+                getAllConfigDataResponse.data,
+              );
+            }
+            if (!getAllConfigDataResponse.success) {
+              sendMessageToMainWindow("ALERT", {
+                title: "Bro...",
+                message: `Errors retrieving config info 😫: ${getAllConfigDataResponse.errorMessage}`,
+              });
+            }
+          } catch (error) {
+            debugLog("error trying to getAllConfigData(): ", error);
+            sendMessageToMainWindow("ALERT", {
+              title: "Bro...",
+              message: `Errors retrieving config info 😫: ${getAllConfigDataResponse.errorMessage}`,
+            });
           }
+          const focusedWindow = BrowserWindow.getFocusedWindow();
         },
       },
       { type: "separator" },
