@@ -6,21 +6,22 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Checkbox from "@mui/material/Checkbox";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 
 import { Notification } from "./Notification";
 
-function PaperComponent(props) {
+const PaperComponent = forwardRef((props, ref) => {
   return (
     <Draggable
+      nodeRef={ref}
       handle="#draggable-dialog-title"
       cancel={'[class*="MuiDialogContent-root"]'}
     >
       <Paper {...props} />
     </Draggable>
   );
-}
+});
 
 export function ConfigDialog({ open, onClose, configData }) {
   useEffect(() => {
