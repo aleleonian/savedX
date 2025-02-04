@@ -4,7 +4,7 @@ import os from "node:os";
 import { loadEnvFromUrl } from "./util/common.mjs";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import { XBotEvents } from "xbot-js/util/constants.mjs";
+import { XBotEvents } from "xbot-js";
 
 
 // 👇 Convert ESM URL to file path
@@ -94,10 +94,10 @@ import { mainEmitter } from "./util/event-emitter.mjs";
 if (result.error) {
   common.debugLog("Failed to load .env file:", result.error);
 } else {
-  common.debugLog(
-    "Loaded environment variables:",
-    JSON.stringify(result.parsed)
-  );
+  // common.debugLog(
+  //   "Loaded environment variables:",
+  //   JSON.stringify(result.parsed)
+  // );
 }
 common.debugLog("envPath->", envPath);
 common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
@@ -202,13 +202,19 @@ console.log("before app.whenready");
 app.whenReady().then(async () => {
   xBot = new XBot();
 
-  xBot.on(XBotEvents.NOTIFICATION, (data) => {
+  xBot.on("notification", (data) => {
     common.debugLog(`✅ NOTIFICATION: ${data}`);
     sendMessageToMainWindow(
       "NOTIFICATION",
       data
     );
   });
+
+  xBot.on("dummy-notify", (data) => {
+    common.debugLog(`✅ dummy-notify: ${data}`);
+  });
+
+  xBot.emit("dummy-notify", "test message from savedX");
 
   xBot.on(XBotEvents.CHECK_SAVED_TWEET_EXISTS, (data) => {
     log.info(`✅ CHECK_SAVED_TWEET_EXISTS: ${data}`);

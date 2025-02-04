@@ -65,7 +65,7 @@ export async function goFetchTweets(xBot, configData) {
     )
   );
 
-  let result = await localBot.init(common.debugLog, sendMessageToMainWindow, waitForNewReport);
+  let result = await localBot.init(common.debugLog);
 
   if (result.success) {
     showProgress(

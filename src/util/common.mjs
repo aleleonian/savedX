@@ -174,11 +174,11 @@ export async function loadEnvFromUrl(envUrl) {
       }
     });
 
-    // Log to confirm
-    debugLog("Environment variables loaded from URL: ");
-    for (const [key, value] of Object.entries(process.env)) {
-      debugLog(`${key}: ${value}`);
-    }
+    // // Log to confirm
+    // debugLog("Environment variables loaded from URL: ");
+    // for (const [key, value] of Object.entries(process.env)) {
+    //   debugLog(`${key}: ${value}`);
+    // }
   } catch (error) {
     console.error("Error loading .env file:", error);
   }
