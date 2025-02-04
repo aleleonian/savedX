@@ -4,7 +4,7 @@ import os from "node:os";
 import { loadEnvFromUrl } from "./util/common.mjs";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import { XBotEvents } from "xbot-js";
+import { XBOTConstants } from "xbot-js";
 
 
 // 👇 Convert ESM URL to file path
@@ -202,13 +202,31 @@ console.log("before app.whenready");
 app.whenReady().then(async () => {
   xBot = new XBot();
 
-  xBot.on("notification", (data) => {
-    common.debugLog(`✅ NOTIFICATION: ${data}`);
+  xBot.on(XBOTConstants.XBotEvents.NOTIFICATION, (data) => {
+    common.debugLog(`✅ XBOTConstants.XBotEvents.NOTIFICATION: ${data}`);
     sendMessageToMainWindow(
       "NOTIFICATION",
       data
     );
   });
+
+  xBot.on(XBOTConstants.XBotEvents.LOG, (level, ...messages) => {
+    const logMessage = `[${level.toUpperCase()}] ${messages.join(" ")}`;
+
+    if (level === XBOTConstants.LOG_LEVELS.ERROR) {
+      common.errorLog(logMessage);
+    } else if (level === XBOTConstants.LOG_LEVELS.DEBUG) {
+      common.debugLog(logMessage);
+    } else if (level === XBOTConstants.LOG_LEVELS.WARN) {
+      common.warnLog(logMessage);
+    } else {
+      common.infoLog(logMessage);
+    }
+
+    // Send logs to frontend (UI log panel)
+    sendMessageToMainWindow("LOG_MESSAGE", logMessage);
+  });
+
 
   xBot.on("dummy-notify", (data) => {
     common.debugLog(`✅ dummy-notify: ${data}`);
@@ -216,7 +234,7 @@ app.whenReady().then(async () => {
 
   xBot.emit("dummy-notify", "test message from savedX");
 
-  xBot.on(XBotEvents.CHECK_SAVED_TWEET_EXISTS, (data) => {
+  xBot.on(XBOTConstants.XBotEvents.CHECK_SAVED_TWEET_EXISTS, (data) => {
     log.info(`✅ CHECK_SAVED_TWEET_EXISTS: ${data}`);
     sendMessageToMainWindow(
       "CHECK_SAVED_TWEET_EXISTS",
