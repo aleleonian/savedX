@@ -95,11 +95,6 @@ ipcRenderer.on("ALERT", async (event, message) => {
 });
 
 ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
-  common.debugLog(
-    api.DEBUG,
-    "SHOW_CONFIG_DIALOG preload configData:",
-    JSON.stringify(configData),
-  );
   if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
   else {
     setTimeout(() => {

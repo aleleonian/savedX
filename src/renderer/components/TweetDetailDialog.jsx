@@ -1,5 +1,5 @@
 import React from "react";
-import { useRef } from "react";
+import { useRef, forwardRef } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -16,16 +16,17 @@ import { VideoPlayer } from "./VideoPlayer";
 import { AlertDialog } from "./AlertDialog";
 import { debugLog } from "../util/common";
 
-function PaperComponent(props) {
+const PaperComponent = forwardRef((props, ref) => {
   return (
     <Draggable
+      nodeRef={ref}
       handle="#draggable-dialog-title"
       cancel={'[class*="MuiDialogContent-root"]'}
     >
       <Paper {...props} />
     </Draggable>
   );
-}
+});
 
 const handleClick = (path) => {
   if (window.savedXApi && window.savedXApi.openUrl) {
