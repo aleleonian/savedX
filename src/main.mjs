@@ -1,7 +1,6 @@
 const appName = "savedX";
 import path from "node:path";
 import os from "node:os";
-import { loadEnvFromUrl } from "./util/common.mjs";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 import { XBOTConstants } from "xbot-js";
@@ -40,10 +39,6 @@ const result = dotenv.config({ path: envPath });
 if (result.error) {
   console.error("env file error:", result.error);
 } else common.debugLog(`.env file loaded from ${envPath}`);
-
-// Example usage
-const envUrl = "https://www.latigo.com.ar/savedX/selectors.env"; // Replace with your actual URL
-loadEnvFromUrl(envUrl);
 
 process.env.APP_FOLDER = APP_FOLDER;
 
@@ -94,21 +89,20 @@ import { mainEmitter } from "./util/event-emitter.mjs";
 if (result.error) {
   common.debugLog("Failed to load .env file:", result.error);
 } else {
-  // common.debugLog(
-  //   "Loaded environment variables:",
-  //   JSON.stringify(result.parsed)
-  // );
+  common.debugLog(
+    "Loaded environment variables:",
+    JSON.stringify(result.parsed)
+  );
 }
 common.debugLog("envPath->", envPath);
 common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
-common.debugLog("result:", JSON.stringify(result));
 common.debugLog("process.env.APP_FOLDER ->", process.env.APP_FOLDER);
 common.debugLog(
   "main.mjs: process.env.XBOT_HEADLESS->",
   process.env.XBOT_HEADLESS
 );
 
-let mainWindow;
+
 let xBot;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -117,13 +111,21 @@ if (electronSquirrelStartup) {
   app.quit();
 }
 
+const rootPath = process.env.NODE_ENV === "development"
+  ? process.cwd()  // Use the real project root in dev mode
+  : app.getAppPath();  // Use app path in production
+
+const preloadPath = path.join(rootPath, "src", "preload.mjs");
+
+common.debugLog("preloadPath->", preloadPath);
+
 const createWindow = () => {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"),
+      preload: preloadPath,
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,
@@ -172,14 +174,15 @@ const createWindow = () => {
 
   // and load the index.html of the app.
 
-  const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window";
   const isDev = process.env.NODE_ENV === "development";
+  const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window"; // Ensure this matches the correct folder
   const appUrl = isDev
-    ? "http://localhost:5173" // Replace with your Vite dev server URL
-    : `file://${path.join(__dirname, `../renderer/${viteName}/index.html`)}`;
+    ? "http://localhost:5173" // Load Vite dev server in development mode
+    : `file://${path.join(__dirname, `../.vite/renderer/${viteName}/index.html`)}`; // Load built file in production
 
   common.debugLog(`Loading URL: ${appUrl}`);
   mainWindow.loadURL(appUrl);
+
 
   // if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
   //   mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -189,7 +192,6 @@ const createWindow = () => {
   //     path.join(__dirname, `../renderer/${viteName}/index.html`)
   //   );
   // }
-  common.debugLog("MAIN_WINDOW_VITE_NAME->", MAIN_WINDOW_VITE_NAME);
   mainWindow.webContents.openDevTools({ mode: "detach" });
   // mainWindow.webContents.openDevTools();
 };

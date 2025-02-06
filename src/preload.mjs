@@ -2,7 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { ipcRenderer, contextBridge, shell } from "electron";
 
-import * as common from "./renderer/util/common";
+import * as common from "./util/common.mjs";
 
 let domContentLoaded = false;
 

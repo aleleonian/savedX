@@ -2,7 +2,6 @@ import * as crypto from "crypto";
 import path from "node:path";
 import fs from "node:fs";
 import log from "electron-log";
-import fetch from "node-fetch"; // You can use axios or native fetch if you're in the browser
 
 const predefinedPaths = [
   "/opt/homebrew/bin",
@@ -156,40 +155,3 @@ export const deleteAllFilesInDirectory = async (dirPath) => {
     return createErrorResponse(errorMessage);
   }
 };
-
-// Function to fetch and load .env variables
-export async function loadEnvFromUrl(envUrl) {
-  try {
-    // Fetch the .env file content from the provided URL
-    const response = await fetch(envUrl);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch .env file: ${response.statusText}`);
-    }
-
-    const envFileContent = await response.text();
-
-    // Parse the .env content line by line and load each key-value pair
-    const lines = envFileContent.split("\n");
-    lines.forEach((line) => {
-      // Ignore empty lines and comments (lines starting with '#')
-      if (line.trim() && !line.startsWith("#")) {
-        // Use a regex to handle key=value pairs, allowing '=' in values
-        const match = line.match(/^([^=]+)=(.*)$/);
-        if (match) {
-          const key = match[1].trim();
-          const value = match[2].trim();
-          process.env[key] = value; // Set the environment variable
-        }
-      }
-    });
-
-    // // Log to confirm
-    // debugLog("Environment variables loaded from URL: ");
-    // for (const [key, value] of Object.entries(process.env)) {
-    //   debugLog(`${key}: ${value}`);
-    // }
-  } catch (error) {
-    console.error("Error loading .env file:", error);
-  }
-}
