@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug SavedX",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/main.mjs",
+      "runtimeExecutable": "electron",
+      "args": ["."],
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "smartStep": true,
+      "skipFiles": ["<node_internals>/**", "node_modules/electron/**"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/node_modules/xbot-js/**/*.js",
+        "${workspaceFolder}/node_modules/xbot-js/**/*.mjs",
+        "${workspaceFolder}/src/**/*.js",
+        "${workspaceFolder}/src/**/*.mjs"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  ]
+}
