@@ -121,7 +121,7 @@ common.debugLog("preloadPath->", preloadPath);
 
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  let mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -130,6 +130,7 @@ const createWindow = () => {
       contextIsolation: true,
       sandbox: false,
       allowFileAccessFromFileURLs: true,
+      devTools: true,
     },
   });
 
