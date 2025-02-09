@@ -15,6 +15,16 @@ export default defineConfig((env) => {
     base: './',
     build: {
       outDir: `.vite/renderer/${name}`,
+      sourcemap: true,
+      minify: false,
+    },
+    server: {
+      sourcemap: true,
+      port: 5173,
+      strictPort: true,
+      hmr: true,       // 🔥 Enable Hot Module Reloading
+      open: false,
+      watch: { usePolling: true },
     },
     plugins: [pluginExposeRenderer(name)],
     resolve: {

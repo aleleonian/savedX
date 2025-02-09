@@ -14,7 +14,7 @@ export default defineConfig((env) => {
 
   const config = {
     build: {
-      sourcemap: "inline",
+      sourcemap: true,
       lib: {
         entry: forgeConfigSelf.entry,
         fileName: () => 'main.mjs',  // 🔥 Ensure output is main.mjs
@@ -25,6 +25,11 @@ export default defineConfig((env) => {
       },
     },
     plugins: [pluginHotRestart('restart')],
+    root: process.cwd(),
+    server: {
+      port: 5173, // 🚀 Ensure Vite dev server runs on this port
+      strictPort: true,
+    },
     define,
     resolve: {
       mainFields: ['module', 'jsnext:main', 'jsnext'],

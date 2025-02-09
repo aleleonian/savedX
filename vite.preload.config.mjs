@@ -13,6 +13,7 @@ export default defineConfig((env) => {
   /** @type {import('vite').UserConfig} */
   const config = {
     build: {
+      sourcemap: true,
       lib: {
         entry: "src/preload.mjs", // Ensure this points to the right file
         formats: ["es"], // Only generate ESM!

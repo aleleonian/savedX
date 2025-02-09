@@ -2,9 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug SavedX",
+      "name": "Start Vite + Electron Main",
       "type": "node",
       "request": "launch",
+      "preLaunchTask": "Start Vite Dev Server",
       "program": "${workspaceFolder}/src/main.mjs",
       "runtimeExecutable": "electron",
       "args": ["."],
@@ -17,12 +18,13 @@
       "resolveSourceMapLocations": [
         "${workspaceFolder}/node_modules/xbot-js/**/*.js",
         "${workspaceFolder}/node_modules/xbot-js/**/*.mjs",
+        "${workspaceFolder}/node_modules/xbot-js/**/*.ts",
         "${workspaceFolder}/src/**/*.js",
         "${workspaceFolder}/src/**/*.mjs"
       ],
-      "preLaunchTask": "Start Vite Dev Server",
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "PORT": "3100"
       }
     }
   ]

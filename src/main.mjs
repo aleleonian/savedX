@@ -115,6 +115,11 @@ const rootPath = process.env.NODE_ENV === "development"
   ? process.cwd()  // Use the real project root in dev mode
   : app.getAppPath();  // Use app path in production
 
+common.debugLog("📌 process.cwd() ->", process.cwd());
+common.debugLog("📌 app.getAppPath() ->", app.getAppPath());
+common.debugLog("📌 __dirname ->", __dirname);
+common.debugLog("📌 preloadPath before setting ->", path.join(rootPath, "src", "preload.mjs"));
+
 const preloadPath = path.join(rootPath, "src", "preload.mjs");
 
 common.debugLog("preloadPath->", preloadPath);
@@ -197,12 +202,36 @@ const createWindow = () => {
   // mainWindow.webContents.openDevTools();
 };
 
+const waitForVite = async (port = 5173, timeout = 10000) => {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeout) {
+    try {
+      const res = await fetch(`http://localhost:${port}`);
+      if (res.ok) return true;
+    } catch (e) { }
+    await new Promise((res) => setTimeout(res, 500));
+  }
+  return false;
+};
+
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 console.log("before app.whenready");
 
 app.whenReady().then(async () => {
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("Waiting for Vite dev server...");
+    const viteReady = await waitForVite();
+    if (!viteReady) {
+      console.error("Vite dev server is not running! Exiting.");
+      app.quit();
+      return;
+    }
+  }
+
   xBot = new XBot();
 
   xBot.on(XBOTConstants.XBotEvents.NOTIFICATION, (data) => {
