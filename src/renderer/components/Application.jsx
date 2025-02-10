@@ -157,6 +157,7 @@ export const Application = () => {
     };
 
     const contentEventListener = (event) => {
+      debugger;
       if (event.detail.tweets) updateState("savedTweets", event.detail.tweets);
       if (event.detail.tags) updateState("tags", event.detail.tags);
     };

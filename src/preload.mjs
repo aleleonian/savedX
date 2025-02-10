@@ -6,6 +6,8 @@ import * as common from "./util/common.mjs";
 
 let domContentLoaded = false;
 
+console.log("✅ preload.mjs loaded");
+
 document.addEventListener("DOMContentLoaded", () => {
   domContentLoaded = true;
 });
@@ -79,6 +81,7 @@ ipcRenderer.on("DISABLE_GO_FETCH_BUTTON", () => {
 });
 
 ipcRenderer.on("CONTENT", async (event, message) => {
+  console.log("CONTENT from ipcRenderer.on")
   if (domContentLoaded) dispatchNotification("CONTENT", message);
   while (!domContentLoaded) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
