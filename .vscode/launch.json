@@ -2,30 +2,21 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Start Vite + Electron Main",
+      "name": "Electron: Debug Main & Renderer",
       "type": "node",
       "request": "launch",
-      "preLaunchTask": "Start Vite Dev Server",
-      "program": "${workspaceFolder}/src/main.mjs",
-      "runtimeExecutable": "electron",
-      "args": ["."],
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "args": [".", "--remote-debugging-port=9222"],
       "cwd": "${workspaceFolder}",
       "outputCapture": "std",
       "console": "integratedTerminal",
       "sourceMaps": true,
       "smartStep": true,
-      "skipFiles": ["<node_internals>/**", "node_modules/electron/**"],
-      "resolveSourceMapLocations": [
-        "${workspaceFolder}/node_modules/xbot-js/**/*.js",
-        "${workspaceFolder}/node_modules/xbot-js/**/*.mjs",
-        "${workspaceFolder}/node_modules/xbot-js/**/*.ts",
-        "${workspaceFolder}/src/**/*.js",
-        "${workspaceFolder}/src/**/*.mjs"
-      ],
+      "skipFiles": ["<node_internals>/**", "node_modules/**"],
       "env": {
-        "NODE_ENV": "development",
-        "PORT": "3100"
-      }
+        "NODE_ENV": "development"
+      },
+      "preLaunchTask": "Start Vite Only"
     }
   ]
 }
