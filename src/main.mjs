@@ -103,7 +103,7 @@ common.debugLog(
 );
 
 
-let xBot;
+let xBot, mainWindow, contentForApp;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 import electronSquirrelStartup from "electron-squirrel-startup";
@@ -126,7 +126,7 @@ common.debugLog("preloadPath->", preloadPath);
 
 const createWindow = () => {
   // Create the browser window.
-  let mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -176,6 +176,9 @@ const createWindow = () => {
     envVarsValues["DEBUG"] = debugEnvVar;
     envVarsValues["MEDIA_FOLDER"] = mediaFolderEnvVar;
     sendMessageToMainWindow("env-vars", envVarsValues);
+
+    console.log("✅ Renderer finished loading. Sending CONTENT event...");
+    sendMessageToMainWindow("CONTENT", contentForApp);
   });
 
   // and load the index.html of the app.
@@ -509,11 +512,9 @@ const init = async () => {
     }
 
     if (!resultOBj.success) return resultOBj;
-
-    sendMessageToMainWindow("CONTENT", {
-      tweets: tweets.rows,
-      tags: readAllTagsResult.rows,
-    });
+    console.log("📨 Sending CONTENT event to renderer:");
+    // sendMessageToMainWindow("CONTENT", { tweets: tweets.rows, tags: readAllTagsResult.rows });
+    contentForApp = { tweets: tweets.rows, tags: readAllTagsResult.rows };
     return resultOBj;
   } else {
     sendMessageToMainWindow(

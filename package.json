@@ -12,6 +12,7 @@
     "dev": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=true DEBUG=true electron-forge start",
     "package": "electron-forge package",
     "build": "vite build && electron-forge package",
+    "build-purge": "rm -rf .vite && npm run build",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ignore-pattern 'noupload/*'  --ignore-pattern '.vite/*'",

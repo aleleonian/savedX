@@ -1,19 +1,41 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { ipcRenderer, contextBridge, shell } from "electron";
-
 import * as common from "./util/common.mjs";
 
 let domContentLoaded = false;
+const eventQueue = [];
 
-console.log("✅ preload.mjs loaded");
-
-document.addEventListener("DOMContentLoaded", () => {
-  domContentLoaded = true;
+// ✅ Create a Promise that resolves when DOM is ready
+const waitForDOM = new Promise((resolve) => {
+  if (document.readyState === "complete") {
+    domContentLoaded = true;
+    resolve();
+  } else {
+    document.addEventListener("DOMContentLoaded", () => {
+      domContentLoaded = true;
+      resolve();
+      console.log("✅ DOMContentLoaded event fired");
+      // Process queued events
+      eventQueue.forEach(({ type, message }) => dispatchNotification(type, message));
+      eventQueue.length = 0; // Clear queue
+    });
+  }
 });
+
+console.log("✅ preload.mjs loaded and registering ipcRenderer event listeners...");
 
 function dispatchNotification(eventType, message) {
   window.dispatchEvent(new CustomEvent(eventType, { detail: message }));
+}
+
+// ✅ Queue events if DOM isn't ready yet
+function safeDispatch(eventType, message) {
+  if (domContentLoaded) {
+    dispatchNotification(eventType, message);
+  } else {
+    eventQueue.push({ type: eventType, message });
+  }
 }
 
 /// Single object to expose all APIs
@@ -28,102 +50,80 @@ const api = {
   getConfigData: () => ipcRenderer.invoke("fetch-config-data"),
   updateConfigData: (formData) =>
     ipcRenderer.invoke("update-config-data", formData),
-  // DEBUG: Boolean(process.env.DEBUG),
   openDebugSession: () => ipcRenderer.send("open-debug-session"),
-  deleteSavedTweet: async (tweetData) => {
-    return ipcRenderer.invoke("delete-saved-tweet", tweetData);
-  },
-  deleteAllSavedTweets: async () => {
-    const deleteAllTweetsResult = await ipcRenderer.invoke(
-      "delete-all-saved-tweets",
-    );
-    return deleteAllTweetsResult;
-  },
+  deleteSavedTweet: async (tweetData) => ipcRenderer.invoke("delete-saved-tweet", tweetData),
+  deleteAllSavedTweets: async () => ipcRenderer.invoke("delete-all-saved-tweets"),
   reportFoundTweet: (reportObj) => {
-    common.debugLog(
-      api.DEBUG,
-      "reportFoundTweet() reportObj:",
-      JSON.stringify(reportObj),
-    );
+    common.debugLog(api.DEBUG, "reportFoundTweet() reportObj:", JSON.stringify(reportObj));
     ipcRenderer.send("report-found-tweet", reportObj);
   },
 };
 
-let envVarsValuesSet = false;
+// ✅ DEBUG: Log all IPC events sent to preload.mjs
+const originalOn = ipcRenderer.on;
+ipcRenderer.on = (channel, listener) => {
+  console.log(`📩 Listening to IPC event: ${channel}`);
+  return originalOn.call(ipcRenderer, channel, (...args) => {
+    console.log(`📨 IPC Event Received: ${channel}`, args);
+    listener(...args);
+  });
+};
 
+
+// ✅ Expose API once `env-vars` are set
+let envVarsValuesSet = false;
 ipcRenderer.on("env-vars", (event, envVarsValues) => {
   api.DEBUG = envVarsValues["DEBUG"];
   api.MEDIA_FOLDER = envVarsValues["MEDIA_FOLDER"];
   envVarsValuesSet = true;
-  // Only expose API once the DEBUG value is set
+
   if (envVarsValuesSet) {
     contextBridge.exposeInMainWorld("savedXApi", api);
   }
 });
 
+// ✅ Simplified event handlers using `safeDispatch()`
 ipcRenderer.on("NOTIFICATION", (event, message) => {
   common.debugLog(api.DEBUG, "message from main:", message);
-  if (domContentLoaded) dispatchNotification("NOTIFICATION", message);
-  else {
-    setTimeout(() => {
-      dispatchNotification("NOTIFICATION", message);
-    }, 1500);
-  }
+  safeDispatch("NOTIFICATION", message);
 });
 
 ipcRenderer.on("DISABLE_GO_FETCH_BUTTON", () => {
-  if (domContentLoaded) dispatchNotification("DISABLE_GO_FETCH_BUTTON");
-  else {
-    setTimeout(() => {
-      dispatchNotification("DISABLE_GO_FETCH_BUTTON");
-    }, 1500);
-  }
+  safeDispatch("DISABLE_GO_FETCH_BUTTON");
 });
 
 ipcRenderer.on("CONTENT", async (event, message) => {
-  console.log("CONTENT from ipcRenderer.on")
-  if (domContentLoaded) dispatchNotification("CONTENT", message);
-  while (!domContentLoaded) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
+  console.log("📨 CONTENT event received in preload.mjs");
+  await waitForDOM; // ⏳ Wait for DOM to be ready before dispatching
   dispatchNotification("CONTENT", message);
 });
 
-ipcRenderer.on("SHOW_PROGRESS", async (event, message) => {
-  dispatchNotification("SHOW_PROGRESS", message);
+ipcRenderer.on("SHOW_PROGRESS", (event, message) => {
+  safeDispatch("SHOW_PROGRESS", message);
 });
 
-ipcRenderer.on("ALERT", async (event, message) => {
-  dispatchNotification("ALERT", message);
+ipcRenderer.on("ALERT", (event, message) => {
+  safeDispatch("ALERT", message);
 });
 
 ipcRenderer.on("SHOW_CONFIG_DIALOG", (event, configData) => {
-  if (domContentLoaded) dispatchNotification("SHOW_CONFIG_DIALOG", configData);
-  else {
-    setTimeout(() => {
-      dispatchNotification("SHOW_CONFIG_DIALOG", configData);
-    }, 1500);
-  }
+  safeDispatch("SHOW_CONFIG_DIALOG", configData);
 });
+
 ipcRenderer.on("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG", () => {
   common.debugLog(api.DEBUG, "SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG preload");
-  dispatchNotification("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG");
+  safeDispatch("SHOW_DELETE_ALL_SAVED_TWEETS_DIALOG");
 });
 
 ipcRenderer.on("CONFIG_DATA", (event, message) => {
-  if (domContentLoaded) dispatchNotification("CONFIG_DATA", message);
-  else {
-    setTimeout(() => {
-      dispatchNotification("CONFIG_DATA", message);
-    }, 1500);
-  }
+  safeDispatch("CONFIG_DATA", message);
 });
 
 ipcRenderer.on("CHECK_SAVED_TWEET_EXISTS", (event, tweetUrl) => {
-  dispatchNotification("CHECK_SAVED_TWEET_EXISTS", tweetUrl);
+  safeDispatch("CHECK_SAVED_TWEET_EXISTS", tweetUrl);
 });
 
-//TODO: this is ON HOLD
+// ✅ Handle SNAPSHOT_TAKEN event properly
 ipcRenderer.on("SNAPSHOT_TAKEN", () => {
-  dispatchNotification("SNAPSHOT_TAKEN");
+  safeDispatch("SNAPSHOT_TAKEN");
 });
