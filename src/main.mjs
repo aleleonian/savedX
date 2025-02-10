@@ -177,7 +177,7 @@ const createWindow = () => {
     envVarsValues["MEDIA_FOLDER"] = mediaFolderEnvVar;
     sendMessageToMainWindow("env-vars", envVarsValues);
 
-    console.log("✅ Renderer finished loading. Sending CONTENT event...");
+    common.debugLog("✅ Renderer finished loading. Sending CONTENT event...");
     sendMessageToMainWindow("CONTENT", contentForApp);
   });
 
@@ -221,12 +221,11 @@ const waitForVite = async (port = 5173, timeout = 10000) => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-console.log("before app.whenready");
 
 app.whenReady().then(async () => {
 
   if (process.env.NODE_ENV === "development") {
-    console.log("Waiting for Vite dev server...");
+    common.debugLog("Waiting for Vite dev server...");
     const viteReady = await waitForVite();
     if (!viteReady) {
       console.error("Vite dev server is not running! Exiting.");
@@ -512,7 +511,7 @@ const init = async () => {
     }
 
     if (!resultOBj.success) return resultOBj;
-    console.log("📨 Sending CONTENT event to renderer:");
+    common.debugLog("📨 Sending CONTENT event to renderer:");
     // sendMessageToMainWindow("CONTENT", { tweets: tweets.rows, tags: readAllTagsResult.rows });
     contentForApp = { tweets: tweets.rows, tags: readAllTagsResult.rows };
     return resultOBj;
