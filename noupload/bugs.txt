@@ -11,12 +11,6 @@
 + after an individual saved tweet is deleted, there is this timer that will hide the dialog but if i delete, hide it and open a new
     tweetdetaildialog, then it will hide the new one.
 
-
-
-+ Sometimes this happens: [2025-01-08 08:29:32.190] [debug] deleteTwitterBookmarks2() started
-    + but it never ends! 
-        + probably handled
-
 + improve 'stop the scrape' sometimes it takes too long
 
 + que durante savedX está scrapeando, vaya guardando los errores para luego desplegarlos todos juntos.

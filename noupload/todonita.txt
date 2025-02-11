@@ -22,6 +22,6 @@
 + implement Vitest
 
 + emprolijar xbot-js:  
-    + decouple (pass only a logger and extend EventEmitter)
-    + refactor XBot class code
     + refactor scrapeBookmarks() into smaller functions
+
++ que uno pueda pasar un array de tweets para saber cuales scrapear y cuales no.
