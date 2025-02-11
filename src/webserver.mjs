@@ -5,6 +5,7 @@ let xBotPointer;
 
 // Function to Start the Express Server
 export const startExpressServer = (xBot) => {
+  common.debugLog("web server started!");
   xBotPointer = xBot;
   const server = express();
   // Serve the media files
@@ -36,7 +37,7 @@ export const startExpressServer = (xBot) => {
     }
   });
 
-  const port = process.env.PORT;
+  const port = process.env.PORT || 3000;
   server.listen(port, () => {
     common.debugLog(
       process.env.DEBUG,
