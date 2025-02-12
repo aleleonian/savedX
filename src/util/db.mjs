@@ -226,7 +226,7 @@ export const storeTweets = async (tweetArray) => {
               tweet.hasLocalMedia ? tweet.hasLocalMedia : "no",
             ],
           );
-          common.debugLog("Insertion result:", result);
+          common.debugLog("Insertion result:" + JSON.stringify(result));
         } catch (error) {
           allSuccessful = false;
           common.debugLog(

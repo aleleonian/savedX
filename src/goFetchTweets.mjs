@@ -84,7 +84,8 @@ export async function goFetchTweets(xBot, configData) {
       await localBot.wait(5000);
       try {
         const bookmarks = await localBot.scrapeBookmarks();
-        common.debugLog(bookmarks.length, " bookmarks scraped.");
+        common.debugLog(bookmarks.length + " bookmarks scraped.");
+        common.debugLog("bookmarks: " + JSON.stringify(bookmarks));
         showProgress(
           encode(
             constants.progress.INIT_PROGRESS,
