@@ -209,6 +209,9 @@ export const storeTweets = async (tweetArray) => {
           );
         }
         try {
+          //VOY POR AQUÍ
+          //La onda es: si tweetUrlHash es unique, no puedo 'pisar' bookmarks porque esee row no se insertaría
+          //el tema es que necesito que se pise. Cómo hago?
           const result = await runQuery(
             `INSERT OR IGNORE INTO tweets (indexId, htmlContent, userName, twitterHandle, tweetDate, tweetImageOrPoster, tweetText, tweetUrl, tweetUrlHash, profilePicUrl, hasLocalMedia) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
