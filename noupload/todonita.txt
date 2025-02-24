@@ -25,3 +25,5 @@
     + refactor scrapeBookmarks() into smaller functions
 
 + que uno pueda pasar un array de tweets para saber cuales scrapear y cuales no.
+
++ if puppeteer fails, we cannot see the error. report it better to the GUI.
