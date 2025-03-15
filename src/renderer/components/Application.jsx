@@ -139,6 +139,10 @@ export const Application = () => {
       setOpenConfigDialog(true);
     };
 
+    const waitForUserInteractionEventListener = (event) => {
+      debugger;
+    }
+
     const checkSavedTweetEventListener = (event) => {
       const tweetUrl = event.detail;
       const found = stateRef.current.savedTweets.find(
@@ -179,6 +183,10 @@ export const Application = () => {
       checkSavedTweetEventListener
     );
     window.addEventListener(
+      "WAIT_FOR_USER_ACTION",
+      waitForUserInteractionEventListener
+    );
+    window.addEventListener(
       "SHOW_CONFIG_DIALOG",
       showConfigDialogEventListener
     );
@@ -204,6 +212,10 @@ export const Application = () => {
       window.removeEventListener(
         "SHOW_CONFIG_DIALOG",
         showConfigDialogEventListener
+      );
+      window.removeEventListener(
+        "WAIT_FOR_USER_ACTION",
+        waitForUserInteractionEventListener
       );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount

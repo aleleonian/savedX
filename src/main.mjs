@@ -243,6 +243,13 @@ app.whenReady().then(async () => {
       data
     );
   });
+  xBot.on(XBOTConstants.XBotEvents.WAIT_FOR_USER_ACTION, (data) => {
+    common.debugLog(`✅ XBOTConstants.XBotEvents.WAIT_FOR_USER_ACTION: ${data}`);
+    sendMessageToMainWindow(
+      "WAIT_FOR_USER_ACTION",
+      data
+    );
+  });
 
   xBot.on(XBOTConstants.XBotEvents.LOG, (level, ...messages) => {
     const logMessage = `[${level.toUpperCase()}] ${messages.join(" ")}`;

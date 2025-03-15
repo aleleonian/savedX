@@ -98,6 +98,11 @@ ipcRenderer.on("CONTENT", async (event, message) => {
   dispatchNotification("CONTENT", message);
 });
 
+ipcRenderer.on("WAIT_FOR_USER_ACTION", async (event, message) => {
+  common.debugLog("📨 WAIT_FOR_USER_ACTION event received in preload.mjs. Message: " + message);
+  dispatchNotification("WAIT_FOR_USER_ACTION", message);
+});
+
 ipcRenderer.on("SHOW_PROGRESS", (event, message) => {
   safeDispatch("SHOW_PROGRESS", message);
 });

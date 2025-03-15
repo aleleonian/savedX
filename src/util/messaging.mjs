@@ -1,3 +1,5 @@
+import * as common from "./common.mjs";
+
 let mainWindow;
 
 // export const sendMessageToMainWindow = (type, data) => {
@@ -5,9 +7,9 @@ let mainWindow;
 // };
 
 export function sendMessageToMainWindow(channel, message) {
-  console.log("calling sendMessageToMainWindow");
+  common.debugLog("calling sendMessageToMainWindow");
   if (mainWindow && mainWindow.webContents) {
-    console.log(`📤 Actually sending ${channel} event to renderer.`);
+    common.debugLog(`📤 Actually sending ${channel} event to renderer. Message: ${message}`);
     mainWindow.webContents.send(channel, message);
   } else {
     console.error(`❌ Failed to send ${channel}: mainWindow is not ready.`);
