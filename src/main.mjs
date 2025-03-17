@@ -132,7 +132,7 @@ const createWindow = () => {
     webPreferences: {
       preload: preloadPath,
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
       sandbox: false,
       allowFileAccessFromFileURLs: true,
       devTools: true,

@@ -16,10 +16,6 @@ export function ConfirmationDialog({
   message,
 }) {
 
-  useEffect(() => {
-    console.log("📢 ConfirmationDialog received open:", open);
-  }, [open]);
-
   if (!open) return null;
 
   return (

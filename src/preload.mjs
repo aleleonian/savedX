@@ -38,11 +38,6 @@ function safeDispatch(eventType, message) {
   }
 }
 
-contextBridge.exposeInMainWorld("e", {
-  copy: (text) => clipboard.writeText(text),
-  paste: () => clipboard.readText(),
-});
-
 /// Single object to expose all APIs
 const api = {
   goFetchTweets: () => ipcRenderer.invoke("go-fetch-tweets"),

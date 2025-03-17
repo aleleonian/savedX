@@ -3,6 +3,7 @@ import { Title } from "./Title";
 import { AlertDialog } from "./AlertDialog";
 import Button from "@mui/material/Button";
 import { Notification } from "./Notification";
+import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
 import dialUpImage from "/src/assets/images/dialup.smaller.gif";
 import doneImage from "/src/assets/images/done.resized.webp";
 import superMarioImage from "/src/assets/images/super.mario.1.resized.webp";
@@ -15,6 +16,7 @@ export const Progress = ({ whichState }) => {
   const [alertTitle, setAlertTitle] = useState(null);
   const [currentTaskText, setCurrentTaskText] = useState("Sleeping...");
   const [currentTaskImage, setCurrentTaskImage] = useState(null);
+  const [waitForUserInputDialog, setWaitForUserInputDialog] = useState(false);
 
   let currentTaskClass = "flex items-center text-gray-400 py-4";
 
@@ -61,6 +63,12 @@ export const Progress = ({ whichState }) => {
       }
     };
 
+    const waitForUserInteractionEventListener = (event) => {
+      console.log("⚡ Received WAIT_FOR_USER_ACTION event:", event.detail);
+
+      setWaitForUserInputDialog(true);
+    };
+
     //TODO: this is ON HOLD
     const snapshotTakenEventListener = () => {
       console.log("snapshot arrived!");
@@ -82,14 +90,35 @@ export const Progress = ({ whichState }) => {
     window.addEventListener("NOTIFICATION", notificationEventListener);
     //TODO: this is ON HOLD
     window.addEventListener("SNAPSHOT_TAKEN", snapshotTakenEventListener);
+    window.addEventListener(
+      "WAIT_FOR_USER_ACTION",
+      waitForUserInteractionEventListener
+    );
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("NOTIFICATION", notificationEventListener);
       window.removeEventListener("ALERT", alertEventListener);
       window.removeEventListener("SNAPSHOT_TAKEN", snapshotTakenEventListener);
+      window.removeEventListener(
+        "WAIT_FOR_USER_ACTION",
+        waitForUserInteractionEventListener
+      );
     };
   }, []); // Empty dependency array ensures this effect runs only once after mount
+
+  const handleCloseWaitForUserInputDialog = () => {
+    setWaitForUserInputDialog(false);
+  };
+
+  const handleConfirmWaitForUserInputDialog = async () => {
+    // gota now ping the main process
+    console.log("@ handleConfirmWaitForUserInputDialog");
+    window.savedXApi.xbotContinue();
+    // then close the dialog
+    handleCloseWaitForUserInputDialog();
+  };
+
 
   return (
     <>
@@ -111,6 +140,16 @@ export const Progress = ({ whichState }) => {
             notificationClass={notificationClass}
             notificationMessage={notificationMessage}
             handleAlertClose={handleAlertClose}
+          />
+        )}
+
+        {waitForUserInputDialog && (
+          <ConfirmationDialog
+            open={waitForUserInputDialog}
+            handleClose={handleCloseWaitForUserInputDialog}
+            handleConfirm={handleConfirmWaitForUserInputDialog}
+            title="Bro, the browser needs you."
+            message="Please solve the captcha or do whatever the browser is requiring you to do and when you're done, click the button below. Thanks."
           />
         )}
 
