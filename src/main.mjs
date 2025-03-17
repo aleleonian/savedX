@@ -131,8 +131,8 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: preloadPath,
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: true,
+      contextIsolation: false,
       sandbox: false,
       allowFileAccessFromFileURLs: true,
       devTools: true,
@@ -202,7 +202,6 @@ const createWindow = () => {
   //   );
   // }
   mainWindow.webContents.openDevTools({ mode: "detach" });
-  // mainWindow.webContents.openDevTools();
 };
 
 const waitForVite = async (port = 5173, timeout = 10000) => {
@@ -449,6 +448,15 @@ ipcMain.handle("delete-all-saved-tweets", async () => {
 ipcMain.on("report-found-tweet", async (event, reportObj) => {
   common.debugLog("report-found-tweet reportObj->", JSON.stringify(reportObj));
   mainEmitter.emit("report-found-tweet", reportObj);
+});
+
+ipcMain.handle("xbot-continue", async (event) => {
+  try {
+    console.log("we're at xbot-continue");
+    xBot.emit(XBOTConstants.XBotEvents.CONTINUE);
+  } catch (error) {
+    return common.createErrorResponse(`Trouble with xbot-continue: ${error}`);
+  }
 });
 
 ipcMain.handle("update-config-data", async (event, formData) => {

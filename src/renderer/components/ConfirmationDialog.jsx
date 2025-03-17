@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogActions,
@@ -8,13 +8,20 @@ import {
   Button,
 } from "@mui/material";
 
-export const ConfirmationDialog = ({
+export function ConfirmationDialog({
   open,
   handleClose,
   handleConfirm,
   title,
   message,
-}) => {
+}) {
+
+  useEffect(() => {
+    console.log("📢 ConfirmationDialog received open:", open);
+  }, [open]);
+
+  if (!open) return null;
+
   return (
     <Dialog
       open={open}

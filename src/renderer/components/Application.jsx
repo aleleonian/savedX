@@ -25,7 +25,10 @@ export const Application = () => {
     logingOut: false,
     loggedOut: false,
   });
+
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
+  const [waitForUserInputDialog, setWaitForUserInputDialog] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const [configData, setConfigData] = useState(null);
   const { state, updateState } = useContext(AppContext);
   const [
@@ -34,6 +37,11 @@ export const Application = () => {
   ] = useState(false);
 
   const stateRef = useRef(state);
+
+  useEffect(() => {
+    console.log("✅ waitForUserInputDialog changed to:", waitForUserInputDialog);
+  }, [waitForUserInputDialog]);
+
 
   useEffect(() => {
     // Wait for savedXApi.DEBUG to be set
@@ -139,9 +147,19 @@ export const Application = () => {
       setOpenConfigDialog(true);
     };
 
+
     const waitForUserInteractionEventListener = (event) => {
-      debugger;
-    }
+      console.log("⚡ Received WAIT_FOR_USER_ACTION event:", event.detail);
+
+      setWaitForUserInputDialog(prevState => {
+        console.log("🔄 Previous state before update:", prevState);
+        return true;
+      });
+
+      setForceUpdate((prev) => prev + 1); // 🔥 Forces a re-render
+
+      console.log("🔍 State after update (should be true):", waitForUserInputDialog);
+    };
 
     const checkSavedTweetEventListener = (event) => {
       const tweetUrl = event.detail;
@@ -224,6 +242,10 @@ export const Application = () => {
     setDeleteAllSavedTweetsConfirmationDialogOpen(false);
   };
 
+  const handleCloseWaitForUserInputDialog = () => {
+    setWaitForUserInputDialog(false);
+  };
+
   const handleConfirmDeleteSavedTweetsAction = async () => {
     const tweetsDeleteResult = await window.savedXApi.deleteAllSavedTweets();
     handleCloseConfirmDeleteSavedTweetsDialog();
@@ -242,6 +264,14 @@ export const Application = () => {
         "Tweets were not deleted: " + tweetsDeleteResult.errorMessage
       );
     }
+  };
+  const handleConfirmWaitForUserInputDialog = async () => {
+    // gota now ping the main process
+    debugger;
+    console.log("@ handleConfirmWaitForUserInputDialog");
+    window.savedXApi.xbotContinue();
+    // then close the dialog
+    handleCloseWaitForUserInputDialog();
   };
 
   async function goFetchTweets() {
@@ -312,6 +342,18 @@ export const Application = () => {
         />
       )}
 
+      {console.log("🛠 Rendering ConfirmationDialog, open:", waitForUserInputDialog)}
+      {waitForUserInputDialog && (
+        <ConfirmationDialog
+          key={waitForUserInputDialog ? "open" : "closed"}
+          open={waitForUserInputDialog}
+          handleClose={handleCloseWaitForUserInputDialog}
+          handleConfirm={handleConfirmWaitForUserInputDialog}
+          title="Bro, the browser needs you."
+          message="Please solve the captcha or do whatever the browser is requiring you to do and when you're done, click the button below. Thanks."
+        />
+      )}
+
       {openConfigDialog && (
         <ConfigDialog
           open={openConfigDialog}
@@ -343,6 +385,17 @@ export const Application = () => {
             onClick={goFetchTweets}
           >
             Go fetch tweets
+          </button>
+        </div>
+
+        <div className="text-center my-4">
+          <button
+            className="btn btn-blue"
+            onClick={() => {
+              setWaitForUserInputDialog(true);
+            }}
+          >
+            open wait user confirmation dialog
           </button>
         </div>
 

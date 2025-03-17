@@ -1,6 +1,6 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-import { ipcRenderer, contextBridge, shell } from "electron";
+import { ipcRenderer, contextBridge, shell, clipboard } from "electron";
 import * as common from "./util/common.mjs";
 
 let domContentLoaded = false;
@@ -38,6 +38,11 @@ function safeDispatch(eventType, message) {
   }
 }
 
+contextBridge.exposeInMainWorld("e", {
+  copy: (text) => clipboard.writeText(text),
+  paste: () => clipboard.readText(),
+});
+
 /// Single object to expose all APIs
 const api = {
   goFetchTweets: () => ipcRenderer.invoke("go-fetch-tweets"),
@@ -57,6 +62,11 @@ const api = {
     common.debugLog(api.DEBUG, "reportFoundTweet() reportObj:", JSON.stringify(reportObj));
     ipcRenderer.send("report-found-tweet", reportObj);
   },
+  xbotContinue: () => {
+    common.debugLog("@ xBotContinue");
+    ipcRenderer.invoke("xbot-continue");
+  },
+
 };
 
 // ✅ DEBUG: Log all IPC events sent to preload.mjs
