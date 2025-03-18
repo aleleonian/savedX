@@ -144,12 +144,15 @@ export const Progress = ({ whichState }) => {
         )}
 
         {waitForUserInputDialog && (
-          <ConfirmationDialog
-            open={waitForUserInputDialog}
-            handleClose={handleCloseWaitForUserInputDialog}
-            handleConfirm={handleConfirmWaitForUserInputDialog}
+          <AlertDialog
+            openFlag={waitForUserInputDialog}
             title="Bro, the browser needs you."
-            message="Please solve the captcha or do whatever the browser is requiring you to do and when you're done, click the button below. Thanks."
+            message="Please solve the captcha or do whatever the browser is requiring you to do and when you're done, click the 'OK' button below. Thanks."
+            cleanUp={() => {
+              setAlertTitle(null);
+              setAlertMessage(null);
+              handleConfirmWaitForUserInputDialog();
+            }}
           />
         )}
 
