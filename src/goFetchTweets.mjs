@@ -72,7 +72,8 @@ export async function goFetchTweets(xBot, configData) {
         encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN),
       );
       await localBot.wait(3000);
-      await localBot.goto("https://twitter.com/i/bookmarks");
+      const targetWebsite = process.env.TARGET_WEBSITE.replace(/\/$/, "");
+      await localBot.goto(targetWebsite + "/i/bookmarks");
       showProgress(
         encode(
           constants.progress.INIT_PROGRESS,
@@ -109,7 +110,7 @@ export async function goFetchTweets(xBot, configData) {
           `error--Error scraping bookmarks! 😫 : ${error}`,
         );
       }
-      await localBot.logOut();
+      // await localBot.logOut();
       showProgress(
         encode(
           constants.progress.INIT_PROGRESS,

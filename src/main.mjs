@@ -94,6 +94,7 @@ if (result.error) {
     JSON.stringify(result.parsed)
   );
 }
+
 common.debugLog("envPath->", envPath);
 common.debugLog("process.env.MEDIA_FOLDER->", process.env.MEDIA_FOLDER);
 common.debugLog("process.env.APP_FOLDER ->", process.env.APP_FOLDER);
