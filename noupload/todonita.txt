@@ -28,3 +28,5 @@
 + que siempre sea headful el pupeteer pero que la visibilidad de la ventana se controle por código
 
 + xbotContinue tiene que chequear si estás en la home (si ya se resolvió el tema del captcha) o no para poder ver si continúa o no
+
++ que sea configurable el persistir la sesión y no logoutear en ese caso. 
