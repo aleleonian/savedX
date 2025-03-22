@@ -19,11 +19,13 @@ export async function goFetchTweets(xBot, configData) {
   localBot.botEmail = configData.TWITTER_BOT_EMAIL;
   localBot.downloadMedia = configData.DOWNLOAD_MEDIA;
   localBot.deleteOnlineBookmarks = configData.DELETE_ONLINE_BOOKMARKS;
+  localBot.persistXLogin = configData.PERSIST_X_LOGIN;
 
   common.debugLog("localBot.botUsername->", localBot.botUsername);
   common.debugLog("localBot.botPassword->", localBot.botPassword);
   common.debugLog("localBot.botEmail->", localBot.botEmail);
   common.debugLog("localBot.downloadMedia->", localBot.downloadMedia);
+  common.debugLog("localBot.persistXLogin->", localBot.persistXLogin);
 
   if (localBot.downloadMedia) {
     const checkDependenciesResponse = await common.checkDependencies();
@@ -56,7 +58,7 @@ export async function goFetchTweets(xBot, configData) {
     }
   }
 
-  let result = await localBot.init();
+  let result = await localBot.init(localBot.persistXLogin);
 
   if (result.success) {
     showProgress(

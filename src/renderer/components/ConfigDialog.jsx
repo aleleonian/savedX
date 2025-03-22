@@ -50,6 +50,7 @@ export function ConfigDialog({ open, onClose, configData }) {
     email: configData?.TWITTER_BOT_EMAIL ?? "",
     downloadMedia: configData?.DOWNLOAD_MEDIA ?? false,
     deleteOnlineBookmarks: configData?.DELETE_ONLINE_BOOKMARKS ?? false,
+    persistXLogin: configData?.PERSIST_X_LOGIN ?? false,
   });
 
   const handleChange = (e) => {
@@ -57,6 +58,8 @@ export function ConfigDialog({ open, onClose, configData }) {
     if (name == "downloadMedia") {
       value = e.target.checked;
     } else if (name == "deleteOnlineBookmarks") {
+      value = e.target.checked;
+    } else if (name == "persistXLogin") {
       value = e.target.checked;
     }
     setFormData({ ...formData, [name]: value });
@@ -123,7 +126,7 @@ export function ConfigDialog({ open, onClose, configData }) {
                 id="config-form"
                 sx={{ mt: 3, width: "100%" }}
               >
-                <Typography variant="h5">Configure your account:</Typography>
+                <Typography variant="h6">Configure your account:</Typography>
 
                 <TextField
                   fullWidth
@@ -158,7 +161,7 @@ export function ConfigDialog({ open, onClose, configData }) {
                   required
                 />
                 <br />
-                <Typography variant="h5">Download tweets media ?</Typography>
+                <Typography variant="h6">Download tweets media ?</Typography>
                 <Checkbox
                   checked={formData.downloadMedia}
                   onChange={handleChange}
@@ -166,7 +169,7 @@ export function ConfigDialog({ open, onClose, configData }) {
                   name="downloadMedia"
                 />
                 <br />
-                <Typography variant="h5">
+                <Typography variant="h6">
                   Delete online bookmarks after save?
                 </Typography>
                 <Checkbox
@@ -174,6 +177,16 @@ export function ConfigDialog({ open, onClose, configData }) {
                   onChange={handleChange}
                   color="primary"
                   name="deleteOnlineBookmarks"
+                />
+                <br />
+                <Typography variant="h6">
+                  Persist X login
+                </Typography>
+                <Checkbox
+                  checked={formData.persistXLogin}
+                  onChange={handleChange}
+                  color="primary"
+                  name="persistXLogin"
                 />
               </Box>
             </Box>
