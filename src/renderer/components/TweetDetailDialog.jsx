@@ -45,7 +45,6 @@ export function TweetDetailDialog({
   updateTweetAndTagsLocally,
 }) {
   const isOpenRef = useRef(open);
-
   useEffect(() => {
     isOpenRef.current = open; // Update the ref whenever `open` changes
   }, [open]);
@@ -82,6 +81,8 @@ export function TweetDetailDialog({
   }, [tweetData]); // Dependency array to rerun when tweetData changes
 
   if (tweetData == null) return null;
+
+  const tweetUrl = "https://x.com" + tweetData.tweetUrl;
 
   const setTweetsData = (savedTweetsArray) => {
     updateState("savedTweets", savedTweetsArray);
@@ -260,18 +261,7 @@ export function TweetDetailDialog({
                       alt="tweet image"
                     />
                   </a>
-                ) : (
-                  <a
-                    href={tweetData.tweetUrl}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleClick(tweetData.tweetUrl);
-                    }}
-                    className="text-blue-500"
-                  >
-                    Tweet Url
-                  </a>
-                )
+                ) : ""
               ) : tweetData.hasLocalMedia == "image" ? (
                 //TODO: make this localhost:3000 dynamic and sent from the main process
                 <img
@@ -285,6 +275,21 @@ export function TweetDetailDialog({
                   videoSrc={`http://localhost:3000/media/${tweetData.tweetUrlHash}.mp4`}
                 />
               )}
+              <br />
+              <div className="flex items-center">
+
+                <a
+                  href={tweetData.tweetUrl}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleClick(tweetData.tweetUrl);
+                  }}
+                  className="text-blue-500"
+                >
+                  {tweetUrl}
+                </a>
+
+              </div>
             </div>
           </div>
         </DialogContent>
