@@ -134,6 +134,57 @@ export function changeDownloadMediaConfig() {
   });
 }
 
+export async function updateLastLoggedinUsername(username) {
+  try {
+
+    const sqlStatement = `UPDATE config SET LAST_LOGGED_IN_USERNAME = '${username}';`
+
+    common.debugLog("updateLastLoggedinUsername() sqlStatement->" + sqlStatement);
+
+    const getQueryResponse = await dbTools.runQuery(sqlStatement);
+
+    common.debugLog(
+      process.env.DEBUG,
+      "updateLastLoggedinUsername() getQueryResponse->",
+      JSON.stringify(getQueryResponse),
+    );
+    if (getQueryResponse.success) {
+      return (common.createSuccessResponse());
+    } else {
+      return (common.createErrorResponse(getQueryResponse.errorMessage));
+    }
+  } catch (error) {
+    common.debugLog(
+      process.env.DEBUG,
+      "updateLastLoggedinUsername() error: ",
+      JSON.stringify(error),
+    );
+    return (common.createErrorResponse(error.errorMessage));
+  }
+}
+
+export async function getLastLoggedinUsername() {
+  try {
+    const getQueryResponse = await dbTools.getQuery(
+      "SELECT LAST_LOGGED_IN_USERNAME from config",
+    );
+    const data = getQueryResponse.data;
+    if (
+      data.LAST_LOGGED_IN_USERNAME
+    ) {
+      return (createSuccessResponse(data.LAST_LOGGED_IN_USERNAME));
+    } else {
+      return (createErrorResponse("Missing config data 🙈"));
+    }
+  } catch (error) {
+    common.debugLog(
+      process.env.DEBUG,
+      "getLastLoggedinUsername error->",
+      error,
+    );
+    return createErrorResponse(error.errorMessage ? error.errorMessage : JSON.stringify(error));
+  }
+}
 // DEPRECATED
 // export function changeDeleteOnlineBookmarksConfig() {
 //   return new Promise((resolve) => {

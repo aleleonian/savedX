@@ -131,7 +131,8 @@ const createIfNotExist = async (filePath) => {
       "TWITTER_BOT_EMAIL"	INTEGER NOT NULL,
       "DOWNLOAD_MEDIA"	NUMERIC NOT NULL DEFAULT 0,
       "DELETE_ONLINE_BOOKMARKS"	NUMERIC NOT NULL DEFAULT 0
-      "PERSIST_X_LOGIN" NUMERIC NOT NULL DEFAULT 1)
+      "PERSIST_X_LOGIN" NUMERIC NOT NULL DEFAULT 1
+      "LAST_LOGGED_IN_USERNAME" TEXT)
      `);
 
       common.debugLog("Database schema initialized.");

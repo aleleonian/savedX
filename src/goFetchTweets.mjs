@@ -1,7 +1,7 @@
 import * as constants from "./util/constants.mjs";
 import * as dbTools from "./util/db.mjs";
 import * as common from "./util/common.mjs";
-import { changeDownloadMediaConfig } from "./util/account.mjs";
+import { changeDownloadMediaConfig, updateLastLoggedinUsername, getLastLoggedinUsername } from "./util/account.mjs";
 import { sendMessageToMainWindow, encode } from "./util/messaging.mjs";
 
 let localBot;
@@ -58,7 +58,22 @@ export async function goFetchTweets(xBot, configData) {
     }
   }
 
-  let result = await localBot.init(localBot.persistXLogin);
+  // here i gotta get the last user logged in
+  // if it's the same as the current one, i shall pass 'false' as the second parameter to .init
+  // if it's different, i shall pass 'true'
+
+  const lastLoggedInUsername = await getLastLoggedinUsername();
+
+  common.debugLog("lastLoggedInUsername->" + JSON.stringify(lastLoggedInUsername));
+
+  // we asume the chrome_data folder does not have to be deleted 
+  let needToDeleteChromeDataFolder = false;
+
+  if (lastLoggedInUsername.data !== localBot.botUsername) {
+    needToDeleteChromeDataFolder = true;
+  }
+
+  let result = await localBot.init(localBot.persistXLogin, needToDeleteChromeDataFolder);
 
   if (result.success) {
     showProgress(
@@ -70,6 +85,12 @@ export async function goFetchTweets(xBot, configData) {
       localBot.botEmail,
     );
     if (result.success) {
+      const updateLastLoggedinUsernameResult = await updateLastLoggedinUsername(localBot.botUsername);
+
+      if (!updateLastLoggedinUsernameResult.success) {
+        common.debugLog("updateLastLoggedinUsername() failed!");
+      }
+
       showProgress(
         encode(constants.progress.INIT_PROGRESS, constants.progress.LOGGED_IN),
       );
