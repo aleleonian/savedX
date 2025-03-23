@@ -2,7 +2,10 @@ import { builtinModules } from "node:module";
 import pkg from "./package.json";
 
 const builtins = ["electron", ...builtinModules.map(m => [m, `node:${m}`]).flat()];
-const external = [...builtins, ...Object.keys(pkg.dependencies || {})];
+const allDeps = Object.keys(pkg.dependencies || {});
+const depsToBundle = ['xbot-js']; // Add any others you want to bundle
+const externalDeps = allDeps.filter(dep => !depsToBundle.includes(dep));
+const external = [...builtins, ...externalDeps];
 
 /** @type {(env: import('vite').ConfigEnv) => import('vite').UserConfig} */
 export const getBuildConfig = (env) => ({

@@ -72,6 +72,6 @@
     "react-draggable": "^4.4.6",
     "react-loader-spinner": "^6.1.6",
     "sqlite3": "^5.1.7",
-    "xbot-js": "^1.1.2"
+    "xbot-js": "^1.1.3"
   }
 }
