@@ -3,15 +3,14 @@
   "productName": "savedX",
   "version": "1.0.0",
   "description": "The X bookmark manager",
-  "main": ".vite/build/main.mjs",
+  "main": "src/main.mjs",
   "type": "module",
   "license": "MIT",
   "scripts": {
     "dev": "vite --config vite.config.js",
-    "start": "npm run build:main && npm run build:renderer && electron .vite/build/main.mjs",
-    "package": "npm run build:main && npm run build:renderer && electron-packager . .vite/build/main.mjs --platform=darwin --arch=arm64 --overwrite --out=out",
+    "start": "npm run build:renderer && electron .",
+    "package": "npm run build:renderer && electron-packager . savedX --platform=darwin --arch=arm64 --overwrite --out=out",
     "build:renderer": "vite build --config vite.config.js",
-    "build:main": "mkdir -p .vite/build && cp src/main.mjs .vite/build/main.mjs",
     "lint": "eslint --ignore-pattern 'noupload/*' --ignore-pattern '.vite/*'",
     "format": "prettier --write \"src/**/*.{js,jsx}\""
   },
@@ -40,7 +39,7 @@
     "react-draggable": "^4.4.6",
     "react-loader-spinner": "^6.1.6",
     "sqlite3": "^5.1.7",
-    "xbot-js": "file:../../xbot/xbot-js-1.1.7.tgz"
+    "xbot-js": "^1.1.8"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.3",
