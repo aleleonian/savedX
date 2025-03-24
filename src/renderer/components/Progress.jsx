@@ -4,10 +4,10 @@ import { AlertDialog } from "./AlertDialog";
 import Button from "@mui/material/Button";
 import { Notification } from "./Notification";
 import { ConfirmationDialog } from "./ConfirmationDialog"; // Adjust the import path based on your folder structure
-import dialUpImage from "/src/assets/images/dialup.smaller.gif";
-import doneImage from "/src/assets/images/done.resized.webp";
-import superMarioImage from "/src/assets/images/super.mario.1.resized.webp";
-import whiteNoiseImage from "/src/assets/images/white.noise.resized.webp";
+import dialUpImage from "../../assets/images/dialup.smaller.gif";
+import doneImage from "../../assets/images/done.resized.webp";
+import superMarioImage from "../../assets/images/super.mario.1.resized.webp";
+import whiteNoiseImage from "../../assets/images/white.noise.resized.webp";
 
 export const Progress = ({ whichState }) => {
   const [notificationMessage, setNotificationMessage] = useState(null);

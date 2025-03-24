@@ -4,50 +4,17 @@
   "version": "1.0.0",
   "description": "The X bookmark manager",
   "main": ".vite/build/main.mjs",
-  "config": {
-    "forge": "./forge.config.cjs"
-  },
-  "scripts": {
-    "start": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=true DEBUG=true electron .vite/build/main.mjs",
-    "dev": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=true DEBUG=true electron-forge start",
-    "package": "electron-forge package",
-    "build": "vite build && electron-forge package",
-    "purge-build": "rm -rf .vite && npm run build",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint --ignore-pattern 'noupload/*'  --ignore-pattern '.vite/*'",
-    "format": "prettier --write \"src/**/*.{js,jsx}\""
-  },
-  "devDependencies": {
-    "@electron-forge/cli": "^7.6.1",
-    "@electron-forge/maker-deb": "^7.3.1",
-    "@electron-forge/maker-rpm": "^7.3.1",
-    "@electron-forge/maker-squirrel": "^7.3.1",
-    "@electron-forge/maker-zip": "^7.3.1",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.3.1",
-    "@electron-forge/plugin-fuses": "^7.2.0",
-    "@electron-forge/plugin-vite": "^7.3.1",
-    "@electron/fuses": "^1.7.0",
-    "cross-env": "^7.0.3",
-    "electron": "29.2.0",
-    "electron-rebuild": "^3.2.9",
-    "eslint": "^9.9.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.37.2",
-    "globals": "^15.9.0",
-    "tailwindcss": "^3.4.3",
-    "vite": "^5.0.12"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.6.1"
-  },
-  "keywords": [],
-  "author": {
-    "name": "Alejandro Leonian",
-    "email": "66581753+aleleonian@users.noreply.github.com"
-  },
   "type": "module",
   "license": "MIT",
+  "scripts": {
+    "dev": "vite --config vite.config.js",
+    "start": "npm run build:main && npm run build:renderer && electron .vite/build/main.mjs",
+    "package": "npm run build:main && npm run build:renderer && electron-packager . .vite/build/main.mjs --platform=darwin --arch=arm64 --overwrite --out=out",
+    "build:renderer": "vite build --config vite.config.js",
+    "build:main": "mkdir -p .vite/build && cp src/main.mjs .vite/build/main.mjs",
+    "lint": "eslint --ignore-pattern 'noupload/*' --ignore-pattern '.vite/*'",
+    "format": "prettier --write \"src/**/*.{js,jsx}\""
+  },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -59,6 +26,7 @@
     "crypto": "^1.0.1",
     "dompurify": "^3.1.0",
     "dotenv": "^16.4.5",
+    "electron": "29.2.0",
     "electron-log": "^5.2.4",
     "electron-squirrel-startup": "^1.0.0",
     "express": "^4.21.1",
@@ -72,6 +40,16 @@
     "react-draggable": "^4.4.6",
     "react-loader-spinner": "^6.1.6",
     "sqlite3": "^5.1.7",
-    "xbot-js": "^1.1.3"
+    "xbot-js": "file:../../xbot/xbot-js-1.1.7.tgz"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.3",
+    "electron-packager": "^17.1.1",
+    "eslint": "^9.9.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.37.2",
+    "globals": "^15.9.0",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.0.12"
   }
 }
