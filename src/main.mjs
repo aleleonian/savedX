@@ -193,7 +193,8 @@ const createWindow = () => {
   // and load the index.html of the app.
 
   const isDev = process.env.NODE_ENV === "development";
-  const viteName = process.env.MAIN_WINDOW_VITE_NAME || "main_window"; // Ensure this matches the correct folder
+  common.debugLog("isDev->" + isDev);
+  const viteName = process.env.MAIN_WINDOW_VITE_NAME || ""; // Ensure this matches the correct folder
   const appUrl = isDev
     ? "http://localhost:5173" // Load Vite dev server in development mode
     : `file://${path.join(__dirname, `../.vite/renderer/${viteName}/index.html`)}`; // Load built file in production
@@ -234,7 +235,7 @@ app.whenReady().then(async () => {
 
   if (process.env.NODE_ENV === "development") {
     common.debugLog("Waiting for Vite dev server...");
-    const viteReady = await waitForVite();
+    const viteReady = await waitForVite(5173, 5000);
     if (!viteReady) {
       console.error("Vite dev server is not running! Exiting.");
       app.quit();
