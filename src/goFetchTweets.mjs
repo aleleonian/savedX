@@ -73,7 +73,7 @@ export async function goFetchTweets(xBot, configData) {
     needToDeleteChromeDataFolder = true;
   }
 
-  let result = await localBot.init(localBot.persistXLogin, needToDeleteChromeDataFolder);
+  let result = await localBot.init(process.env.APP_FOLDER, localBot.persistXLogin, needToDeleteChromeDataFolder);
 
   if (result.success) {
     showProgress(

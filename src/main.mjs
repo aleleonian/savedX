@@ -192,13 +192,17 @@ const createWindow = () => {
 
   // and load the index.html of the app.
 
+  common.debugLog("Running from:", __dirname);
+  common.debugLog("Resolved path:", path.join(__dirname, "../dist/index.html"));
+  
+  //TODO: voy por aquí, como hago bien lo de appUrl
   const isDev = process.env.NODE_ENV === "development";
   common.debugLog("isDev->" + isDev);
   const viteName = process.env.MAIN_WINDOW_VITE_NAME || ""; // Ensure this matches the correct folder
   const appUrl = isDev
-    ? "http://localhost:5173" // Load Vite dev server in development mode
-    : `file://${path.join(__dirname, `../.vite/renderer/${viteName}/index.html`)}`; // Load built file in production
-
+    ? "http://localhost:5173"
+    : `file://${path.join(__dirname, "../dist/index.html")}`;
+    
   common.debugLog(`Loading URL: ${appUrl}`);
   mainWindow.loadURL(appUrl);
 
