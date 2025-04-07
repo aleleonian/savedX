@@ -73,7 +73,7 @@ if (!fs.existsSync(process.env.MEDIA_FOLDER)) {
   fs.mkdirSync(process.env.MEDIA_FOLDER, { recursive: true });
 }
 
-import { startExpressServer } from "./webserver.mjs";
+import { startExpressServer, stopExpressServer } from "./webserver.mjs";
 import * as dbTools from "./util/db.mjs";
 import * as common from "./util/common.mjs";
 import {
@@ -156,6 +156,7 @@ const createWindow = () => {
 
   mainWindow.on("closed", () => {
     mainWindow = null;
+    app.quit();
   });
 
   mainWindow.webContents.on("did-finish-load", () => {
@@ -194,7 +195,7 @@ const createWindow = () => {
 
   common.debugLog("Running from:", __dirname);
   common.debugLog("Resolved path:", path.join(__dirname, "../dist/index.html"));
-  
+
   //TODO: voy por aquí, como hago bien lo de appUrl
   const isDev = process.env.NODE_ENV === "development";
   common.debugLog("isDev->" + isDev);
@@ -202,7 +203,7 @@ const createWindow = () => {
   const appUrl = isDev
     ? "http://localhost:5173"
     : `file://${path.join(__dirname, "../dist/index.html")}`;
-    
+
   common.debugLog(`Loading URL: ${appUrl}`);
   mainWindow.loadURL(appUrl);
 
@@ -332,20 +333,14 @@ app.on("activate", () => {
   }
 });
 
-// app.on("ready", () => {
-//   if (process.env.DEBUG) {
-//     startExpressServer(xBot); // Start the Express server here
-//   }
-// });
-
 app.on("window-all-closed", () => {
   app.quit();
 });
 
-app.on("before-quit", () => {
-  // Your code to run before the app process exits
-  dbTools.closeDb();
+app.on("before-quit", async () => {
   // Save data, perform cleanup, etc.
+  dbTools.closeDb();
+  await stopExpressServer();
 });
 
 ipcMain.handle("fetch-config-data", async () => {

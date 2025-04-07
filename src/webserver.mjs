@@ -1,10 +1,12 @@
 import * as common from "./util/common.mjs";
 import express from "express";
+import getPort from "get-port";
 
 let xBotPointer;
+let serverInstance;
 
 // Function to Start the Express Server
-export const startExpressServer = (xBot) => {
+export const startExpressServer = async (xBot) => {
   common.debugLog("web server started!");
   xBotPointer = xBot;
   const server = express();
@@ -37,11 +39,40 @@ export const startExpressServer = (xBot) => {
     }
   });
 
-  const port = process.env.PORT || 3000;
-  server.listen(port, () => {
-    common.debugLog(
-      process.env.DEBUG,
-      `Express server running at http://localhost:${port}`,
-    );
+  // 🌈 Pick a port, default to 3000, but find another if it's busy
+  const preferredPort = Number(process.env.PORT) || 3000;
+  const port = await getPort({ port: preferredPort });
+
+  // 🔐 Store the chosen port back into process.env
+  process.env.PORT = port;
+
+  try {
+    serverInstance = server.listen(port, () => {
+      common.debugLog(
+        `✅ Express server running at http://localhost:${port}`
+      );
+    });
+
+    serverInstance.on("error", (err) => {
+      common.debugLog("❌ Server error:", err);
+    });
+
+    return serverInstance;
+  } catch (err) {
+    common.debugLog("❌ Failed to start server:", err);
+    return null;
+  }
+};
+
+export const stopExpressServer = () => {
+  return new Promise((resolve, reject) => {
+    if (serverInstance) {
+      serverInstance.close((err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    } else {
+      resolve();
+    }
   });
 };

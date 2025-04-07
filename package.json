@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite --config vite.config.js",
-    "start": "concurrently \"vite --config vite.config.js\" \"wait-on http://localhost:5173 && electron .\"",
+    "start": "concurrently -k -n VITE,ELECTRON -c blue,green \"vite --config vite.config.js\" \"wait-on http://localhost:5173 && electron .\"",
     "package": "rm -rf chrome_data && rm -rf dist && npm run build:renderer && cp -r dist .vite/ && electron-packager . savedX --platform=darwin --arch=arm64 --overwrite --out=out",
     "build:renderer": "vite build --config vite.config.js",
     "lint": "eslint --ignore-pattern 'noupload/*' --ignore-pattern '.vite/*'",
@@ -29,6 +29,7 @@
     "electron-log": "^5.2.4",
     "electron-squirrel-startup": "^1.0.0",
     "express": "^4.21.1",
+    "get-port": "^7.1.0",
     "postcss": "^8.4.38",
     "prettier": "^3.4.2",
     "puppeteer": "^22.6.2",

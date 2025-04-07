@@ -2,7 +2,9 @@
     + de esta manera si yo paro el scraping antes de tiempo, solo se borran las que fueron scrapeadas y no hay que esperar
     hasta el final para que se borren todas. makes more sense.
         + improved this by deleting bookmarks in batches, not all of them together at the end.
-    
+
++ add a 'cancel' button to 'Bro, the browser needs you.'dialog
+
 + dar la opción de guardar una copia del multimedia de los tweets
     + maybe also guardar un snapshot del tweet. 
 
