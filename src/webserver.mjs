@@ -5,22 +5,17 @@ import getPort from "get-port";
 let xBotPointer;
 let serverInstance;
 
-// Function to Start the Express Server
 export const startExpressServer = async (xBot) => {
-  common.debugLog("web server started!");
+  common.debugLog("🌐 Starting web server...");
   xBotPointer = xBot;
   const server = express();
-  // Serve the media files
+
   server.use("/media", express.static(process.env.MEDIA_FOLDER));
-  // Add middleware if needed
   server.use(express.json());
-  // Example route to fetch data
+
   server.get("/debug-xbot", async (req, res) => {
     try {
       common.debugLog("/debug-xbot GET");
-      common.debugLog("xBotPointer->", xBotPointer);
-      // const data = await getQuery("SELECT * FROM config"); // Assume this is your DB helper function
-      // res.json(data);
       await xBotPointer.goto("https://www.latigo.com.ar");
       res.send("/xbot-debug");
     } catch (error) {
@@ -31,8 +26,6 @@ export const startExpressServer = async (xBot) => {
   server.post("/debug-xbot", async (req, res) => {
     try {
       common.debugLog("/debug-xbot POST");
-      // const data = await getQuery("SELECT * FROM config"); // Assume this is your DB helper function
-      // res.json(data);
       res.send("/xbot-debug");
     } catch (error) {
       res.status(500).json({ error: error.message });
