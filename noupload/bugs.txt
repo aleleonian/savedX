@@ -1,3 +1,5 @@
++ something's off because when i scrape the saved tweets and choose to delete, the program does not save (and delete) ALL OF THEM.
+
 + text search and filters only are applied to the current list of tweets being shown and not to ALL of them
 
 + when TWITTER_UNUSUAL_LOGIN_TEXT is found, there's a bug. Make sure this case is handled properly.
@@ -15,3 +17,10 @@
 
 + que durante savedX está scrapeando, vaya guardando los errores para luego desplegarlos todos juntos.
 
++ sometimes this happens and it triggers a 'wait for user interaction' event:
+    [DEBUG] Exception in logIntoX():TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    [ELECTRON] 10:23:58.581 › calling sendMessageToMainWindow
+    [ELECTRON] 10:23:58.582 › 📤 Actually sending LOG_MESSAGE event to renderer. Message: [DEBUG] Exception in logIntoX():TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    [ELECTRON] 10:23:58.582 › ✅ XBOTConstants.XBotEvents.WAIT_FOR_USER_ACTION: X requires your intervention to continue: TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    [ELECTRON] 10:23:58.582 › calling sendMessageToMainWindow
+    [ELECTRON] 10:23:58.582 › 📤 Actually sending WAIT_FOR_USER_ACTION event to renderer. Message: X requires your intervention to continue: TypeError: Cannot read properties of undefined (reading 'toLowerCase')
